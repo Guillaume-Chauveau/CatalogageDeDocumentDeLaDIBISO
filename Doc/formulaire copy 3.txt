@@ -1,0 +1,19 @@
+Article:a:100:1
+Titre:a:100:1
+Auteur:a:100:1
+Complement du titre:a:100:1
+Numero du volume:a:100:1
+Ville:a:100:1
+Editeur:a:100:1
+Annee:a:100:1
+Illustration:a:100:1
+Taille:a:100:1
+Champ Scientifique:Physique:100:1
+Premier Auteur:a:100:1
+Co-Auteur:a:100:1
+Role Auteur:a:100:1
+Role CoAuteur:a:100:1
+Auteur Secondaire:a:100:1
+Role Auteur Secondaire:a:100:1
+Nom de la Collectivite:a:100:1
+Role de la Collectivite:a:100:1

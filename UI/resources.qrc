@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file alias="cross.png">image/cross.png</file>
+        <file alias="pen.png">image/folder--pencil.png</file>
+        <file alias="robot.png">image/robot.png</file>
+    </qresource>
+    <qresource prefix="/image">
+        <file>image/briefe_von_justus_liebig.jpg</file>
+        <file>image/Conférencessurquelquesproblèmesactuelsdelachimiephysiqueetcosmique.jpg</file>
+        <file>image/Influenceexercéesurlesréactionschimiquesparlesagentsphysiquesautresquelachaleur.jpg</file>
+        <file>image/Jubileeofthediscoveryofmauveandofthefoundationofthecoal-tarcolourindustry.jpg</file>
+        <file>image/les_actualites_de_chimie_contemporaine.jpg</file>
+    </qresource>
+</RCC>

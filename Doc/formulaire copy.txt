@@ -1,0 +1,19 @@
+Article:1:16:0
+Titre:2:32:0
+Auteur:3:42:0
+Complement du titre:4:24:0
+Numero du volume:5:100:0
+Ville:6a:100:1
+Editeur:7a:100:0
+Annee:8:24:0
+Illustration:9:96:0
+Taille:10:24:0
+Champ Scientifique:11:99:0
+Premier Auteur:12, a, c:24:0
+Co-Auteur:13, e:24:0
+Role Auteur:14, b, d:24:0
+Role CoAuteur:15, f:24:0
+Auteur Secondaire:16, h:60:0
+Role Auteur Secondaire:17, g:24:0
+Nom de la Collectivite:18:50:0
+Role de la Collectivite:19:24:0
