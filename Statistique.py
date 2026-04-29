@@ -7,7 +7,7 @@ class Statistique:
 
     def __init__(self):
         self.Fiches=os.listdir("./Doc")
-        self.FichesFini= os.listdir("./Sorti")
+        self.FichesFini= os.listdir("./Sortie")
         self.totalCaractéristique=0
         self.totalHumain=0
         self.getRatioHumain()
@@ -25,7 +25,7 @@ class Statistique:
             f.close()
         return self.totalHumain/self.totalCaractéristique
     
-    ## renvoi le pourcentage de complétion des fiches (fiche complaite= fiche qui a eu une sorti)
+    ## renvoi le pourcentage de complétion des fiches (fiche complaite= fiche qui a eu une Sortie)
     def pourcentageFait(self):
         return ((len(self.FichesFini))*100/(len(self.Fiches)))
     

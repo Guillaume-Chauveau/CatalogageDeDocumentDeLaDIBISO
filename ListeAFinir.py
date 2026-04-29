@@ -57,7 +57,7 @@ class ListeAFinir:
         return self.FichesNonFinies
 
     def ajouterFicheNonFinie(self):
-        FichesFini= os.listdir("./Sorti")
+        FichesFini= os.listdir("./Sortie")
         self.FichesNonFinies.clear()
         for i in self.Fiches:
             if i not in FichesFini:

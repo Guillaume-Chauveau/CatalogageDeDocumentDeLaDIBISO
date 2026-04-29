@@ -229,7 +229,7 @@ class Fiche:
                 f.write(f"{self.window.gridLayout.itemAtPosition(i.id,1).widget().text()}:{texte}:{i.getProba()}:{self.window.gridLayout.itemAtPosition(i.id,4).widget().text()}\n")
 
     def exportation(self):
-        chemain=os.path.join(os.path.dirname(__file__), "Sorti", str(self.nomDuFichier))
+        chemain=os.path.join(os.path.dirname(__file__), "Sortie", str(self.nomDuFichier))
         chemain+=".txt"
         print (f"Exportation de la fiche:{chemain}")
         with open(chemain,"w") as f:
