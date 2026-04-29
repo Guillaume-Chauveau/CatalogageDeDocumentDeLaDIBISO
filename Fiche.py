@@ -113,14 +113,18 @@ class Fiche:
 
     def change_color(self,bar):
         value = bar.value()
-        if value > 100:
-            bar.setStyleSheet("QProgressBar { border: 2px solid grey; border-radius: 5px; text-align: center; color: black;} \n QProgressBar::chunk { background-color: blue; }")
-        if value < 50: 
-            bar.setStyleSheet("QProgressBar { border: 2px solid grey; border-radius: 5px; text-align: center; color: black;} \n QProgressBar::chunk { background-color: red ;}")
-        elif value < 80:
-            bar.setStyleSheet(" QProgressBar { border: 2px solid grey; border-radius: 5px; text-align: center; color: black;} \n QProgressBar::chunk { background-color: yellow; }")
+        if value == 100:
+            color = "cyan"
+        elif value <= 30:
+            color = "red"
+        elif value <=50:
+            color = "orange"
+        elif value <= 75:
+            color = "yellow"
         else:
-            bar.setStyleSheet("QProgressBar { border: 2px solid grey; border-radius: 5px; text-align: center; color: black;} \n QProgressBar::chunk { background-color: green; }")
+            color = "green"
+        bar.setStyleSheet("QProgressBar { border: 2px solid grey; border-radius: 5px; text-align: center; color: black;} \n QProgressBar::chunk { background-color: "+color+" ;}")
+
 
     def set_dot_color(self, widget, value):
         if value == 100:

@@ -1,7 +1,7 @@
-Article:1:16:0
-Titre:2:32:0
-Auteur:3:42:0
-Complement du titre:4:24:0
+Article:1:0:0
+Titre:2:26:0
+Auteur:3:51:0
+Complement du titre:4:76:0
 Numero du volume:5:100:0
 Ville:6a:100:1
 Editeur:7a:100:0
