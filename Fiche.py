@@ -82,9 +82,9 @@ class Fiche:
 
     def lecture(self,page):
         print(self.chemainOrigine)
-        page+=".txt"
-        print(f"lecture de la page: {page}")
-        with open(page, "r") as f:
+        pageL= page+".txt"
+        print(f"lecture de la page: {pageL}")
+        with open(pageL, "r") as f:
             for line in f:
                 label_text, field_text, proba, edit = line.strip().split(":")
                 for i in self.listeDesCaracteristiques:
@@ -265,7 +265,7 @@ class Fiche:
         view = self.window.graphicsView
         view.resetTransform()
 
-    def ActualiserValeur(self):
+    def actualiserValeur(self):
         for i in self.listeDesCaracteristiques:
             #print(f"Actualisation de la valeur de la ligne {i.id} : {i.getValeur()}")
             field_item = self.window.gridLayout.itemAtPosition((i.id), 2)
@@ -319,5 +319,5 @@ class Fiche:
     
     
 
-def getlisteDesNom():
+def getlisteDesNoms():
     return ["Article","Titre","Auteur","Complement du titre","Numero du volume","Ville","Editeur","Annee","Illustration","Taille","Champ Scientifique","Premier Auteur","Co-Auteur","Role Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire","Nom de la Collectivite","Role de la Collectivite"]

@@ -13,7 +13,7 @@ class ListeAFinir:
     def __init__(self,w):
         self.window=w
         self.window.setWindowTitle("Catalogue de documents")
-        self.ajouterFiche()
+        self.ajouterFicheAuto()
         self.ajouterFicheNonFinie()
         self.creerCatalogueNonFini()
         
@@ -50,7 +50,7 @@ class ListeAFinir:
     def addFiche(self,fiche):
         self.Fiches.append(fiche)
     
-    def ajouterFiche(self):
+    def ajouterFicheAuto(self):
         self.Fiches=os.listdir("./Doc")
 
     def getFichesNonFinies(self):

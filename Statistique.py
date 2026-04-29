@@ -32,7 +32,7 @@ class Statistique:
     ##fonction auxiliaire de caracteristiquesLesPlusAutomatique pour initialiser le dictionnaire et le remplire
     def ratioParCaracteristiques(self):
         d={}
-        for i in F.getlisteDesNom():
+        for i in F.getlisteDesNoms():
             d[i]=self.ratioParCaracteristique(i)
         return d
     

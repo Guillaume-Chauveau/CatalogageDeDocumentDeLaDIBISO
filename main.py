@@ -128,7 +128,7 @@ def ajouterBoutonFormulaire(w):
         if w.window.gridLayout.itemAtPosition(i,2)!=None:
             field = w.window.gridLayout.itemAtPosition(i,2).widget()
             if isinstance(field, QtWidgets.QLineEdit):
-                field.textChanged.connect(lambda: w.change_edit(w.ActualiserValeur()))
+                field.textChanged.connect(lambda: w.change_edit(w.actualiserValeur()))
             #print(f"connection entre le champ de texte et la fonction change_edit pour la ligne {i}")
 
 def afficherRenduFormulaire(fiche=None):

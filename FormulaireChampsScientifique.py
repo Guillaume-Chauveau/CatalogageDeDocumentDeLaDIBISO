@@ -4,15 +4,15 @@ from PySide6 import QtGui, QtWidgets
 class FormulaireChampsScientifique:
     def __init__(self,window,fiche):
         self.window=window
-        self.mainwindow_setup()
+        self.formulaireChampsScientifique_setup()
         self.fiche=fiche
         self.chargerChampsScientifiques()
         self.remplirFormulaire()
     # Liste partagée des champs scientifiques
     champs_scientifiques = ["Champs Scientifique", "Physique"]
 
-    def mainwindow_setup(self):
-        self.window.setWindowTitle("MainWindow Title")
+    def formulaireChampsScientifique_setup(self):
+        self.window.setWindowTitle("Formulaire Champs Scientifique")
         self.window.ChampsScientifiquePlus.clicked.connect(lambda: self.ajouterUnChamp())
         self.window.ChampsScientifiqueMoins.clicked.connect(lambda: self.removeLastRow())
         self.window.NouveauChampsScientifiqueValider.clicked.connect(lambda: self.validerNouveauChamp())
@@ -76,6 +76,7 @@ class FormulaireChampsScientifique:
         with open("champs_scientifiques.txt", "w") as f:
             for champ in self.champs_scientifiques:
                 f.write(champ + "\n")
+
     def chargerChampsScientifiques(self):
         # Charger la liste des champs scientifiques depuis un fichier
         try:

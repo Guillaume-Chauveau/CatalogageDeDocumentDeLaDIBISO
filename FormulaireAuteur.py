@@ -8,12 +8,12 @@ import os
 class FormulaireAuteur:
     def __init__(self,window,fiche):
         self.window=window
-        self.mainwindow_setup()
+        self.FormulaireAuteur_setup()
         self.fiche=fiche
         self.remplirFormulaire()
 
-    def mainwindow_setup(self):
-        self.window.setWindowTitle("MainWindow Title")
+    def FormulaireAuteur_setup(self):
+        self.window.setWindowTitle("Formulaire Auteur")
         self.window.AuteurPlus.clicked.connect(lambda: self.ajouterUnChamp("Auteur"))
         self.window.AuteurMoins.clicked.connect(lambda: self.removeLastRow("Auteur"))
         self.window.CoAuteurPlus.clicked.connect(lambda: self.ajouterUnChamp("CoAuteur"))
