@@ -105,7 +105,7 @@ class Parametre:
                 if isinstance(item, QtWidgets.QCheckBox):
                     item.setChecked(True)
                 i+=1
-            self.listeDesCocher=self.listeAfficher
+            self.listeDesCocher+=self.listeAfficher
             print(self.listeDesCocher)
                 
                 

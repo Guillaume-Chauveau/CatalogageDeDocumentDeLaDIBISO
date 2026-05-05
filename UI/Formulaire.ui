@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>812</width>
+    <width>952</width>
     <height>668</height>
    </rect>
   </property>
@@ -876,7 +876,7 @@ QProgressBar::chunk {
          <item>
           <widget class="QPushButton" name="Restart">
            <property name="text">
-            <string>Recomancer</string>
+            <string>Recommancer</string>
            </property>
           </widget>
          </item>
@@ -890,7 +890,7 @@ QProgressBar::chunk {
          <item>
           <widget class="QPushButton" name="Quiter">
            <property name="text">
-            <string>Quiter</string>
+            <string>Quitter</string>
            </property>
           </widget>
          </item>
@@ -906,7 +906,7 @@ QProgressBar::chunk {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>812</width>
+     <width>952</width>
      <height>33</height>
     </rect>
    </property>

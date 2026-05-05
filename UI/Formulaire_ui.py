@@ -25,7 +25,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(812, 668)
+        MainWindow.resize(952, 668)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.frame = QFrame(self.centralwidget)
@@ -731,7 +731,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 812, 33))
+        self.menubar.setGeometry(QRect(0, 0, 952, 33))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -787,8 +787,8 @@ class Ui_MainWindow(object):
         self.zoomOutButton.setText(QCoreApplication.translate("MainWindow", u"-", None))
         self.Validation.setText(QCoreApplication.translate("MainWindow", u"Fini", None))
         self.Reset.setText(QCoreApplication.translate("MainWindow", u"R\u00e9initialiser", None))
-        self.Restart.setText(QCoreApplication.translate("MainWindow", u"Recomancer", None))
+        self.Restart.setText(QCoreApplication.translate("MainWindow", u"Recommancer", None))
         self.Sauvgarde.setText(QCoreApplication.translate("MainWindow", u"Sauvegarder", None))
-        self.Quiter.setText(QCoreApplication.translate("MainWindow", u"Quiter", None))
+        self.Quiter.setText(QCoreApplication.translate("MainWindow", u"Quitter", None))
     # retranslateUi
 
