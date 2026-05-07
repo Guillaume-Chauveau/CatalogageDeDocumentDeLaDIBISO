@@ -15,6 +15,14 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QFrame" name="frame">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>640</width>
+      <height>480</height>
+     </rect>
+    </property>
     <property name="frameShape">
      <enum>QFrame::Shape::StyledPanel</enum>
     </property>
@@ -26,6 +34,9 @@
       <widget class="QLabel" name="Reponce">
        <property name="text">
         <string>TextLabel</string>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -61,7 +72,7 @@
          <item>
           <widget class="QPushButton" name="BoutonFormulaire">
            <property name="text">
-            <string>voir le formulaire</string>
+            <string>Voir le formulaire</string>
            </property>
           </widget>
          </item>

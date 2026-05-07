@@ -113,9 +113,9 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
-        self.ParametreCommun.setText(QCoreApplication.translate("MainWindow", u"Parametre Commun", None))
-        self.ParametreClassique.setText(QCoreApplication.translate("MainWindow", u"Parametre Classique", None))
-        self.ParametreHebdomadaire.setText(QCoreApplication.translate("MainWindow", u"Parametre Hebdomadaire", None))
+        self.ParametreCommun.setText(QCoreApplication.translate("MainWindow", u"Param\u00e8tres Commun", None))
+        self.ParametreClassique.setText(QCoreApplication.translate("MainWindow", u"Param\u00e8tres Classique", None))
+        self.ParametreHebdomadaire.setText(QCoreApplication.translate("MainWindow", u"Param\u00e8tres Hebdomadaire", None))
         self.ToutVrai.setText(QCoreApplication.translate("MainWindow", u"Tout Vrai", None))
         self.ToutFaux.setText(QCoreApplication.translate("MainWindow", u"Tout Faux", None))
         self.Annuler.setText(QCoreApplication.translate("MainWindow", u"Annuler", None))

@@ -28,12 +28,14 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName(u"centralwidget")
         self.frame = QFrame(self.centralwidget)
         self.frame.setObjectName(u"frame")
+        self.frame.setGeometry(QRect(0, 0, 640, 480))
         self.frame.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame.setFrameShadow(QFrame.Shadow.Raised)
         self.verticalLayout = QVBoxLayout(self.frame)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.Reponce = QLabel(self.frame)
         self.Reponce.setObjectName(u"Reponce")
+        self.Reponce.setWordWrap(True)
 
         self.verticalLayout.addWidget(self.Reponce)
 
@@ -98,7 +100,7 @@ class Ui_MainWindow(object):
         self.Reponce.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
         self.BoutonCopier.setText(QCoreApplication.translate("MainWindow", u"Copier", None))
         self.BoutonExporter.setText(QCoreApplication.translate("MainWindow", u"Exporter", None))
-        self.BoutonFormulaire.setText(QCoreApplication.translate("MainWindow", u"voir le formulaire", None))
+        self.BoutonFormulaire.setText(QCoreApplication.translate("MainWindow", u"Voir le formulaire", None))
         self.BoutonHome.setText(QCoreApplication.translate("MainWindow", u"Page d'accueil", None))
     # retranslateUi
 

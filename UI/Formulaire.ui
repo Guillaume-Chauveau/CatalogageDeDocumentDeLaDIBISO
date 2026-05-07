@@ -876,7 +876,7 @@ QProgressBar::chunk {
          <item>
           <widget class="QPushButton" name="Restart">
            <property name="text">
-            <string>Recommancer</string>
+            <string>Recommencer</string>
            </property>
           </widget>
          </item>
