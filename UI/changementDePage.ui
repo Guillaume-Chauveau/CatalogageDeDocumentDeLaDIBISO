@@ -35,7 +35,7 @@
        <item>
         <widget class="QPushButton" name="Reactualiser">
          <property name="text">
-          <string>Reactualiser</string>
+          <string>Réactualiser</string>
          </property>
         </widget>
        </item>
@@ -49,7 +49,7 @@
        <item>
         <widget class="QPushButton" name="Parametre">
          <property name="text">
-          <string>Parametre</string>
+          <string>Paramètres</string>
          </property>
         </widget>
        </item>
@@ -76,7 +76,7 @@
          <item>
           <widget class="QCheckBox" name="VoirFini">
            <property name="text">
-            <string>Voir les fiche déja traité</string>
+            <string>Voir les fiches déja traitées</string>
            </property>
           </widget>
          </item>

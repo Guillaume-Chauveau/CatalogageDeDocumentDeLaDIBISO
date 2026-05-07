@@ -787,7 +787,7 @@ class Ui_MainWindow(object):
         self.zoomOutButton.setText(QCoreApplication.translate("MainWindow", u"-", None))
         self.Validation.setText(QCoreApplication.translate("MainWindow", u"Fini", None))
         self.Reset.setText(QCoreApplication.translate("MainWindow", u"R\u00e9initialiser", None))
-        self.Restart.setText(QCoreApplication.translate("MainWindow", u"Recommancer", None))
+        self.Restart.setText(QCoreApplication.translate("MainWindow", u"Recommencer", None))
         self.Sauvgarde.setText(QCoreApplication.translate("MainWindow", u"Sauvegarder", None))
         self.Quiter.setText(QCoreApplication.translate("MainWindow", u"Quitter", None))
     # retranslateUi

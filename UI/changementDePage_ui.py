@@ -51,6 +51,11 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2.addWidget(self.Parametre)
 
+        self.AjouterUnFichier = QPushButton(self.frame)
+        self.AjouterUnFichier.setObjectName(u"AjouterUnFichier")
+
+        self.verticalLayout_2.addWidget(self.AjouterUnFichier)
+
 
         self.horizontalLayout.addLayout(self.verticalLayout_2)
 
@@ -95,10 +100,11 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
-        self.Reactualiser.setText(QCoreApplication.translate("MainWindow", u"Reactualiser", None))
+        self.Reactualiser.setText(QCoreApplication.translate("MainWindow", u"R\u00e9actualiser", None))
         self.Statistique.setText(QCoreApplication.translate("MainWindow", u"Statistique", None))
-        self.Parametre.setText(QCoreApplication.translate("MainWindow", u"Parametre", None))
+        self.Parametre.setText(QCoreApplication.translate("MainWindow", u"Param\u00e8tres", None))
+        self.AjouterUnFichier.setText(QCoreApplication.translate("MainWindow", u"Ajouter", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"changez de page", None))
-        self.VoirFini.setText(QCoreApplication.translate("MainWindow", u"Voir les fiche d\u00e9ja trait\u00e9", None))
+        self.VoirFini.setText(QCoreApplication.translate("MainWindow", u"Voir les fiches d\u00e9ja trait\u00e9es", None))
     # retranslateUi
 

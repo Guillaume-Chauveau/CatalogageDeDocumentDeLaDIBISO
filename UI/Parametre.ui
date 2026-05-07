@@ -44,21 +44,21 @@
         <item>
          <widget class="QCheckBox" name="ParametreCommun">
           <property name="text">
-           <string>Parametre Commun</string>
+           <string>Paramètres Commun</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QCheckBox" name="ParametreClassique">
           <property name="text">
-           <string>Parametre Classique</string>
+           <string>Paramètres Classique</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QCheckBox" name="ParametreHebdomadaire">
           <property name="text">
-           <string>Parametre Hebdomadaire</string>
+           <string>Paramètres Hebdomadaire</string>
           </property>
          </widget>
         </item>
