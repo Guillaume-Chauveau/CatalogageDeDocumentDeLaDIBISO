@@ -114,13 +114,13 @@ Gère le catalogue des documents à traiter.
 
 ### Fichiers d'Entrée (LLMOutput/ et Doc/)
 
-Format : `label§valeur§probabilite§edite`
+Format : `label$valeur$probabilite$edite`
 
 Exemple :
 ```
-Titre§Influence des agents physiques§85§0
-Auteur§Liebig, Justus§92§1
-Annee§1850§78§0
+Titre$Influence des agents physiques$85$0
+Auteur$Liebig, Justus$92$1
+Annee$1850$78$0
 ```
 
 ### Format d'Export (Sortie/)
@@ -181,6 +181,11 @@ pip install PySide6
 python main.py
 ```
 
+### Création d'un build
+
+```bash
+pyinstaller editor.spec
+```
 ### Structure des Données
 
 Créer les dossiers suivants dans le répertoire de l'application :

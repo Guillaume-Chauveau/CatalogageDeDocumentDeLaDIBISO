@@ -18,7 +18,7 @@ class Statistique:
             self.chemain = os.path.join(os.path.dirname(__file__), "Doc", str(i))
             with open(self.chemain, "r") as f:
                 for line in f:
-                    label_text, field_text, proba, edit = line.strip().split("§")   
+                    label_text, field_text, proba, edit = line.strip().split("$")   
                     self.totalCaractéristique+=1
                     if edit=="1":
                         self.totalHumain+=1
@@ -45,7 +45,7 @@ class Statistique:
             self.chemain = os.path.join(os.path.dirname(__file__), "Doc", str(f))
             with open(self.chemain, "r") as f:
                 for line in f:
-                    label_text, field_text, proba, edit = line.strip().split("§")
+                    label_text, field_text, proba, edit = line.strip().split("$")
                     if label_text==c:
                         cp+=1
                         if edit=="1":

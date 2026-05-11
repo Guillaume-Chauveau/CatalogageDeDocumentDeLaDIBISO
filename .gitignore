@@ -3,3 +3,5 @@ Doc/
 Scan/
 LLMOutput/
 Sortie/
+build/
+dist/
