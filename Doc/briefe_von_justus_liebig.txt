@@ -1,19 +1,19 @@
-Article: :0:0
-Titre:Briefe von Justus Liebig nach neuen Funden:25:0
-Auteur:herausgegeben von Ernst Berl im Auftrag der Gesellschaft Liebig-Museum in Giessen und der Liebig-Stiftung in Darmstadt:51:0
-Complement du titre: :90:0
-Numero du volume:1 vol. (88 p.):100:0
-Ville:Giessen | Darmstadt:100:1
-Editeur:Selbstverlag der Gesellschaft Liebig-Museum und der Liebighaus Stiftung in Darmstadt:100:0
-Annee:1928:24:0
-Illustration:portr.:95:0
-Taille:25 cm:24:0
-Champ Scientifique::0:0
-Premier Auteur:032441576{{Liebig Justus von (1803-1873)}}:24:0
-Co-Auteur::24:0
-Role Auteur:70:24:0
-Role CoAuteur::24:0
-Auteur Secondaire:034807012{{Berl Ernst (1877-1946)}}:60:0
-Role Auteur Secondaire:340:24:0
-Nom de la Collectivite: :100:0
-Role de la Collectivite: :24:0
+Article§ §0§0
+Titre§Briefe von Justus Liebig nach neuen Funden§25§0
+Auteur§herausgegeben von Ernst Berl im Auftrag der Gesellschaft Liebig-Museum in Giessen und der Liebig-Stiftung in Darmstadt§51§0
+Complement du titre§ §90§0
+Numero du volume§1 vol. (88 p.)§100§0
+Ville§Giessen | Darmstadt§100§1
+Editeur§Selbstverlag der Gesellschaft Liebig-Museum und der Liebighaus Stiftung in Darmstadt§100§0
+Annee§1928§24§0
+Illustration§portr.§95§0
+Taille§25 cm§24§0
+Champ Scientifique§§0§0
+Premier Auteur§032441576{{Liebig Justus von (1803-1873)}}§24§0
+Co-Auteur§§24§0
+Role Auteur§70§24§0
+Role CoAuteur§§24§0
+Auteur Secondaire§034807012{{Berl Ernst (1877-1946)}}§60§0
+Role Auteur Secondaire§340§24§0
+Nom de la Collectivite§ §100§0
+Role de la Collectivite§ §24§0
