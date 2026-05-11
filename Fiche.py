@@ -86,7 +86,8 @@ class Fiche:
         print(f"lecture de la page: {pageL}")
         with open(pageL, "r") as f:
             for line in f:
-                label_text, field_text, proba, edit = line.strip().split("§")
+                print(line)
+                label_text, field_text, proba, edit = line.strip().split("$")
                 for i in self.listeDesCaracteristiques:
                     if i.isCaracteristique(label_text):
                         i.setValeur(field_text)
@@ -230,7 +231,7 @@ class Fiche:
         with open(chemaintmp, "w") as f:
             for i in self.listeDesCaracteristiques:
                 texte = i.getValeur()
-                f.write(f"{self.window.gridLayout.itemAtPosition(i.id,1).widget().text()}:{texte}:{i.getProba()}:{self.window.gridLayout.itemAtPosition(i.id,4).widget().text()}\n")
+                f.write(f"{self.window.gridLayout.itemAtPosition(i.id,1).widget().text()}${texte}${i.getProba()}${self.window.gridLayout.itemAtPosition(i.id,4).widget().text()}\n")
 
     def exportation(self):
         chemain=os.path.join(os.path.dirname(__file__), "Sortie", str(self.nomDuFichier))

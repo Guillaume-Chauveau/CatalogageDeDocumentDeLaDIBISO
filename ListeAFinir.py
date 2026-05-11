@@ -5,6 +5,11 @@ from PySide6.QtWidgets import QFileDialog
 from pathlib import Path
 import shutil
 import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+if hasattr(sys, '_MEIPASS'):
+    BASE_DIR = sys._MEIPASS
+
 class ListeAFinir:
     Fiches = []
     FichesNonFinies =[]
@@ -51,13 +56,13 @@ class ListeAFinir:
         self.Fiches.append(fiche)
     
     def ajouterFicheAuto(self):
-        self.Fiches=os.listdir("./Doc")
+        self.Fiches=os.listdir(os.path.join(BASE_DIR, "Doc"))
 
     def getFichesNonFinies(self):
         return self.FichesNonFinies
 
     def ajouterFicheNonFinie(self):
-        FichesFini= os.listdir("./Sortie")
+        FichesFini= os.listdir(os.path.join(BASE_DIR, "Sortie"))
         self.FichesNonFinies.clear()
         for i in self.Fiches:
             if i not in FichesFini:

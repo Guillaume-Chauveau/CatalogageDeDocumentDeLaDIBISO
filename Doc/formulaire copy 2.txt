@@ -1,19 +1,19 @@
-Article§1§16§1
-Titre§2§32§1
-Auteur§3§42§1
-Complement du titre§4§24§1
-Numero du volume§5§100§1
-Ville§6§24§1
-Editeur§7§60§1
-Annee§8§24§1
-Illustration§9§96§1
-Taille§10§24§1
-Champ Scientifique§Physique§100§1
-Premier Auteur§a§24§TextLabel
-Co-Auteur§§100§1
-Role Auteur§b§24§TextLabel
-Role CoAuteur§§24§TextLabel
-Auteur Secondaire§§24§TextLabel
-Role Auteur Secondaire§§24§TextLabel
-Nom de la Collectivite§§24§TextLabel
-Role de la Collectivite§§24§TextLabel
+Article$1$16$1
+Titre$2$32$1
+Auteur$3$42$1
+Complement du titre$4$24$1
+Numero du volume$5$100$1
+Ville$6$24$1
+Editeur$7$60$1
+Annee$8$24$1
+Illustration$9$96$1
+Taille$10$24$1
+Champ Scientifique$Physique$100$1
+Premier Auteur$a$24$TextLabel
+Co-Auteur$$100$1
+Role Auteur$b$24$TextLabel
+Role CoAuteur$$24$TextLabel
+Auteur Secondaire$$24$TextLabel
+Role Auteur Secondaire$$24$TextLabel
+Nom de la Collectivite$$24$TextLabel
+Role de la Collectivite$$24$TextLabel
