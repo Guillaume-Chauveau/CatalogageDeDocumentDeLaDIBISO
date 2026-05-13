@@ -12,7 +12,7 @@ import CaracteristiqueMultiple as cm
 class Fiche:
     window=None
     listeDesCaracteristiques=[]
-    listeDesNom=["Article","Titre","Auteur","Complement du titre","Numero du volume","Ville","Editeur","Annee","Illustration","Taille","Champ Scientifique","Premier Auteur","Co-Auteur","Role Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire","Nom de la Collectivite","Role de la Collectivite"]
+    listeDesNom=["Article","Titre","Auteur","Complement du titre","Numero du volume","Ville","Editeur","Annee","Volume","Illustration","Taille","Champ Scientifique","Premier Auteur","Co-Auteur","Role Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire","Nom de la Collectivite","Role de la Collectivite"]
     listeDesCaracteristiquesMultiple=["Champ Scientifique","Premier Auteur","Role Auteur","Co-Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire"]
     chemain=""
     nomDuFichier=""
@@ -32,53 +32,63 @@ class Fiche:
         self.chemainOrigine =os.path.join(os.path.dirname(__file__), "LLMOutput", str(nomDuFichier))
         self.nomDuFichier=nomDuFichier
         self.listeDesCaracteristiques = []
-        ligne_index = [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
-        for row, nom in zip(ligne_index, self.listeDesNom):
-            #print(nom+ str(nom in self.listeDesCaracteristiquesMultiple))
-            if nom in self.listeDesCaracteristiquesMultiple:
-                 self.listeDesCaracteristiques.append(cm.CaracteristiqueMultiple(row, nom))
-            else:
-                self.listeDesCaracteristiques.append(c.Caracteristique(row, nom))
-        # Replace QLineEdit with QPushButton for multiple characteristics
-        for i in self.listeDesCaracteristiques:
-            if isinstance(i, cm.CaracteristiqueMultiple):
-                item = self.window.gridLayout.itemAtPosition(i.id, 2)
-                if item:
-                    widget = item.widget()
-                    self.window.gridLayout.removeWidget(widget)
-                    widget.deleteLater()
-                    button = QtWidgets.QPushButton()
-                    self.window.gridLayout.addWidget(button, i.id, 2)
-                    if i.nom == "Champ Scientifique":
-                        button.clicked.connect(lambda checked, f=self: self.afficherChamps(f))
-                    else:
-                        button.clicked.connect(lambda checked, f=self: self.afficherAuteur(f))
-        # Replace QProgressBar with QLabel for dots
-        for i in self.listeDesCaracteristiques:
-            item = self.window.gridLayout.itemAtPosition(i.id, 3)
-            if item:
-                widget = item.widget()
-                if isinstance(widget, QtWidgets.QProgressBar):
-                    self.window.gridLayout.removeWidget(widget)
-                    widget.deleteLater()
-                    label = QtWidgets.QLabel("●")
-                    self.window.gridLayout.addWidget(label, i.id, 3)
-                    self.set_dot_color(label, i.getProba())
-        # cache "edit"
-        for i in self.listeDesCaracteristiques:
-            edit_item = self.window.gridLayout.itemAtPosition(i.id, 4)
-            if edit_item is not None:
-                edit_widget = edit_item.widget()
-                try:
-                    edit_widget.hide()
-                except Exception:
-                    # If hide is not available, set invisible
-                    edit_widget.setVisible(False)
+        self.creerLignesFormulaire()
         self.lecture(self.chemain)
         self.calculeDeLaBareCentrale()
         self.setImage()
 
-    def __str__(self):        return f"Fiche: {self.listeDesCaracteristiques[1].getValeur()} de {self.listeDesCaracteristiques[2].getValeur()} ({self.listeDesCaracteristiques[7].getValeur()})"
+    def clearFormRows(self):
+        for row in range(self.window.gridLayout.rowCount()):
+            for col in range(1, 5):
+                item = self.window.gridLayout.itemAtPosition(row, col)
+                if item is not None:
+                    widget = item.widget()
+                    if widget is not None:
+                        self.window.gridLayout.removeWidget(widget)
+                        widget.deleteLater()
+
+    def creerLignesFormulaire(self):
+        self.clearFormRows()
+        self.listeDesCaracteristiques = []
+        for row, nom in enumerate(self.listeDesNom):
+            if nom in self.listeDesCaracteristiquesMultiple:
+                caracteristique = cm.CaracteristiqueMultiple(row, nom)
+            else:
+                caracteristique = c.Caracteristique(row, nom)
+            self.listeDesCaracteristiques.append(caracteristique)
+
+            label = QtWidgets.QLabel(nom)
+            if isinstance(caracteristique, cm.CaracteristiqueMultiple):
+                field = QtWidgets.QPushButton()
+                if nom == "Champ Scientifique":
+                    field.clicked.connect(lambda checked, f=self: self.afficherChamps(f))
+                else:
+                    field.clicked.connect(lambda checked, f=self: self.afficherAuteur(f))
+            else:
+                field = QtWidgets.QLineEdit()
+
+            dot = QtWidgets.QLabel("●")
+            self.set_dot_color(dot, caracteristique.getProba())
+
+            edit = QtWidgets.QLineEdit("0")
+            edit.setVisible(False)
+
+            self.window.gridLayout.addWidget(label, row, 1)
+            self.window.gridLayout.addWidget(field, row, 2)
+            self.window.gridLayout.addWidget(dot, row, 3)
+            self.window.gridLayout.addWidget(edit, row, 4)
+
+    def __str__(self):        return f"Fiche: {self.getValeurParNom('Titre')} de {self.getValeurParNom('Auteur')} ({self.getValeurParNom('Annee')})"
+
+    def getCaracteristiqueParNom(self, nom):
+        for char in self.listeDesCaracteristiques:
+            if char.isCaracteristique(nom):
+                return char
+        return None
+
+    def getValeurParNom(self, nom):
+        caracteristique = self.getCaracteristiqueParNom(nom)
+        return caracteristique.getValeur() if caracteristique is not None else ""
 
     def lecture(self,page):
         print(self.chemainOrigine)
@@ -150,75 +160,108 @@ class Fiche:
 
     def affichage(self):
         text=""
-        if ((self.listeDesCaracteristiques[0].getValeur()!="") or (self.listeDesCaracteristiques[1].getValeur()!="") or (self.listeDesCaracteristiques[2].getValeur()!="")or(self.listeDesCaracteristiques[3].getValeur()!="")):
-            text+="200 "
-            if self.listeDesCaracteristiques[0].getValeur()!="":
-                text+=("0#$a"+str(self.listeDesCaracteristiques[0].getValeur())+" @"+str(self.listeDesCaracteristiques[1].getValeur()))
+        self.nettoyerCaracteristiques()
+        article = self.getValeurParNom("Article")
+        titre = self.getValeurParNom("Titre")
+        auteur = self.getValeurParNom("Auteur")
+        complement_titre = self.getValeurParNom("Complement du titre")
+        numero_volume = self.getValeurParNom("Numero du volume")
+        ville = self.getValeurParNom("Ville")
+        editeur = self.getValeurParNom("Editeur")
+        annee = self.getValeurParNom("Annee")
+        volume = self.getValeurParNom("Volume")
+        illustration = self.getValeurParNom("Illustration")
+        taille = self.getValeurParNom("Taille")
+        champs_scientifique = self.getCaracteristiqueParNom("Champ Scientifique")
+        premier_auteur = self.getValeurParNom("Premier Auteur")
+        coauteur = self.getValeurParNom("Co-Auteur")
+        role_auteur = self.getValeurParNom("Role Auteur")
+        role_coauteur = self.getValeurParNom("Role CoAuteur")
+        auteur_secondaire = self.getValeurParNom("Auteur Secondaire")
+        role_auteur_secondaire = self.getValeurParNom("Role Auteur Secondaire")
+        collectivite = self.getValeurParNom("Nom de la Collectivite")
+        role_collectivite = self.getValeurParNom("Role de la Collectivite")
+
+        if article != "" or titre != "" or auteur != "" or complement_titre != "":
+            text += "200 "
+            if article != "":
+                text += ("0#$a" + str(article) + " @" + str(titre))
             else:
-                text+=("1#$a"+str(self.listeDesCaracteristiques[1].getValeur()))
-            if self.listeDesCaracteristiques[2].getValeur()!="":
-                text+=("$f"+str(self.listeDesCaracteristiques[2].getValeur()))
-            if self.listeDesCaracteristiques[3].getValeur()!="":
-                text+=("$e"+str(self.listeDesCaracteristiques[3].getValeur()))
-            text+="; "
-        if ((self.listeDesCaracteristiques[4].getValeur()!="") or (self.listeDesCaracteristiques[5].getValeur()!="") or (self.listeDesCaracteristiques[6].getValeur()!="")):
-            text+=("210 ##")
-            if self.listeDesCaracteristiques[4].getValeur()!="":
-                text+=("$a"+str(self.listeDesCaracteristiques[4].getValeur()))
-            if self.listeDesCaracteristiques[5].getValeur()!="":
-                text+=("$c"+str(self.listeDesCaracteristiques[5].getValeur()))
-            if self.listeDesCaracteristiques[6].getValeur()!="":
-                text+=("$d"+str(self.listeDesCaracteristiques[6].getValeur()))
-            text+="; "
-        if ((self.listeDesCaracteristiques[4].getValeur()!="") or (self.listeDesCaracteristiques[5].getValeur()!="") or (self.listeDesCaracteristiques[6].getValeur()!="")):
-            text+=("214 ##")
-            if self.listeDesCaracteristiques[4].getValeur()!="":
-                text+=("$a"+str(self.listeDesCaracteristiques[4].getValeur()))
-            if self.listeDesCaracteristiques[5].getValeur()!="":
-                text+=("$c"+str(self.listeDesCaracteristiques[5].getValeur()))
-            if self.listeDesCaracteristiques[6].getValeur()!="":
-                text+=("$d"+str(self.listeDesCaracteristiques[6].getValeur()))
-            text+="; "
-        if ((self.listeDesCaracteristiques[7].getValeur()!="") or (self.listeDesCaracteristiques[8].getValeur()!="")or (self.listeDesCaracteristiques[9].getValeur()!="")):
-            text+="215 ##"
-            if self.listeDesCaracteristiques[7].getValeur()!="":
-                text+=("$a"+str(self.listeDesCaracteristiques[7].getValeur()))
-            if self.listeDesCaracteristiques[8].getValeur()!="":
-                text+=("$c"+str(self.listeDesCaracteristiques[8].getValeur()))
-            if self.listeDesCaracteristiques[9].getValeur()!="":
-                text+=("$d"+str(self.listeDesCaracteristiques[9].getValeur()))
-            text+="; "
-        if self.listeDesCaracteristiques[10].getValeur()!="":
-            text+=("606 ##$"+str(self.listeDesCaracteristiques[10].getValeurChampsScientifique())+"; ")
-        if ((self.listeDesCaracteristiques[11].getValeur()!="")or(self.listeDesCaracteristiques[13].getValeur()!="")):
-            text+="700 "
-            if self.listeDesCaracteristiques[11].getValeur()!="":
-                text+=("#1$3"+str(self.listeDesCaracteristiques[11].getValeur()))
-            if self.listeDesCaracteristiques[13].getValeur()!="":
-                text+=("$40"+str(self.listeDesCaracteristiques[13].getValeur()))
-            text+="; "
-        if ((self.listeDesCaracteristiques[12].getValeur()!="")or(self.listeDesCaracteristiques[14].getValeur()!="")):
-            text+="701 "
-            if self.listeDesCaracteristiques[12].getValeur()!="":
-                text+=("#1$3"+str(self.listeDesCaracteristiques[12].getValeur()))
-            if self.listeDesCaracteristiques[14].getValeur()!="":
-                text+=("$40"+str(self.listeDesCaracteristiques[14].getValeur()))
-            text+="; "
-        if ((self.listeDesCaracteristiques[15].getValeur()!="")or(self.listeDesCaracteristiques[16].getValeur()!="")):
-            text+="702 "
-            if self.listeDesCaracteristiques[15].getValeur()!="":
-                text+=("#1$3"+str(self.listeDesCaracteristiques[15].getValeur()))
-            if self.listeDesCaracteristiques[16].getValeur()!="":
-                text+=("$4"+str(self.listeDesCaracteristiques[16].getValeur()))
-            text+="; "
-        if ((self.listeDesCaracteristiques[17].getValeur()!="")or(self.listeDesCaracteristiques[18].getValeur()!="")):
-            text+="712 "
-            if self.listeDesCaracteristiques[17].getValeur()!="":
-                text+=("02$3"+str(self.listeDesCaracteristiques[17].getValeur()))
-            if self.listeDesCaracteristiques[18].getValeur()!="":
-                text+=("$4"+str(self.listeDesCaracteristiques[18].getValeur()))
-        print(f"Affichage de la fiche: {self.listeDesCaracteristiques[1].getValeur()} de {self.listeDesCaracteristiques[2].getValeur()} ({self.listeDesCaracteristiques[7].getValeur()})")
-        print (text)
+                text += ("1#$a@" + str(titre))
+            if auteur != "":
+                text += ("$f" + str(auteur))
+            if complement_titre != "":
+                text += ("$e" + str(complement_titre))
+            if numero_volume != "":
+                text += ("$h" + str(numero_volume))
+            text += "; "
+
+        if  ville != "" or editeur != "":
+            text += "210 ##"
+            if ville != "":
+                text += ("$a" + str(ville))
+            if editeur != "":
+                text += ("$c" + str(editeur))
+            if annee != "":
+                text += ("$d" + str(annee))
+            text += "; "
+
+        if ville != "" or editeur != "" or annee != "":
+            text += "214 #0"
+            if ville != "":
+                text += ("$a" + str(ville))
+            if editeur != "":
+                text += ("$c" + str(editeur))
+            if annee != "":
+                text += ("$d" + str(annee))
+            text += "; "
+
+        if volume != "" or illustration != "" or taille != "":
+            text += "215 ##"
+            if volume != "":
+                text += ("$a" + str(volume))
+            if illustration != "":
+                text += ("$c" + str(illustration))
+            if taille != "":
+                text += ("$d" + str(taille))
+            text += "; "
+
+        if champs_scientifique is not None and champs_scientifique.getValeur() != "":
+            text += ("606 ##$" + str(champs_scientifique.getValeurChampsScientifique()) + "; ")
+
+        if premier_auteur != "" or role_auteur != "":
+            text += "700 "
+            if premier_auteur != "":
+                text += ("#1$3" + str(premier_auteur))
+            if role_auteur != "":
+                text += ("$40" + str(role_auteur))
+            text += "; "
+
+        if coauteur != "" or role_coauteur != "":
+            text += "701 "
+            if coauteur != "":
+                text += ("#1$3" + str(coauteur))
+            if role_coauteur != "":
+                text += ("$40" + str(role_coauteur))
+            text += "; "
+
+        if auteur_secondaire != "" or role_auteur_secondaire != "":
+            text += "702 "
+            if auteur_secondaire != "":
+                text += ("#1$3" + str(auteur_secondaire))
+            if role_auteur_secondaire != "":
+                text += ("$4" + str(role_auteur_secondaire))
+            text += "; "
+
+        if collectivite != "" or role_collectivite != "":
+            text += "712 "
+            if collectivite != "":
+                text += ("02$3" + str(collectivite))
+            if role_collectivite != "":
+                text += ("$4" + str(role_collectivite))
+
+        print(f"Affichage de la fiche: {titre} de {auteur} ({annee})")
+        print(text)
         return text
 
 
@@ -317,8 +360,29 @@ class Fiche:
         average = total / len(self.listeDesCaracteristiques) if self.listeDesCaracteristiques else 0
         self.window.BarCentrale.setValue(average)
         self.change_color(self.window.BarCentrale)
+
+    def nettoyerCaracteristiques(self):
+        for caracteristique in self.listeDesCaracteristiques:
+            if isinstance(caracteristique, cm.CaracteristiqueMultiple):
+                # Pour les caractéristiques multiples, nettoyer chaque élément de la liste
+                if caracteristique.valeur:
+                    caracteristique.valeur = [valeur.strip() for valeur in caracteristique.valeur if valeur.strip()]
+            else:
+                # Pour les caractéristiques simples, nettoyer la valeur
+                if caracteristique.valeur:
+                    caracteristique.valeur = caracteristique.valeur.strip()
+        # Mettre à jour les boutons et les widgets après nettoyage
+        self.updateButtons()
+        for caracteristique in self.listeDesCaracteristiques:
+            field_item = self.window.gridLayout.itemAtPosition(caracteristique.id, 2)
+            if field_item is not None:
+                widget = field_item.widget()
+                if isinstance(widget, QtWidgets.QLineEdit):
+                    widget.setText(caracteristique.getValeur())
+                elif isinstance(widget, QtWidgets.QPushButton):
+                    widget.setText(caracteristique.getValeur())
     
     
 
 def getlisteDesNoms():
-    return ["Article","Titre","Auteur","Complement du titre","Numero du volume","Ville","Editeur","Annee","Illustration","Taille","Champ Scientifique","Premier Auteur","Co-Auteur","Role Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire","Nom de la Collectivite","Role de la Collectivite"]
+    return ["Article","Titre","Auteur","Complement du titre","Numero du volume","Ville","Editeur","Annee","Volume","Illustration","Taille","Champ Scientifique","Premier Auteur","Co-Auteur","Role Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire","Nom de la Collectivite","Role de la Collectivite"]
