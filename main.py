@@ -9,6 +9,9 @@ import Fiche as f
 import FormulaireAuteur as fa
 import FormulaireChampsScientifique as FC
 import Parametre as p
+import Statistique as s
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 
 BASE_DIR = os.path.dirname(__file__)
 loader = QUiLoader()
@@ -223,6 +226,11 @@ def afficherLesStatistiques():
     statistiques = loader.load(statistiques_path, None)
     activerRedimensionnementDynamique(statistiques)
     statistiques.Retour.clicked.connect(lambda: statistiques.close())
+    statistiques.Retour.clicked.connect(lambda: afficherLeCatalogue(current_catalogue.window))
+    statistiques.figure = s.Statistique().desinnerRatioHumain()
+    statistiques.canvas = FigureCanvas(statistiques.figure)
+    statistiques.gridLayout.addWidget(statistiques.canvas, 1, 0, 1, 1)
+    statistiques.canvas.draw()
     statistiques.show()
     current_statistiques = statistiques
 
