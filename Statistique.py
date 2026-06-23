@@ -1,5 +1,7 @@
 import Fiche as F
 import os
+import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 ##Todo: interface graphique pour illustré les résultat et l'intégration dans l'application
 
 ## classe pour la réalisation des statistique
@@ -18,6 +20,7 @@ class Statistique:
             self.chemain = os.path.join(os.path.dirname(__file__), "Doc", str(i))
             with open(self.chemain, "r") as f:
                 for line in f:
+                    print(line)
                     label_text, field_text, proba, edit = line.strip().split("$")   
                     self.totalCaractéristique+=1
                     if edit=="1":
@@ -51,12 +54,28 @@ class Statistique:
                         if edit=="1":
                             cpH+=1
             f.close()
+        if cp==0:
+            return 0
         return cpH/cp
     
     ## renvoi un dictionnaire trier par caractistique où le model à le mieux fonctionner
     def caracteristiquesLesPlusAutomatique(self):
         liste=self.ratioParCaracteristiques()
         return dict(sorted(liste.items(), key=lambda item: item[1]))
+
+    def desinnerRatioHumain(self):
+        DicoCaracteristiquesLesPlusAutomatique=self.caracteristiquesLesPlusAutomatique()
+        print(DicoCaracteristiquesLesPlusAutomatique)
+        figure = Figure(figsize=(10, 6))
+        ax = figure.add_subplot(111)
+        ax.set_xlim(0, 1)
+        ax.bar( list(DicoCaracteristiquesLesPlusAutomatique.values()),list(DicoCaracteristiquesLesPlusAutomatique.keys()))
+        ax.set_xlabel('Pourcentage')
+        ax.set_title('Ratio de Remplissage Humain')
+        ax.set_ylabel('Caractéristiques')
+        #ax.tick_params(axis='x', rotation=60)
+        figure.tight_layout()
+        return figure
 
 if __name__ == "__main__":
     S=Statistique()

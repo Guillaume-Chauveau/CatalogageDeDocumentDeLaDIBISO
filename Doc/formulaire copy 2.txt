@@ -1,8 +1,8 @@
-Article$1$16$1
-Titre$2$32$1
-Auteur$3$42$1
-Complement du titre$4$24$1
-Numero du volume$5$100$1
+Article$1$16$0
+Titre$2$32$0
+Auteur$3$42$0
+Complement du titre$4$24$0
+Numero du volume$5$100$0
 Ville$6$24$1
 Editeur$7$60$1
 Annee$8$24$1
