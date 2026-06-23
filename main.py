@@ -15,6 +15,7 @@ loader = QUiLoader()
 current_catalogue = None
 current_fiche = None
 current_parametre = None
+current_statistiques = None
 
 def afficherUnFormulaire(w, page):
     global current_fiche
@@ -197,6 +198,7 @@ def afficherLeCatalogue(w=None):
     current_catalogue.window.Parametre.clicked.connect(lambda: afficherLesParametres())
     current_catalogue.window.AjouterUnFichier.clicked.connect(lambda: current_catalogue.openFileDialog())
     current_catalogue.window.AjouterUnFichier.clicked.connect(lambda: afficherLeCatalogue(current_catalogue.window))
+    current_catalogue.window.Statistique.clicked.connect(lambda: afficherLesStatistiques())
     activerRedimensionnementDynamique(current_catalogue)
     
     current_catalogue.window.show()
@@ -214,6 +216,15 @@ def afficherLeFormulaireChampsScientifique(fiche=None):
     formulaire_champs_scientifique_window = FC.FormulaireChampsScientifique(formulaire_champs_scientifique,fiche)
     activerRedimensionnementDynamique(formulaire_champs_scientifique_window)
     formulaire_champs_scientifique_window.window.show()
+
+def afficherLesStatistiques():
+    global current_statistiques
+    statistiques_path = os.path.join(BASE_DIR, "UI", "Statistiques.ui")
+    statistiques = loader.load(statistiques_path, None)
+    activerRedimensionnementDynamique(statistiques)
+    statistiques.Retour.clicked.connect(lambda: statistiques.close())
+    statistiques.show()
+    current_statistiques = statistiques
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
