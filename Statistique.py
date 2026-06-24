@@ -68,12 +68,12 @@ class Statistique:
         print(DicoCaracteristiquesLesPlusAutomatique)
         figure = Figure(figsize=(10, 6))
         ax = figure.add_subplot(111)
-        ax.set_xlim(0, 1)
-        ax.bar( list(DicoCaracteristiquesLesPlusAutomatique.values()),list(DicoCaracteristiquesLesPlusAutomatique.keys()))
-        ax.set_xlabel('Pourcentage')
+        ax.set_ylim(0, 1)
+        ax.bar( list(DicoCaracteristiquesLesPlusAutomatique.keys()),list(DicoCaracteristiquesLesPlusAutomatique.values()))
+        ax.set_ylabel('Pourcentage')
         ax.set_title('Ratio de Remplissage Humain')
-        ax.set_ylabel('Caractéristiques')
-        #ax.tick_params(axis='x', rotation=60)
+        ax.set_xlabel('Caractéristiques')
+        ax.tick_params(axis='x', rotation=90)
         figure.tight_layout()
         return figure
 
