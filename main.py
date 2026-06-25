@@ -230,8 +230,12 @@ def afficherLesStatistiques():
     statistiques.figure = s.Statistique().desinnerRatioHumain()
     statistiques.canvas = FigureCanvas(statistiques.figure)
     statistiques.gridLayout.addWidget(statistiques.canvas, 1, 0, 1, 1)
+    statistiques.figure = s.Statistique().desinnerPourcentageFait()
+    statistiques.canvas = FigureCanvas(statistiques.figure)
+    statistiques.gridLayout.addWidget(statistiques.canvas, 2, 0, 1, 1)
     statistiques.canvas.draw()
     statistiques.show()
+
     current_statistiques = statistiques
 
 if __name__ == "__main__":

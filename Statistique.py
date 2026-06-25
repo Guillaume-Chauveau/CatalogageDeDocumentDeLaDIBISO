@@ -77,6 +77,15 @@ class Statistique:
         figure.tight_layout()
         return figure
 
+    def desinnerPourcentageFait(self):
+        figure = Figure(figsize=(10, 6))
+        ax = figure.add_subplot(111)
+        ax.set_ylim(0, 100)
+        ax.pie([self.pourcentageFait(),100-self.pourcentageFait()],labels=['Fait', 'Non fait'],autopct="%1.1f%%")
+        ax.set_title('Pourcentage de réalisation des fiches')
+        figure.tight_layout()
+        return figure
+
 if __name__ == "__main__":
     S=Statistique()
     print(S.caracteristiquesLesPlusAutomatique())
