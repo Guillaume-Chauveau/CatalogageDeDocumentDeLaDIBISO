@@ -233,6 +233,9 @@ def afficherLesStatistiques():
     statistiques.figure = s.Statistique().desinnerPourcentageFait()
     statistiques.canvas = FigureCanvas(statistiques.figure)
     statistiques.gridLayout.addWidget(statistiques.canvas, 2, 0, 1, 1)
+    statistiques.figure = s.Statistique().dessinerNombreDErreurParCaracteristique()
+    statistiques.canvas = FigureCanvas(statistiques.figure)
+    statistiques.gridLayout.addWidget(statistiques.canvas, 3, 0, 1, 1)
     statistiques.canvas.draw()
     statistiques.show()
 

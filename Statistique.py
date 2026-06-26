@@ -85,6 +85,70 @@ class Statistique:
         ax.set_title('Pourcentage de réalisation des fiches')
         figure.tight_layout()
         return figure
+    
+    def _normaliserValeurPourComparaison(self, label, valeur):
+        if valeur is None:
+            return ""
+        texte = valeur.strip()
+        if label in F.getlisteDesCaracteristiquesMultiple():
+            elements = [item.strip() for item in texte.split(",") if item.strip()]
+            return tuple(sorted(elements))
+        return texte
+
+    def _lireCaracteristiques(self, chemin):
+        resultat = {}
+        if not os.path.exists(chemin):
+            return resultat
+        with open(chemin, "r", encoding="utf-8") as f:
+            for line in f:
+                parts = line.strip().split("$", 3)
+                if len(parts) != 4:
+                    continue
+                label_text, field_text, proba, edit = parts
+                resultat[label_text] = field_text
+        return resultat
+
+    def calculerNombreDErreurParCaracteristique(self):
+        ## fonction qui calcule le nombre moyen d'erreur par caractéristique en comparant les fiches de sortie(/Doc) avec les fiches d'entrée(/LLMOutput)
+        erreurs = {nom: 0 for nom in F.getlisteDesNoms()}
+        totaux = {nom: 0 for nom in F.getlisteDesNoms()}
+
+        for fichier in self.Fiches:
+            chemin_doc = os.path.join(os.path.dirname(__file__), "Doc", str(fichier))
+            chemin_llm = os.path.join(os.path.dirname(__file__), "LLMOutput", str(fichier))
+            if not os.path.exists(chemin_llm):
+                continue
+
+            donnees_doc = self._lireCaracteristiques(chemin_doc)
+            donnees_llm = self._lireCaracteristiques(chemin_llm)
+
+            for nom in F.getlisteDesNoms():
+                if nom not in donnees_doc or nom not in donnees_llm:
+                    continue
+                totaux[nom] += 1
+                valeur_doc = self._normaliserValeurPourComparaison(nom, donnees_doc[nom])
+                valeur_llm = self._normaliserValeurPourComparaison(nom, donnees_llm[nom])
+                if valeur_doc != valeur_llm:
+                    erreurs[nom] += 1
+
+        return {
+            nom: (erreurs[nom] / totaux[nom]) if totaux[nom] else 0
+            for nom in F.getlisteDesNoms()
+        }
+    
+    def dessinerNombreDErreurParCaracteristique(self):
+        erreurs = self.calculerNombreDErreurParCaracteristique()
+        figure = Figure(figsize=(10, 6))
+        ax = figure.add_subplot(111)
+        ax.set_ylim(0, 1)
+        ax.bar(list(erreurs.keys()), list(erreurs.values()))
+        ax.set_ylabel('Pourcentage d\'erreurs')
+        ax.set_title('Nombre moyen d\'erreurs par caractéristique')
+        ax.set_xlabel('Caractéristiques')
+        ax.tick_params(axis='x', rotation=90)
+        figure.tight_layout()
+        return figure
+
 
 if __name__ == "__main__":
     S=Statistique()
