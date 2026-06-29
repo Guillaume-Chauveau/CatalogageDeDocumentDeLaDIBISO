@@ -20,8 +20,7 @@ class Statistique:
             self.chemain = os.path.join(os.path.dirname(__file__), "Doc", str(i))
             with open(self.chemain, "r") as f:
                 for line in f:
-                    print(line)
-                    label_text, field_text, proba, edit = line.strip().split("$")   
+                    labelText, fieldText, proba, edit = line.strip().split("$")   
                     self.totalCaractéristique+=1
                     if edit=="1":
                         self.totalHumain+=1
@@ -41,22 +40,22 @@ class Statistique:
     
 
     ##fonction auxiliaire de caracteristiquesLesPlusAutomatique pour le calcule de la performance pour chaque caractéristique 
-    def ratioParCaracteristique(self,c):
-        cp=0
-        cpH=0
+    def ratioParCaracteristique(self,Caracteristique):
+        compteurDeLaCaracteristique=0
+        compteurDeLaCaracteristiqueHumaine=0
         for f in self.FichesFini:
             self.chemain = os.path.join(os.path.dirname(__file__), "Doc", str(f))
             with open(self.chemain, "r") as f:
                 for line in f:
-                    label_text, field_text, proba, edit = line.strip().split("$")
-                    if label_text==c:
-                        cp+=1
+                    labelText, fieldText, proba, edit = line.strip().split("$")
+                    if labelText==Caracteristique:
+                        compteurDeLaCaracteristique+=1
                         if edit=="1":
-                            cpH+=1
+                            compteurDeLaCaracteristiqueHumaine+=1
             f.close()
-        if cp==0:
+        if compteurDeLaCaracteristique==0:
             return 0
-        return cpH/cp
+        return compteurDeLaCaracteristiqueHumaine/compteurDeLaCaracteristique
     
     ## renvoi un dictionnaire trier par caractistique où le model à le mieux fonctionner
     def caracteristiquesLesPlusAutomatique(self):
@@ -66,11 +65,11 @@ class Statistique:
     def desinnerRatioHumain(self):
         DicoCaracteristiquesLesPlusAutomatique=self.caracteristiquesLesPlusAutomatique()
         print(DicoCaracteristiquesLesPlusAutomatique)
-        figure = Figure(figsize=(10, 6))
+        figure = Figure(figsize=(5, 5))
         ax = figure.add_subplot(111)
         ax.set_ylim(0, 1)
         ax.bar( list(DicoCaracteristiquesLesPlusAutomatique.keys()),list(DicoCaracteristiquesLesPlusAutomatique.values()))
-        ax.set_ylabel('Pourcentage')
+        ax.set_ylabel('probabilité')
         ax.set_title('Ratio de Remplissage Humain')
         ax.set_xlabel('Caractéristiques')
         ax.tick_params(axis='x', rotation=90)
@@ -78,7 +77,7 @@ class Statistique:
         return figure
 
     def desinnerPourcentageFait(self):
-        figure = Figure(figsize=(10, 6))
+        figure = Figure(figsize=(5, 5))
         ax = figure.add_subplot(111)
         ax.set_ylim(0, 100)
         ax.pie([self.pourcentageFait(),100-self.pourcentageFait()],labels=['Fait', 'Non fait'],autopct="%1.1f%%")
@@ -104,8 +103,8 @@ class Statistique:
                 parts = line.strip().split("$", 3)
                 if len(parts) != 4:
                     continue
-                label_text, field_text, proba, edit = parts
-                resultat[label_text] = field_text
+                labelText, fieldText, proba, edit = parts
+                resultat[labelText] = fieldText
         return resultat
 
     def calculerNombreDErreurParCaracteristique(self):
@@ -138,11 +137,11 @@ class Statistique:
     
     def dessinerNombreDErreurParCaracteristique(self):
         erreurs = self.calculerNombreDErreurParCaracteristique()
-        figure = Figure(figsize=(10, 6))
+        figure = Figure(figsize=(5, 5))
         ax = figure.add_subplot(111)
-        ax.set_ylim(0, 1)
+        #ax.set_ylim(0, 1)
         ax.bar(list(erreurs.keys()), list(erreurs.values()))
-        ax.set_ylabel('Pourcentage d\'erreurs')
+        ax.set_ylabel('probabilité d\'erreurs')
         ax.set_title('Nombre moyen d\'erreurs par caractéristique')
         ax.set_xlabel('Caractéristiques')
         ax.tick_params(axis='x', rotation=90)
@@ -152,43 +151,43 @@ class Statistique:
     def calculerNombreDErreurParFichier(self):
         erreurs = {}
         for fichier in self.Fiches:
-            chemin_doc = os.path.join(os.path.dirname(__file__), "Doc", str(fichier))
-            chemin_llm = os.path.join(os.path.dirname(__file__), "LLMOutput", str(fichier))
-            if not os.path.exists(chemin_llm):
+            cheminDoc = os.path.join(os.path.dirname(__file__), "Doc", str(fichier))
+            cheminLLM = os.path.join(os.path.dirname(__file__), "LLMOutput", str(fichier))
+            if not os.path.exists(cheminLLM):
                 continue
 
-            donnees_doc = self._lireCaracteristiques(chemin_doc)
-            donnees_llm = self._lireCaracteristiques(chemin_llm)
+            donneesDoc = self._lireCaracteristiques(cheminDoc)
+            donneesLLM = self._lireCaracteristiques(cheminLLM)
 
-            erreurs_fichier = 0
-            total_caracteristiques = 0
+            erreursFichier = 0
+            totalCaracteristiques = 0
 
             for nom in F.getlisteDesNoms():
-                if nom not in donnees_doc or nom not in donnees_llm:
+                if nom not in donneesDoc or nom not in donneesLLM:
                     continue
-                total_caracteristiques += 1
-                valeur_doc = self._normaliserValeurPourComparaison(nom, donnees_doc[nom])
-                valeur_llm = self._normaliserValeurPourComparaison(nom, donnees_llm[nom])
-                if valeur_doc != valeur_llm:
-                    erreurs_fichier += 1
+                totalCaracteristiques += 1
+                valeurDoc = self._normaliserValeurPourComparaison(nom, donneesDoc[nom])
+                valeurLLM = self._normaliserValeurPourComparaison(nom, donneesLLM[nom])
+                if valeurDoc != valeurLLM:
+                    erreursFichier += 1
 
             def _remouveExtension(filename):
                 return os.path.splitext(filename)[0]
             
-            erreurs[_remouveExtension(fichier)] = (erreurs_fichier / total_caracteristiques) if total_caracteristiques else 0
+            erreurs[_remouveExtension(fichier)] = (erreursFichier / totalCaracteristiques) if totalCaracteristiques else 0
 
         return erreurs
     
     def dessinerNombreDErreurParFichier(self):
         erreurs = self.calculerNombreDErreurParFichier()
-        figure = Figure(figsize=(10, 6))
+        figure = Figure(figsize=(5, 5))
         ax = figure.add_subplot(111)
         ax.set_ylim(0, 1)
         ax.bar(list(erreurs.keys()), list(erreurs.values()))
-        ax.set_ylabel('Pourcentage d\'erreurs')
+        ax.set_ylabel('probabilité d\'erreurs')
         ax.set_title('Nombre moyen d\'erreurs par fichier')
         ax.set_xlabel('Fichiers')
-        ax.tick_params(axis='x', rotation=90)
+        ax.tick_params(axis='x', rotation=15)
         figure.tight_layout()
         return figure
 
