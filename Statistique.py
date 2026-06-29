@@ -149,6 +149,48 @@ class Statistique:
         figure.tight_layout()
         return figure
 
+    def calculerNombreDErreurParFichier(self):
+        erreurs = {}
+        for fichier in self.Fiches:
+            chemin_doc = os.path.join(os.path.dirname(__file__), "Doc", str(fichier))
+            chemin_llm = os.path.join(os.path.dirname(__file__), "LLMOutput", str(fichier))
+            if not os.path.exists(chemin_llm):
+                continue
+
+            donnees_doc = self._lireCaracteristiques(chemin_doc)
+            donnees_llm = self._lireCaracteristiques(chemin_llm)
+
+            erreurs_fichier = 0
+            total_caracteristiques = 0
+
+            for nom in F.getlisteDesNoms():
+                if nom not in donnees_doc or nom not in donnees_llm:
+                    continue
+                total_caracteristiques += 1
+                valeur_doc = self._normaliserValeurPourComparaison(nom, donnees_doc[nom])
+                valeur_llm = self._normaliserValeurPourComparaison(nom, donnees_llm[nom])
+                if valeur_doc != valeur_llm:
+                    erreurs_fichier += 1
+
+            def _remouveExtension(filename):
+                return os.path.splitext(filename)[0]
+            
+            erreurs[_remouveExtension(fichier)] = (erreurs_fichier / total_caracteristiques) if total_caracteristiques else 0
+
+        return erreurs
+    
+    def dessinerNombreDErreurParFichier(self):
+        erreurs = self.calculerNombreDErreurParFichier()
+        figure = Figure(figsize=(10, 6))
+        ax = figure.add_subplot(111)
+        ax.set_ylim(0, 1)
+        ax.bar(list(erreurs.keys()), list(erreurs.values()))
+        ax.set_ylabel('Pourcentage d\'erreurs')
+        ax.set_title('Nombre moyen d\'erreurs par fichier')
+        ax.set_xlabel('Fichiers')
+        ax.tick_params(axis='x', rotation=90)
+        figure.tight_layout()
+        return figure
 
 if __name__ == "__main__":
     S=Statistique()
