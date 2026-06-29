@@ -235,8 +235,8 @@ def afficherLesStatistiques():
     gridL = QtWidgets.QGridLayout()
     central_widget.setLayout(gridL)
     statistiques.setCentralWidget(central_widget)   
-    gridL.setContentsMargins(0, 0, 64, 200)
-    gridL.setSpacing(64)
+    gridL.setContentsMargins(5, 5, 64, 64)
+    gridL.setSpacing(10)
     gridL.setColumnStretch(0, 1)
     gridL.setColumnStretch(1, 1)
     gridL.setRowStretch(0, 1)
@@ -251,12 +251,14 @@ def afficherLesStatistiques():
     canvasRatioRéalisationHumaine = _ajouter_canvas(s.Statistique().desinnerRatioHumain())
     canvasPourcentageFait = _ajouter_canvas(s.Statistique().desinnerPourcentageFait())
     canvasNombreErreursParCatacteristique = _ajouter_canvas(s.Statistique().dessinerNombreDErreurParCaracteristique())
+    canvasNombreErreursParFichier = _ajouter_canvas(s.Statistique().dessinerNombreDErreurParFichier())
 
     gridL.addWidget(canvasRatioRéalisationHumaine, 0, 0, 1, 1)
     gridL.addWidget(canvasPourcentageFait, 0, 1, 1, 1)
-    gridL.addWidget(canvasNombreErreursParCatacteristique, 1, 0, 1, 2)
+    gridL.addWidget(canvasNombreErreursParCatacteristique, 1, 0, 1, 1)
+    gridL.addWidget(canvasNombreErreursParFichier, 1, 1, 1, 1)
 
-    for canvas in (canvasRatioRéalisationHumaine, canvasPourcentageFait, canvasNombreErreursParCatacteristique):
+    for canvas in (canvasRatioRéalisationHumaine, canvasPourcentageFait, canvasNombreErreursParCatacteristique, canvasNombreErreursParFichier):
         canvas.draw()
 
     statistiques.resize(1500, 950)
