@@ -224,19 +224,42 @@ def afficherLesStatistiques():
     global current_statistiques
     statistiques_path = os.path.join(BASE_DIR, "UI", "Statistiques.ui")
     statistiques = loader.load(statistiques_path, None)
-    activerRedimensionnementDynamique(statistiques)
+    
+    # Configurer les size policies avant activerRedimensionnementDynamique
+    statistiques.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+
     statistiques.Retour.clicked.connect(lambda: statistiques.close())
     statistiques.Retour.clicked.connect(lambda: afficherLeCatalogue(current_catalogue.window))
-    statistiques.figure = s.Statistique().desinnerRatioHumain()
-    statistiques.canvas = FigureCanvas(statistiques.figure)
-    statistiques.gridLayout.addWidget(statistiques.canvas, 1, 0, 1, 1)
-    statistiques.figure = s.Statistique().desinnerPourcentageFait()
-    statistiques.canvas = FigureCanvas(statistiques.figure)
-    statistiques.gridLayout.addWidget(statistiques.canvas, 2, 0, 1, 1)
-    statistiques.figure = s.Statistique().dessinerNombreDErreurParCaracteristique()
-    statistiques.canvas = FigureCanvas(statistiques.figure)
-    statistiques.gridLayout.addWidget(statistiques.canvas, 3, 0, 1, 1)
-    statistiques.canvas.draw()
+
+    central_widget = QtWidgets.QWidget()
+    gridL = QtWidgets.QGridLayout()
+    central_widget.setLayout(gridL)
+    statistiques.setCentralWidget(central_widget)   
+    gridL.setContentsMargins(0, 0, 64, 200)
+    gridL.setSpacing(64)
+    gridL.setColumnStretch(0, 1)
+    gridL.setColumnStretch(1, 1)
+    gridL.setRowStretch(0, 1)
+    gridL.setRowStretch(1, 1)
+
+    def _ajouter_canvas(figure):
+        canvas = FigureCanvas(figure)
+        canvas.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        canvas.setMinimumSize(300, 280)
+        return canvas
+
+    canvasRatioRéalisationHumaine = _ajouter_canvas(s.Statistique().desinnerRatioHumain())
+    canvasPourcentageFait = _ajouter_canvas(s.Statistique().desinnerPourcentageFait())
+    canvasNombreErreursParCatacteristique = _ajouter_canvas(s.Statistique().dessinerNombreDErreurParCaracteristique())
+
+    gridL.addWidget(canvasRatioRéalisationHumaine, 0, 0, 1, 1)
+    gridL.addWidget(canvasPourcentageFait, 0, 1, 1, 1)
+    gridL.addWidget(canvasNombreErreursParCatacteristique, 1, 0, 1, 2)
+
+    for canvas in (canvasRatioRéalisationHumaine, canvasPourcentageFait, canvasNombreErreursParCatacteristique):
+        canvas.draw()
+
+    statistiques.resize(1500, 950)
     statistiques.show()
 
     current_statistiques = statistiques
