@@ -148,7 +148,7 @@ class Statistique:
         figure.tight_layout()
         return figure
 
-    def calculerNombreDErreurParFichier(self):
+    def calculerNombreDeCaracteristiqueCorrigeParFichierParFichier(self):
         erreurs = {}
         for fichier in self.Fiches:
             cheminDoc = os.path.join(os.path.dirname(__file__), "Doc", str(fichier))
@@ -174,19 +174,22 @@ class Statistique:
             def _remouveExtension(filename):
                 return os.path.splitext(filename)[0]
             
-            erreurs[_remouveExtension(fichier)] = (erreursFichier / totalCaracteristiques) if totalCaracteristiques else 0
+            erreurs[_remouveExtension(fichier)] = erreursFichier if totalCaracteristiques else 0
 
         return erreurs
     
-    def dessinerNombreDErreurParFichier(self):
-        erreurs = self.calculerNombreDErreurParFichier()
+    def dessinerNombreDeCaracteristiqueCorrigeParFichier(self):
+        erreurs = self.calculerNombreDeCaracteristiqueCorrigeParFichierParFichier()
+        print(erreurs)
+        valeurs = list(erreurs.values())
+        occurrences = [valeurs.count(valeur) for valeur in valeurs]
         figure = Figure(figsize=(5, 5))
         ax = figure.add_subplot(111)
-        ax.set_ylim(0, 1)
-        ax.bar(list(erreurs.keys()), list(erreurs.values()))
-        ax.set_ylabel('probabilité d\'erreurs')
-        ax.set_title('Nombre moyen d\'erreurs par fichier')
-        ax.set_xlabel('Fichiers')
+        ax.set_ylim(0, 21)
+        ax.scatter(occurrences, valeurs)
+        ax.set_ylabel('Nombre de caractéristiques corrigées')
+        ax.set_title('Nombre de caractéristiques corrigées par fichier')
+        ax.set_xlabel('Nombre de fichiers')
         ax.tick_params(axis='x', rotation=15)
         figure.tight_layout()
         return figure
