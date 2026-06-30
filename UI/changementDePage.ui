@@ -19,8 +19,8 @@
      <rect>
       <x>80</x>
       <y>110</y>
-      <width>369</width>
-      <height>248</height>
+      <width>491</width>
+      <height>281</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -56,7 +56,14 @@
        <item>
         <widget class="QPushButton" name="AjouterUnFichier">
          <property name="text">
-          <string>Ajouter</string>
+          <string>Ajouter un fichier</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="ChoisirUnNouveauDossierDeBase">
+         <property name="text">
+          <string>Nouveau dossier</string>
          </property>
         </widget>
        </item>

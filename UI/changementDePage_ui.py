@@ -29,7 +29,7 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName(u"centralwidget")
         self.frame = QFrame(self.centralwidget)
         self.frame.setObjectName(u"frame")
-        self.frame.setGeometry(QRect(80, 110, 369, 248))
+        self.frame.setGeometry(QRect(80, 110, 491, 281))
         self.frame.setFrameShape(QFrame.Shape.StyledPanel)
         self.frame.setFrameShadow(QFrame.Shadow.Raised)
         self.horizontalLayout = QHBoxLayout(self.frame)
@@ -55,6 +55,11 @@ class Ui_MainWindow(object):
         self.AjouterUnFichier.setObjectName(u"AjouterUnFichier")
 
         self.verticalLayout_2.addWidget(self.AjouterUnFichier)
+
+        self.ChoisirUnNouveauDossierDeBase = QPushButton(self.frame)
+        self.ChoisirUnNouveauDossierDeBase.setObjectName(u"ChoisirUnNouveauDossierDeBase")
+
+        self.verticalLayout_2.addWidget(self.ChoisirUnNouveauDossierDeBase)
 
 
         self.horizontalLayout.addLayout(self.verticalLayout_2)
@@ -103,7 +108,8 @@ class Ui_MainWindow(object):
         self.Reactualiser.setText(QCoreApplication.translate("MainWindow", u"R\u00e9actualiser", None))
         self.Statistique.setText(QCoreApplication.translate("MainWindow", u"Statistique", None))
         self.Parametre.setText(QCoreApplication.translate("MainWindow", u"Param\u00e8tres", None))
-        self.AjouterUnFichier.setText(QCoreApplication.translate("MainWindow", u"Ajouter", None))
+        self.AjouterUnFichier.setText(QCoreApplication.translate("MainWindow", u"Ajouter un fichier", None))
+        self.ChoisirUnNouveauDossierDeBase.setText(QCoreApplication.translate("MainWindow", u"Nouveau dossier", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"changez de page", None))
         self.VoirFini.setText(QCoreApplication.translate("MainWindow", u"Voir les fiches d\u00e9ja trait\u00e9es", None))
     # retranslateUi

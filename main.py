@@ -19,12 +19,20 @@ currentCatalogue = None
 currentFiche = None
 currentParametre = None
 currentStatistiques = None
+chemainScan = "Scan"  # Répertoire par défaut pour les scans
+
+def mettreAJourChemainScan(repertoire):
+    global chemainScan
+    chemainScan = repertoire
+
 
 def afficherUnFormulaire(w, page):
-    global currentFiche
+    global currentFiche, chemainScan
+    if currentCatalogue is not None:
+        chemainScan = currentCatalogue.repertoirDesScan
     formulairePath = os.path.join(BASE_DIR, "UI", "Formulaire.ui")
     formulaire = loader.load(formulairePath, None)
-    currentFiche = f.Fiche(page, formulaire, afficherLeFormulaireAuteur, afficherLeFormulaireChampsScientifique)
+    currentFiche = f.Fiche(page, formulaire, afficherLeFormulaireAuteur, afficherLeFormulaireChampsScientifique, chemainScan)
     activerRedimensionnementDynamique(currentFiche)
     ajouterBoutonFormulaire(currentFiche)
     w.close()
@@ -119,7 +127,7 @@ def ajouterBoutonFormulaire(w):
     w.window.Validation.clicked.connect(lambda: w.affichage())
     w.window.Validation.clicked.connect(lambda: w.ecriture())
     w.window.Validation.clicked.connect(lambda: afficherRenduFormulaire(w))
-    w.window.Quiter.clicked.connect(lambda: afficherLeCatalogue(w.window))
+    w.window.Quiter.clicked.connect(lambda: afficherLeCatalogue(w.window, w.chemainScan))
     w.window.Restart.clicked.connect(lambda: w.lecture(w.chemain))
     w.window.Restart.clicked.connect(lambda:w.calculeDeLaBareCentrale())
     w.window.zoomInButton.clicked.connect(lambda: w.zoom(1.2))
@@ -150,7 +158,7 @@ def afficherRenduFormulaire(fiche=None):
                 return ""
 
     # Bouton Home: retour au catalogue
-    parametre.BoutonHome.clicked.connect(lambda: afficherLeCatalogue(fiche.window))
+    parametre.BoutonHome.clicked.connect(lambda: afficherLeCatalogue(fiche.window, fiche.chemainScan))
     parametre.BoutonHome.clicked.connect(lambda: parametre.close())
 
     # Bouton Formulaire: revenir au formulaire courant
@@ -188,20 +196,27 @@ def afficherRenduFormulaire(fiche=None):
     activerRedimensionnementDynamique(parametre)
     parametre.show()
 
-def afficherLeCatalogue(w=None):
+def afficherLeCatalogue(w=None, repertoire="Scan"):
+    global currentCatalogue, chemainScan
+    if currentCatalogue is not None and getattr(currentCatalogue, "repertoirDesScan", ""):
+        repertoire = currentCatalogue.repertoirDesScan
+
+    mettreAJourChemainScan(repertoire)
+    print(f"Répertoire de scan utilisé pour le catalogue: {repertoire}")
     if w is not None:
         w.close()
-    global currentCatalogue
+
     cataloguePath = os.path.join(BASE_DIR, "UI", "changementDePage.ui")
     catalogue = loader.load(cataloguePath, None)
-    currentCatalogue = Catalogue.ListeAFinir(catalogue)
-    currentCatalogue.window.Reactualiser.clicked.connect(lambda: afficherLeCatalogue(currentCatalogue.window))
+    currentCatalogue = Catalogue.ListeAFinir(catalogue, repertoire)
+    currentCatalogue.window.Reactualiser.clicked.connect(lambda: afficherLeCatalogue(currentCatalogue.window, repertoire))
     currentCatalogue.window.listWidget.currentItemChanged.connect(lambda: afficherUnFormulaire(currentCatalogue.window, currentCatalogue.window.listWidget.currentItem().text()))
     currentCatalogue.window.VoirFini.checkStateChanged.connect(lambda: currentCatalogue.creerCatalogue())
     currentCatalogue.window.Parametre.clicked.connect(lambda: afficherLesParametres())
     currentCatalogue.window.AjouterUnFichier.clicked.connect(lambda: currentCatalogue.openFileDialog())
-    currentCatalogue.window.AjouterUnFichier.clicked.connect(lambda: afficherLeCatalogue(currentCatalogue.window))
+    currentCatalogue.window.AjouterUnFichier.clicked.connect(lambda: afficherLeCatalogue(currentCatalogue.window, repertoire))
     currentCatalogue.window.Statistique.clicked.connect(lambda: afficherLesStatistiques())
+    currentCatalogue.window.ChoisirUnNouveauDossierDeBase.clicked.connect(lambda: currentCatalogue.choisirRepertoireDeScan(mettreAJourChemainScan))
     activerRedimensionnementDynamique(currentCatalogue)
     
     currentCatalogue.window.show()
@@ -229,7 +244,7 @@ def afficherLesStatistiques():
     statistiques.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
     statistiques.Retour.clicked.connect(lambda: statistiques.close())
-    statistiques.Retour.clicked.connect(lambda: afficherLeCatalogue(currentCatalogue.window))
+    statistiques.Retour.clicked.connect(lambda: afficherLeCatalogue(currentCatalogue.window, currentCatalogue.repertoirDesScan))
 
     centralWidget = QtWidgets.QWidget()
     gridL = QtWidgets.QGridLayout()

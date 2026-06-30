@@ -23,13 +23,15 @@ class Fiche:
     INDICEROLECOAUTEUR=14
     INDICEAUTEURSECONDAIRE=15
     INDICEROLEAUTEURSECONDAIRE=16
+    chemainScan=""
 
-    def __init__(self,nomDuFichier,w, afficherAuteur, afficherChamps):
+    def __init__(self,nomDuFichier,w, afficherAuteur, afficherChamps,chemainScan ):
         self.window = w
         self.afficherAuteur = afficherAuteur
         self.afficherChamps = afficherChamps
         self.chemain = os.path.join(os.path.dirname(__file__), "Doc", str(nomDuFichier))
         self.chemainOrigine =os.path.join(os.path.dirname(__file__), "LLMOutput", str(nomDuFichier))
+        self.chemainScan = os.path.join(os.path.dirname(__file__), chemainScan, str(nomDuFichier))
         self.nomDuFichier=nomDuFichier
         self.listeDesCaracteristiques = []
         self.creerLignesFormulaire()
@@ -284,7 +286,7 @@ class Fiche:
             f.write(self.affichage())
 
     def setImage(self):
-        chemain=os.path.join(os.path.dirname(__file__), "Scan", str(self.nomDuFichier))
+        chemain=self.chemainScan
         chemainPNG=chemain+".png"
         chemainJPG=chemain+".jpg"
         if os.path.exists(chemainPNG):
