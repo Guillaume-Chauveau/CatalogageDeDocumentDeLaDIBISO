@@ -251,7 +251,7 @@ def afficherLesStatistiques():
     canvasRatioRéalisationHumaine = _ajouter_canvas(s.Statistique().desinnerRatioHumain())
     canvasPourcentageFait = _ajouter_canvas(s.Statistique().desinnerPourcentageFait())
     canvasNombreErreursParCatacteristique = _ajouter_canvas(s.Statistique().dessinerNombreDErreurParCaracteristique())
-    canvasNombreErreursParFichier = _ajouter_canvas(s.Statistique().dessinerNombreDErreurParFichier())
+    canvasNombreErreursParFichier = _ajouter_canvas(s.Statistique().dessinerNombreDeCaracteristiqueCorrigeParFichier())
 
     gridL.addWidget(canvasRatioRéalisationHumaine, 0, 0, 1, 1)
     gridL.addWidget(canvasPourcentageFait, 0, 1, 1, 1)
