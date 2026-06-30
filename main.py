@@ -15,37 +15,37 @@ from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 
 BASE_DIR = os.path.dirname(__file__)
 loader = QUiLoader()
-current_catalogue = None
-current_fiche = None
-current_parametre = None
-current_statistiques = None
+currentCatalogue = None
+currentFiche = None
+currentParametre = None
+currentStatistiques = None
 
 def afficherUnFormulaire(w, page):
-    global current_fiche
-    formulaire_path = os.path.join(BASE_DIR, "UI", "Formulaire.ui")
-    formulaire = loader.load(formulaire_path, None)
-    current_fiche = f.Fiche(page, formulaire, afficherLeFormulaireAuteur, afficherLeFormulaireChampsScientifique)
-    activerRedimensionnementDynamique(current_fiche)
-    ajouterBoutonFormulaire(current_fiche)
+    global currentFiche
+    formulairePath = os.path.join(BASE_DIR, "UI", "Formulaire.ui")
+    formulaire = loader.load(formulairePath, None)
+    currentFiche = f.Fiche(page, formulaire, afficherLeFormulaireAuteur, afficherLeFormulaireChampsScientifique)
+    activerRedimensionnementDynamique(currentFiche)
+    ajouterBoutonFormulaire(currentFiche)
     w.close()
-    print(current_fiche)
-    current_fiche.window.show()
+    print(currentFiche)
+    currentFiche.window.show()
 
 def afficherLesParametres():
-    global current_parametre
-    parametre_path = os.path.join(BASE_DIR, "UI", "Parametre.ui")
-    parametre = loader.load(parametre_path, None)
-    current_parametre = p.Parametre(parametre)
-    current_parametre.window.ParametreCommun.clicked.connect(lambda: current_parametre.clickFixe())
-    current_parametre.window.ParametreHebdomadaire.clicked.connect(lambda: current_parametre.clickHebdo())
-    current_parametre.window.ParametreClassique.clicked.connect(lambda: current_parametre.clickClassique())
-    current_parametre.window.ToutVrai.clicked.connect(lambda: current_parametre.clickVraiTout())
-    current_parametre.window.ToutFaux.clicked.connect(lambda: current_parametre.clickFauxTout())
-    current_parametre.window.Valider.clicked.connect(lambda: current_parametre.retour())
-    current_parametre.window.Annuler.clicked.connect(lambda: current_parametre.window.close())
+    global currentParametre
+    parametrePath = os.path.join(BASE_DIR, "UI", "Parametre.ui")
+    parametre = loader.load(parametrePath, None)
+    currentParametre = p.Parametre(parametre)
+    currentParametre.window.ParametreCommun.clicked.connect(lambda: currentParametre.clickFixe())
+    currentParametre.window.ParametreHebdomadaire.clicked.connect(lambda: currentParametre.clickHebdo())
+    currentParametre.window.ParametreClassique.clicked.connect(lambda: currentParametre.clickClassique())
+    currentParametre.window.ToutVrai.clicked.connect(lambda: currentParametre.clickVraiTout())
+    currentParametre.window.ToutFaux.clicked.connect(lambda: currentParametre.clickFauxTout())
+    currentParametre.window.Valider.clicked.connect(lambda: currentParametre.retour())
+    currentParametre.window.Annuler.clicked.connect(lambda: currentParametre.window.close())
 
-    activerRedimensionnementDynamique(current_parametre)
-    current_parametre.window.show()
+    activerRedimensionnementDynamique(currentParametre)
+    currentParametre.window.show()
 
 def activerRedimensionnementDynamique(w):
     # Accept either an object with a `.window` attribute (wrapper) or the window/widget itself
@@ -137,8 +137,8 @@ def ajouterBoutonFormulaire(w):
 
 def afficherRenduFormulaire(fiche=None):
     global current_Rendu
-    parametre_path = os.path.join(BASE_DIR, "UI", "RenduFormulaire.ui")
-    parametre = loader.load(parametre_path, None)
+    parametrePath = os.path.join(BASE_DIR, "UI", "RenduFormulaire.ui")
+    parametre = loader.load(parametrePath, None)
 
     def _get_response_text():
         try:
@@ -155,9 +155,9 @@ def afficherRenduFormulaire(fiche=None):
 
     # Bouton Formulaire: revenir au formulaire courant
     if fiche is not None and hasattr(fiche, 'page'):
-        parametre.BoutonFormulaire.clicked.connect(lambda: afficherUnFormulaire(current_catalogue.window, fiche.page))
+        parametre.BoutonFormulaire.clicked.connect(lambda: afficherUnFormulaire(currentCatalogue.window, fiche.page))
     else:
-        parametre.BoutonFormulaire.clicked.connect(lambda:afficherUnFormulaire(current_catalogue.window, current_catalogue.window.listWidget.currentItem().text()))
+        parametre.BoutonFormulaire.clicked.connect(lambda:afficherUnFormulaire(currentCatalogue.window, currentCatalogue.window.listWidget.currentItem().text()))
     parametre.BoutonHome.clicked.connect(lambda: parametre.close())
     # Remplir le champ de rendu avec le texte renvoyé par fiche.affichage()
     try:
@@ -191,50 +191,50 @@ def afficherRenduFormulaire(fiche=None):
 def afficherLeCatalogue(w=None):
     if w is not None:
         w.close()
-    global current_catalogue
-    catalogue_path = os.path.join(BASE_DIR, "UI", "changementDePage.ui")
-    catalogue = loader.load(catalogue_path, None)
-    current_catalogue = Catalogue.ListeAFinir(catalogue)
-    current_catalogue.window.Reactualiser.clicked.connect(lambda: afficherLeCatalogue(current_catalogue.window))
-    current_catalogue.window.listWidget.currentItemChanged.connect(lambda: afficherUnFormulaire(current_catalogue.window, current_catalogue.window.listWidget.currentItem().text()))
-    current_catalogue.window.VoirFini.checkStateChanged.connect(lambda: current_catalogue.creerCatalogue())
-    current_catalogue.window.Parametre.clicked.connect(lambda: afficherLesParametres())
-    current_catalogue.window.AjouterUnFichier.clicked.connect(lambda: current_catalogue.openFileDialog())
-    current_catalogue.window.AjouterUnFichier.clicked.connect(lambda: afficherLeCatalogue(current_catalogue.window))
-    current_catalogue.window.Statistique.clicked.connect(lambda: afficherLesStatistiques())
-    activerRedimensionnementDynamique(current_catalogue)
+    global currentCatalogue
+    cataloguePath = os.path.join(BASE_DIR, "UI", "changementDePage.ui")
+    catalogue = loader.load(cataloguePath, None)
+    currentCatalogue = Catalogue.ListeAFinir(catalogue)
+    currentCatalogue.window.Reactualiser.clicked.connect(lambda: afficherLeCatalogue(currentCatalogue.window))
+    currentCatalogue.window.listWidget.currentItemChanged.connect(lambda: afficherUnFormulaire(currentCatalogue.window, currentCatalogue.window.listWidget.currentItem().text()))
+    currentCatalogue.window.VoirFini.checkStateChanged.connect(lambda: currentCatalogue.creerCatalogue())
+    currentCatalogue.window.Parametre.clicked.connect(lambda: afficherLesParametres())
+    currentCatalogue.window.AjouterUnFichier.clicked.connect(lambda: currentCatalogue.openFileDialog())
+    currentCatalogue.window.AjouterUnFichier.clicked.connect(lambda: afficherLeCatalogue(currentCatalogue.window))
+    currentCatalogue.window.Statistique.clicked.connect(lambda: afficherLesStatistiques())
+    activerRedimensionnementDynamique(currentCatalogue)
     
-    current_catalogue.window.show()
+    currentCatalogue.window.show()
 
 def afficherLeFormulaireAuteur(fiche=None):
-    formulaire_auteur_path = os.path.join(BASE_DIR, "UI", "FormulaireAuteur.ui")
-    formulaire_auteur = loader.load(formulaire_auteur_path, None)
-    formulaire_auteur_window = fa.FormulaireAuteur(formulaire_auteur,fiche)
-    activerRedimensionnementDynamique(formulaire_auteur_window)
-    formulaire_auteur_window.window.show()
+    formulaireAuteurPath = os.path.join(BASE_DIR, "UI", "FormulaireAuteur.ui")
+    formulaireAuteur = loader.load(formulaireAuteurPath, None)
+    formulaireAuteurWindow = fa.FormulaireAuteur(formulaireAuteur,fiche)
+    activerRedimensionnementDynamique(formulaireAuteurWindow)
+    formulaireAuteurWindow.window.show()
 
 def afficherLeFormulaireChampsScientifique(fiche=None):
-    formulaire_champs_scientifique_path = os.path.join(BASE_DIR, "UI", "FormulaireChampsScientifique.ui")
-    formulaire_champs_scientifique = loader.load(formulaire_champs_scientifique_path, None)
-    formulaire_champs_scientifique_window = FC.FormulaireChampsScientifique(formulaire_champs_scientifique,fiche)
-    activerRedimensionnementDynamique(formulaire_champs_scientifique_window)
-    formulaire_champs_scientifique_window.window.show()
+    formulaireChampsScientifiquePath = os.path.join(BASE_DIR, "UI", "FormulaireChampsScientifique.ui")
+    formulaireChampsScientifique = loader.load(formulaireChampsScientifiquePath, None)
+    formulaireChampsScientifiqueWindow = FC.FormulaireChampsScientifique(formulaireChampsScientifique,fiche)
+    activerRedimensionnementDynamique(formulaireChampsScientifiqueWindow)
+    formulaireChampsScientifiqueWindow.window.show()
 
 def afficherLesStatistiques():
-    global current_statistiques
-    statistiques_path = os.path.join(BASE_DIR, "UI", "Statistiques.ui")
-    statistiques = loader.load(statistiques_path, None)
+    global currentStatistiques
+    statistiquesPath = os.path.join(BASE_DIR, "UI", "Statistiques.ui")
+    statistiques = loader.load(statistiquesPath, None)
     
     # Configurer les size policies avant activerRedimensionnementDynamique
     statistiques.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
     statistiques.Retour.clicked.connect(lambda: statistiques.close())
-    statistiques.Retour.clicked.connect(lambda: afficherLeCatalogue(current_catalogue.window))
+    statistiques.Retour.clicked.connect(lambda: afficherLeCatalogue(currentCatalogue.window))
 
-    central_widget = QtWidgets.QWidget()
+    centralWidget = QtWidgets.QWidget()
     gridL = QtWidgets.QGridLayout()
-    central_widget.setLayout(gridL)
-    statistiques.setCentralWidget(central_widget)   
+    centralWidget.setLayout(gridL)
+    statistiques.setCentralWidget(centralWidget)   
     gridL.setContentsMargins(5, 5, 64, 64)
     gridL.setSpacing(10)
     gridL.setColumnStretch(0, 1)
@@ -264,7 +264,7 @@ def afficherLesStatistiques():
     statistiques.resize(1500, 950)
     statistiques.show()
 
-    current_statistiques = statistiques
+    currentStatistiques = statistiques
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)

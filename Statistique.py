@@ -185,7 +185,7 @@ class Statistique:
         occurrences = [valeurs.count(valeur) for valeur in valeurs]
         figure = Figure(figsize=(5, 5))
         ax = figure.add_subplot(111)
-        ax.set_ylim(0, 21)
+        ax.set_ylim(0, 21) #à voir si relement utile
         ax.scatter(occurrences, valeurs)
         ax.set_ylabel('Nombre de caractéristiques corrigées')
         ax.set_title('Nombre de caractéristiques corrigées par fichier')
