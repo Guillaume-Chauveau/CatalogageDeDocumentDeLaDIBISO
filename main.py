@@ -132,7 +132,7 @@ def ajouterBoutonFormulaire(w):
     w.window.Restart.clicked.connect(lambda:w.calculeDeLaBareCentrale())
     w.window.zoomInButton.clicked.connect(lambda: w.zoom(1.2))
     w.window.zoomOutButton.clicked.connect(lambda: w.zoom(0.8))
-    w.window.zoomZero.clicked.connect(lambda: w.reset_zoom())
+    w.window.zoomZero.clicked.connect(lambda: w.resetZoom())
     w.window.Sauvgarde.clicked.connect(lambda: w.sauvgarde())
     w.window.Reset.clicked.connect(lambda: w.lecture(w.chemainOrigine))
     w.window.Reset.clicked.connect(lambda:w.calculeDeLaBareCentrale())
@@ -140,8 +140,8 @@ def ajouterBoutonFormulaire(w):
         if w.window.gridLayout.itemAtPosition(i,2)!=None:
             field = w.window.gridLayout.itemAtPosition(i,2).widget()
             if isinstance(field, QtWidgets.QLineEdit):
-                field.textChanged.connect(lambda: w.change_edit(w.actualiserValeur()))
-            #print(f"connection entre le champ de texte et la fonction change_edit pour la ligne {i}")
+                field.textChanged.connect(lambda: w.changeEdit(w.actualiserValeur()))
+            #print(f"connection entre le champ de texte et la fonction changeEdit pour la ligne {i}")
 
 def afficherRenduFormulaire(fiche=None):
     global current_Rendu

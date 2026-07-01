@@ -60,7 +60,7 @@ La classe `Fiche` représente une fiche bibliographique complète. Elle gère :
   - `ecriture()` : Sauvegarde et export
   - `sauvgarde()` : Sauvegarde dans Doc/
   - `exportation()` : Export dans Sortie/
-  - `zoom()` / `reset_zoom()` : Gestion du zoom sur l'image
+  - `zoom()` / `resetZoom()` : Gestion du zoom sur l'image
   - `calculeDeLaBareCentrale()` : Calcul de la progression globale
 
 ### Classe Caracteristique

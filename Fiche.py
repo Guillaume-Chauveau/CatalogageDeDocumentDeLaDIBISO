@@ -71,7 +71,7 @@ class Fiche:
                 field = QtWidgets.QLineEdit()
 
             dot = QtWidgets.QLabel("●")
-            self.set_dot_color(dot, caracteristique.getProba())
+            self._setDotColor(dot, caracteristique.getProba())
 
             edit = QtWidgets.QLineEdit("0")
             edit.setVisible(False)
@@ -100,32 +100,32 @@ class Fiche:
         with open(pageL, "r") as f:
             for line in f:
                 print(line)
-                label_text, field_text, proba, edit = line.strip().split("$")
-                for i in self.listeDesCaracteristiques:
-                    if i.isCaracteristique(label_text):
-                        i.setValeur(field_text)
-                        i.setProba(int(proba) if proba != "None" else 0)
-                        field_item = self.window.gridLayout.itemAtPosition(i.id, 2)
-                        bar_item = self.window.gridLayout.itemAtPosition(i.id, 3)
-                        edit_item = self.window.gridLayout.itemAtPosition(i.id, 4)
+                labelText, fieldText, proba, edit = line.strip().split("$")
+                for caracteristique in self.listeDesCaracteristiques:
+                    if caracteristique.isCaracteristique(labelText):
+                        caracteristique.setValeur(fieldText)
+                        caracteristique.setProba(int(proba) if proba != "None" else 0)
+                        fieldItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 2)
+                        barItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 3)
+                        editItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 4)
 
-                        if field_item is not None:
-                            widget = field_item.widget()
+                        if fieldItem is not None:
+                            widget = fieldItem.widget()
                             if isinstance(widget, QtWidgets.QPushButton):
-                                widget.setText(i.getValeur())
+                                widget.setText(caracteristique.getValeur())
                             else:
-                                widget.setText(field_text)
-                        if bar_item is not None:
-                            bar = bar_item.widget()
+                                widget.setText(fieldText)
+                        if barItem is not None:
+                            bar = barItem.widget()
                             if isinstance(bar, QtWidgets.QLabel):
-                                self.set_dot_color(bar, i.getProba())
-                        if edit_item is not None:
-                            edit_item.widget().setText(edit)
+                                self._setDotColor(bar, caracteristique.getProba())
+                        if editItem is not None:
+                            editItem.widget().setText(edit)
                             if edit=="1":
-                                   self.change_edit(i.id)
+                                   self.changeEdit(caracteristique.id)
         f.close()                         
 
-    def change_color(self,bar):
+    def changeColor(self,bar):
         value = bar.value()
         if value == 100:
             color = "cyan"
@@ -140,7 +140,7 @@ class Fiche:
         bar.setStyleSheet("QProgressBar { border: 2px solid grey; border-radius: 5px; text-align: center; color: black;} \n QProgressBar::chunk { background-color: "+color+" ;}")
 
 
-    def set_dot_color(self, widget, value):
+    def _setDotColor(self, widget, value):
         if value == 100:
             color = "cyan"
         elif value <= 30:
@@ -167,25 +167,25 @@ class Fiche:
         article = self.getValeurParNom("Article")
         titre = self.getValeurParNom("Titre")
         auteur = self.getValeurParNom("Auteur")
-        complement_titre = self.getValeurParNom("Complement du titre")
-        numero_volume = self.getValeurParNom("Numero du volume")
+        complementTitre = self.getValeurParNom("Complement du titre")
+        numeroVolume = self.getValeurParNom("Numero du volume")
         ville = self.getValeurParNom("Ville")
         editeur = self.getValeurParNom("Editeur")
         annee = self.getValeurParNom("Annee")
         volume = self.getValeurParNom("Volume")
         illustration = self.getValeurParNom("Illustration")
         taille = self.getValeurParNom("Taille")
-        champs_scientifique = self.getCaracteristiqueParNom("Champ Scientifique")
-        premier_auteur = self.getValeurParNom("Premier Auteur")
-        coauteur = self.getValeurParNom("Co-Auteur")
-        role_auteur = self.getValeurParNom("Role Auteur")
-        role_coauteur = self.getValeurParNom("Role CoAuteur")
-        auteur_secondaire = self.getValeurParNom("Auteur Secondaire")
-        role_auteur_secondaire = self.getValeurParNom("Role Auteur Secondaire")
+        champsScientifique = self.getCaracteristiqueParNom("Champ Scientifique")
+        premierAuteur = self.getValeurParNom("Premier Auteur")
+        coAuteur = self.getValeurParNom("Co-Auteur")
+        roleAuteur = self.getValeurParNom("Role Auteur")
+        roleCoauteur = self.getValeurParNom("Role CoAuteur")
+        auteurSecondaire = self.getValeurParNom("Auteur Secondaire")
+        roleAuteurSecondaire = self.getValeurParNom("Role Auteur Secondaire")
         collectivite = self.getValeurParNom("Nom de la Collectivite")
-        role_collectivite = self.getValeurParNom("Role de la Collectivite")
+        roleCollectivite = self.getValeurParNom("Role de la Collectivite")
 
-        if article != "" or titre != "" or auteur != "" or complement_titre != "":
+        if article != "" or titre != "" or auteur != "" or complementTitre != "":
             text += "200 "
             if article != "":
                 text += ("0#$a" + str(article) + " @" + str(titre))
@@ -193,10 +193,10 @@ class Fiche:
                 text += ("1#$a@" + str(titre))
             if auteur != "":
                 text += ("$f" + str(auteur))
-            if complement_titre != "":
-                text += ("$e" + str(complement_titre))
-            if numero_volume != "":
-                text += ("$h" + str(numero_volume))
+            if complementTitre != "":
+                text += ("$e" + str(complementTitre))
+            if numeroVolume != "":
+                text += ("$h" + str(numeroVolume))
             text += "; "
 
         if  ville != "" or editeur != "":
@@ -229,39 +229,39 @@ class Fiche:
                 text += ("$d" + str(taille))
             text += "; "
 
-        if champs_scientifique is not None and champs_scientifique.getValeur() != "":
-            text += ("606 ##$" + str(champs_scientifique.getValeurChampsScientifique()) + "; ")
+        if champsScientifique is not None and champsScientifique.getValeur() != "":
+            text += ("606 ##$" + str(champsScientifique.getValeurChampsScientifique()) + "; ")
 
-        if premier_auteur != "" or role_auteur != "":
+        if premierAuteur != "" or roleAuteur != "":
             text += "700 "
-            if premier_auteur != "":
-                text += ("#1$3" + str(premier_auteur))
-            if role_auteur != "":
-                text += ("$40" + str(role_auteur))
+            if premierAuteur != "":
+                text += ("#1$3" + str(premierAuteur))
+            if roleAuteur != "":
+                text += ("$40" + str(roleAuteur))
             text += "; "
 
-        if coauteur != "" or role_coauteur != "":
+        if coAuteur != "" or roleCoauteur != "":
             text += "701 "
-            if coauteur != "":
-                text += ("#1$3" + str(coauteur))
-            if role_coauteur != "":
-                text += ("$40" + str(role_coauteur))
+            if coAuteur != "":
+                text += ("#1$3" + str(coAuteur))
+            if roleCoauteur != "":
+                text += ("$40" + str(roleCoauteur))
             text += "; "
 
-        if auteur_secondaire != "" or role_auteur_secondaire != "":
+        if auteurSecondaire != "" or roleAuteurSecondaire != "":
             text += "702 "
-            if auteur_secondaire != "":
-                text += ("#1$3" + str(auteur_secondaire))
-            if role_auteur_secondaire != "":
-                text += ("$4" + str(role_auteur_secondaire))
+            if auteurSecondaire != "":
+                text += ("#1$3" + str(auteurSecondaire))
+            if roleAuteurSecondaire != "":
+                text += ("$4" + str(roleAuteurSecondaire))
             text += "; "
 
-        if collectivite != "" or role_collectivite != "":
+        if collectivite != "" or roleCollectivite != "":
             text += "712 "
             if collectivite != "":
                 text += ("02$3" + str(collectivite))
-            if role_collectivite != "":
-                text += ("$4" + str(role_collectivite))
+            if roleCollectivite != "":
+                text += ("$4" + str(roleCollectivite))
 
         print(f"Affichage de la fiche: {titre} de {auteur} ({annee})")
         print(text)
@@ -308,34 +308,32 @@ class Fiche:
         view = self.window.graphicsView
         view.scale(factor, factor)   
 
-    def reset_zoom(self):
+    def resetZoom(self):
         view = self.window.graphicsView
         view.resetTransform()
 
     def actualiserValeur(self):
         for i in self.listeDesCaracteristiques:
-            #print(f"Actualisation de la valeur de la ligne {i.id} : {i.getValeur()}")
-            field_item = self.window.gridLayout.itemAtPosition((i.id), 2)
-            #print(field_item)
-            if field_item is not None:
-                if field_item.widget().text() != i.getValeur():
-                    i.setValeur(field_item.widget().text())
+            fieldItem = self.window.gridLayout.itemAtPosition((i.id), 2)
+            if fieldItem is not None:
+                if fieldItem.widget().text() != i.getValeur():
+                    i.setValeur(fieldItem.widget().text())
                     return i.id
 
-    def change_edit(self,i):
+    def changeEdit(self,i):
         print (f"Changement de l'edit de la ligne {i}")
         if i is not None:
             if self.window.gridLayout.itemAtPosition(i,4).widget().text()!="1":
                 self.window.gridLayout.itemAtPosition(i,4).widget().setText("1")
-                bar_widget = self.window.gridLayout.itemAtPosition(i,3).widget()
-                if isinstance(bar_widget, QtWidgets.QLabel):
-                    bar_widget.setText("✓")
-                    bar_widget.setStyleSheet("color: cyan; font-size: 20px;")
-                elif isinstance(bar_widget, QtWidgets.QProgressBar):
-                    bar_widget.setFormat("✓")
-                    bar_widget.setStyleSheet("QProgressBar { border: 2px solid grey; border-radius: 5px; text-align: center; color: cyan; font-size: 20px; } QProgressBar::chunk { background-color: green; }")
-                    bar_widget.setValue(100)
-                    bar_widget.setMaximum(100)
+                barWidget = self.window.gridLayout.itemAtPosition(i,3).widget()
+                if isinstance(barWidget, QtWidgets.QLabel):
+                    barWidget.setText("✓")
+                    barWidget.setStyleSheet("color: cyan; font-size: 20px;")
+                elif isinstance(barWidget, QtWidgets.QProgressBar):
+                    barWidget.setFormat("✓")
+                    barWidget.setStyleSheet("QProgressBar { border: 2px solid grey; border-radius: 5px; text-align: center; color: cyan; font-size: 20px; } QProgressBar::chunk { background-color: green; }")
+                    barWidget.setValue(100)
+                    barWidget.setMaximum(100)
                 # Find the characteristic and set proba
                 for char in self.listeDesCaracteristiques:
                     if char.id == i:
@@ -344,10 +342,10 @@ class Fiche:
                 self.calculeDeLaBareCentrale()
             #utliser pour l'initialisation de la fiche, pour mettre les edits à 1 et les barres à ✓
             else:
-                bar_widget = self.window.gridLayout.itemAtPosition(i,3).widget()
-                if isinstance(bar_widget, QtWidgets.QLabel):
-                    bar_widget.setText("✓")
-                    bar_widget.setStyleSheet("color: cyan; font-size: 20px;")
+                barWidget = self.window.gridLayout.itemAtPosition(i,3).widget()
+                if isinstance(barWidget, QtWidgets.QLabel):
+                    barWidget.setText("✓")
+                    barWidget.setStyleSheet("color: cyan; font-size: 20px;")
         
     def updateButtons(self):
         for i in self.listeDesCaracteristiques:
@@ -362,7 +360,7 @@ class Fiche:
         total = sum(i.getProba() for i in self.listeDesCaracteristiques)
         average = total / len(self.listeDesCaracteristiques) if self.listeDesCaracteristiques else 0
         self.window.BarCentrale.setValue(average)
-        self.change_color(self.window.BarCentrale)
+        self.changeColor(self.window.BarCentrale)
 
     def nettoyerCaracteristiques(self):
         for caracteristique in self.listeDesCaracteristiques:
@@ -377,9 +375,9 @@ class Fiche:
         # Mettre à jour les boutons et les widgets après nettoyage
         self.updateButtons()
         for caracteristique in self.listeDesCaracteristiques:
-            field_item = self.window.gridLayout.itemAtPosition(caracteristique.id, 2)
-            if field_item is not None:
-                widget = field_item.widget()
+            fieldItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 2)
+            if fieldItem is not None:
+                widget = fieldItem.widget()
                 if isinstance(widget, QtWidgets.QLineEdit):
                     widget.setText(caracteristique.getValeur())
                 elif isinstance(widget, QtWidgets.QPushButton):
@@ -390,7 +388,7 @@ class Fiche:
         nomDuFichier = os.path.basename(self.nomDuFichier)
         nomSansExtention = os.path.splitext(nomDuFichier)[0]
         parts = nomSansExtention.split('#')
-        if len(parts) == 2:
+        if len(parts) == 2: # Normalement inutile, mais on le laisse en cas d'érreur lors de la saisie du nom du fichier
             taille = parts[1]
             self.getCaracteristiqueParNom("Taille").setValeur(taille)
             # Mettre à jour les widgets correspondants
