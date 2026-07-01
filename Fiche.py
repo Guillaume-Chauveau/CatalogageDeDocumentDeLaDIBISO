@@ -99,7 +99,6 @@ class Fiche:
         print(f"lecture de la page: {pageL}")
         with open(pageL, "r") as f:
             for line in f:
-                print(line)
                 labelText, fieldText, proba, edit = line.strip().split("$")
                 for caracteristique in self.listeDesCaracteristiques:
                     if caracteristique.isCaracteristique(labelText):
@@ -321,7 +320,6 @@ class Fiche:
                     return i.id
 
     def changeEdit(self,i):
-        print (f"Changement de l'edit de la ligne {i}")
         if i is not None:
             if self.window.gridLayout.itemAtPosition(i,4).widget().text()!="1":
                 self.window.gridLayout.itemAtPosition(i,4).widget().setText("1")
@@ -409,7 +407,7 @@ class Fiche:
                 volumeWidget.setText(volume)
         
     
-def getlisteDesNomDeCaracteristiquesMultiple():
+def getListeDesNomDeCaracteristiquesMultiple():
     return ["Champ Scientifique","Premier Auteur","Role Auteur","Co-Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire"]
-def getlisteDesNomsDeCaracterisitiques():
+def getListeDesNomsDeCaracterisitiques():
     return ["Article","Titre","Auteur","Complement du titre","Numero du volume","Ville","Editeur","Annee","Volume","Illustration","Taille","Champ Scientifique","Premier Auteur","Co-Auteur","Role Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire","Nom de la Collectivite","Role de la Collectivite"]

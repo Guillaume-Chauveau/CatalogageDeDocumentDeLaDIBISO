@@ -30,7 +30,10 @@ class CaracteristiqueMultiple(Caracteristique):
     def supValeur(self,valeur):
         self.valeur.remove(valeur)
     def __str__(self):
-        return "{{"+" | ".join(self.valeur)+"}}"
+        if self.valeur is None or len(self.valeur) == 0:
+            return ""
+        else:
+            return "{{"+" | ".join(self.valeur)+"}}"
     
     def getValeurChampsScientifique(self):
         texte="{{"+self.valeur[0]+"}} | rameau"

@@ -37,7 +37,7 @@ class Statistique:
     ##fonction auxiliaire de caracteristiquesLesPlusAutomatique pour initialiser le dictionnaire et le remplire
     def ratioParCaracteristiques(self):
         d={}
-        for i in F.getlisteDesNomsDeCaracterisitiques():
+        for i in F.getListeDesNomsDeCaracterisitiques():
             d[i]=self.ratioParCaracteristique(i)
         return d
     
@@ -93,7 +93,7 @@ class Statistique:
         if valeur is None:
             return ""
         texte = valeur.strip()
-        if label in F.getlisteDesNomDeCaracteristiquesMultiple():
+        if label in F.getListeDesNomDeCaracteristiquesMultiple():
             elements = [item.strip() for item in texte.split(",") if item.strip()]
             return tuple(sorted(elements))
         return texte
@@ -113,8 +113,8 @@ class Statistique:
 
     def calculerNombreDErreurParCaracteristique(self):
         ## fonction qui calcule le nombre moyen d'erreur par caractéristique en comparant les fiches de sortie(/Doc) avec les fiches d'entrée(/LLMOutput)
-        erreurs = {nom: 0 for nom in F.getlisteDesNomsDeCaracterisitiques()}
-        totaux = {nom: 0 for nom in F.getlisteDesNomsDeCaracterisitiques()}
+        erreurs = {nom: 0 for nom in F.getListeDesNomsDeCaracterisitiques()}
+        totaux = {nom: 0 for nom in F.getListeDesNomsDeCaracterisitiques()}
 
         for fichier in self.Fiches:
             chemin_doc = os.path.join(os.path.dirname(__file__), "Doc", str(fichier))
@@ -125,7 +125,7 @@ class Statistique:
             donnees_doc = self._lireCaracteristiques(chemin_doc)
             donnees_llm = self._lireCaracteristiques(chemin_llm)
 
-            for nom in F.getlisteDesNomsDeCaracterisitiques():
+            for nom in F.getListeDesNomsDeCaracterisitiques():
                 if nom not in donnees_doc or nom not in donnees_llm:
                     continue
                 totaux[nom] += 1
@@ -136,7 +136,7 @@ class Statistique:
 
         return {
             nom: (erreurs[nom] / totaux[nom]) if totaux[nom] else 0
-            for nom in F.getlisteDesNomsDeCaracterisitiques()
+            for nom in F.getListeDesNomsDeCaracterisitiques()
         }
     
     def dessinerNombreDErreurParCaracteristique(self):
@@ -166,7 +166,7 @@ class Statistique:
             erreursFichier = 0
             totalCaracteristiques = 0
 
-            for nom in F.getlisteDesNomsDeCaracterisitiques():
+            for nom in F.getListeDesNomsDeCaracterisitiques():
                 if nom not in donneesDoc or nom not in donneesLLM:
                     continue
                 totalCaracteristiques += 1

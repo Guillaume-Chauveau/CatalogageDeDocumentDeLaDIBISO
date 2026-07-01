@@ -34,7 +34,7 @@ class FormulaireChampsScientifique:
             if isinstance(combo, QtWidgets.QComboBox):
                 champs_selectionnes.append(combo.currentText())
         self.fiche.listeDesCaracteristiques[self.fiche.INDICECHAMPSCIENTIFIQUE].setValeur(champs_selectionnes)
-        self.fiche.change_edit(self.fiche.INDICECHAMPSCIENTIFIQUE+1)
+        self.fiche.changeEdit(self.fiche.INDICECHAMPSCIENTIFIQUE+1)
         self.fiche.updateButtons()
 
     def ajouterUnChamp(self):
