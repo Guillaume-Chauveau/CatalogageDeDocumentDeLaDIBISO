@@ -2,14 +2,16 @@ import Fiche as F
 import os
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
-##Todo: interface graphique pour illustré les résultat et l'intégration dans l'application
+
 
 ## classe pour la réalisation des statistique
+## ne prend pas en conte les fiches qui on été suprimé par un humain 
 class Statistique:
 
     def __init__(self):
         self.Fiches=os.listdir("./Doc")
         self.FichesFini= os.listdir("./Sortie")
+        self.FichesOriginale= os.listdir("./LLMOutput")
         self.totalCaractéristique=0
         self.totalHumain=0
         self.getRatioHumain()
@@ -46,14 +48,15 @@ class Statistique:
         compteurDeLaCaracteristiqueHumaine=0
         for f in self.FichesFini:
             self.chemain = os.path.join(os.path.dirname(__file__), "Doc", str(f))
-            with open(self.chemain, "r") as f:
-                for line in f:
-                    labelText, fieldText, proba, edit = line.strip().split("$")
-                    if labelText==Caracteristique:
-                        compteurDeLaCaracteristique+=1
-                        if edit=="1":
-                            compteurDeLaCaracteristiqueHumaine+=1
-            f.close()
+            if os.path.exists(self.chemain):
+                with open(self.chemain, "r") as f:
+                    for line in f:
+                        labelText, fieldText, proba, edit = line.strip().split("$")
+                        if labelText==Caracteristique:
+                            compteurDeLaCaracteristique+=1
+                            if edit=="1":
+                                compteurDeLaCaracteristiqueHumaine+=1
+                f.close()
         if compteurDeLaCaracteristique==0:
             return 0
         return compteurDeLaCaracteristiqueHumaine/compteurDeLaCaracteristique
