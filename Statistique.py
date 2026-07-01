@@ -17,14 +17,15 @@ class Statistique:
     ## renvoi le ratio de caractistique qui on été rempli par un humain  
     def getRatioHumain(self):
         for i in self.FichesFini:
-            self.chemain = os.path.join(os.path.dirname(__file__), "Doc", str(i))
-            with open(self.chemain, "r") as f:
-                for line in f:
-                    labelText, fieldText, proba, edit = line.strip().split("$")   
-                    self.totalCaractéristique+=1
-                    if edit=="1":
-                        self.totalHumain+=1
-            f.close()
+                self.chemain = os.path.join(os.path.dirname(__file__), "Doc", str(i))
+                if os.path.exists(self.chemain):
+                    with open(self.chemain, "r") as f:
+                        for line in f:
+                            labelText, fieldText, proba, edit = line.strip().split("$")   
+                            self.totalCaractéristique+=1
+                            if edit=="1":
+                                self.totalHumain+=1
+                    f.close()
         return self.totalHumain/self.totalCaractéristique
     
     ## renvoi le pourcentage de complétion des fiches (fiche complaite= fiche qui a eu une Sortie)
