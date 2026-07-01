@@ -12,8 +12,8 @@ import CaracteristiqueMultiple as cm
 class Fiche:
     window=None
     listeDesCaracteristiques=[]
-    listeDesNom=["Article","Titre","Auteur","Complement du titre","Numero du volume","Ville","Editeur","Annee","Volume","Illustration","Taille","Champ Scientifique","Premier Auteur","Co-Auteur","Role Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire","Nom de la Collectivite","Role de la Collectivite"]
-    listeDesCaracteristiquesMultiple=["Champ Scientifique","Premier Auteur","Role Auteur","Co-Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire"]
+    listeDesNomDeCaracteristiques=["Article","Titre","Auteur","Complement du titre","Numero du volume","Ville","Editeur","Annee","Volume","Illustration","Taille","Champ Scientifique","Premier Auteur","Co-Auteur","Role Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire","Nom de la Collectivite","Role de la Collectivite"]
+    listeDesNomDeCaracteristiquesMultiple=["Champ Scientifique","Premier Auteur","Role Auteur","Co-Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire"]
     chemain=""
     nomDuFichier=""
     INDICECHAMPSCIENTIFIQUE=10
@@ -38,6 +38,7 @@ class Fiche:
         self.lecture(self.chemain)
         self.calculeDeLaBareCentrale()
         self.setImage()
+        self.extrationDesDonnéeDuTitreDuFichier()
 
     def clearFormRows(self):
         for row in range(self.window.gridLayout.rowCount()):
@@ -52,8 +53,8 @@ class Fiche:
     def creerLignesFormulaire(self):
         self.clearFormRows()
         self.listeDesCaracteristiques = []
-        for row, nom in enumerate(self.listeDesNom):
-            if nom in self.listeDesCaracteristiquesMultiple:
+        for row, nom in enumerate(self.listeDesNomDeCaracteristiques):
+            if nom in self.listeDesNomDeCaracteristiquesMultiple:
                 caracteristique = cm.CaracteristiqueMultiple(row, nom)
             else:
                 caracteristique = c.Caracteristique(row, nom)
@@ -383,9 +384,34 @@ class Fiche:
                     widget.setText(caracteristique.getValeur())
                 elif isinstance(widget, QtWidgets.QPushButton):
                     widget.setText(caracteristique.getValeur())
+
+    def extrationDesDonnéeDuTitreDuFichier(self):
+        # Extraction de la taille et du volume à partir du nom du fichier
+        nomDuFichier = os.path.basename(self.nomDuFichier)
+        nomSansExtention = os.path.splitext(nomDuFichier)[0]
+        parts = nomSansExtention.split('#')
+        if len(parts) == 2:
+            taille = parts[1]
+            self.getCaracteristiqueParNom("Taille").setValeur(taille)
+            # Mettre à jour les widgets correspondants
+            tailleWidget = self.window.gridLayout.itemAtPosition(self.getCaracteristiqueParNom("Taille").id, 2).widget()
+            if isinstance(tailleWidget, QtWidgets.QLineEdit):
+                tailleWidget.setText(taille)
+        elif len(parts) >= 3:
+            taille = parts[1]
+            volume = parts[2]
+            self.getCaracteristiqueParNom("Taille").setValeur(taille)
+            self.getCaracteristiqueParNom("Volume").setValeur(volume)
+            # Mettre à jour les widgets correspondants
+            tailleWidget = self.window.gridLayout.itemAtPosition(self.getCaracteristiqueParNom("Taille").id, 2).widget()
+            volumeWidget = self.window.gridLayout.itemAtPosition(self.getCaracteristiqueParNom("Volume").id, 2).widget()
+            if isinstance(tailleWidget, QtWidgets.QLineEdit):
+                tailleWidget.setText(taille)
+            if isinstance(volumeWidget, QtWidgets.QLineEdit):
+                volumeWidget.setText(volume)
+        
     
-    
-def getlisteDesCaracteristiquesMultiple():
+def getlisteDesNomDeCaracteristiquesMultiple():
     return ["Champ Scientifique","Premier Auteur","Role Auteur","Co-Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire"]
-def getlisteDesNoms():
+def getlisteDesNomsDeCaracterisitiques():
     return ["Article","Titre","Auteur","Complement du titre","Numero du volume","Ville","Editeur","Annee","Volume","Illustration","Taille","Champ Scientifique","Premier Auteur","Co-Auteur","Role Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire","Nom de la Collectivite","Role de la Collectivite"]
