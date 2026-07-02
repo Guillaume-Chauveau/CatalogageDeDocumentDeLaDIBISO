@@ -1,9 +1,7 @@
 import sys
-from PySide6 import QtWidgets
-from PySide6.QtUiTools import QUiLoader
-from PySide6 import QtGui, QtWidgets
-from PySide6 import QtCore
 import os
+from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6.QtUiTools import QUiLoader
 import ListeAFinir as Catalogue
 import Fiche as f
 import FormulaireAuteur as fa
@@ -24,7 +22,6 @@ chemainScan = "Scan"  # Répertoire par défaut pour les scans
 def mettreAJourChemainScan(repertoire):
     global chemainScan
     chemainScan = repertoire
-
 
 def afficherUnFormulaire(w, page):
     global currentFiche, chemainScan
@@ -104,9 +101,7 @@ def _configurer_enfants_layout(widget):
     """Configurer les enfants d'un widget pour qu'ils s'étendent correctement."""
     if not hasattr(widget, "layout") or widget.layout() is None:
         return
-    
     layout = widget.layout()
-    
     # Mettre un stretch factor élevé sur le premier item (généralement le contenu principal)
     for i in range(layout.count()):
         item = layout.itemAt(i)
@@ -257,16 +252,16 @@ def afficherLesStatistiques():
     gridL.setRowStretch(0, 1)
     gridL.setRowStretch(1, 1)
 
-    def _ajouter_canvas(figure):
+    def _ajouterCanvas(figure):
         canvas = FigureCanvas(figure)
         canvas.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         canvas.setMinimumSize(300, 280)
         return canvas
 
-    canvasRatioRéalisationHumaine = _ajouter_canvas(s.Statistique().desinnerRatioHumain())
-    canvasPourcentageFait = _ajouter_canvas(s.Statistique().desinnerPourcentageFait())
-    canvasNombreErreursParCatacteristique = _ajouter_canvas(s.Statistique().dessinerNombreDErreurParCaracteristique())
-    canvasNombreErreursParFichier = _ajouter_canvas(s.Statistique().dessinerNombreDeCaracteristiqueCorrigeParFichier())
+    canvasRatioRéalisationHumaine = _ajouterCanvas(s.Statistique().desinnerRatioHumain())
+    canvasPourcentageFait = _ajouterCanvas(s.Statistique().desinnerPourcentageFait())
+    canvasNombreErreursParCatacteristique = _ajouterCanvas(s.Statistique().dessinerNombreDErreurParCaracteristique())
+    canvasNombreErreursParFichier = _ajouterCanvas(s.Statistique().dessinerNombreDeCaracteristiqueCorrigeParFichier())
 
     gridL.addWidget(canvasRatioRéalisationHumaine, 0, 0, 1, 1)
     gridL.addWidget(canvasPourcentageFait, 0, 1, 1, 1)

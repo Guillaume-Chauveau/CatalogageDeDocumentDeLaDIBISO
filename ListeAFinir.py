@@ -90,12 +90,11 @@ class ListeAFinir:
     def _ajouterUnFichier(self,filename):
         ##Todo: appelé le LLM ici
         #créer le doc vide (solution tmp avant de faire appele au llm)
-        chemain=os.path.join(os.path.dirname(__file__), "LLMOutput", str(filename))
-        chemain=chemain.replace(".png",".txt").replace(".jpg",".txt")
-        with open(chemain,"w") as c:
-            ##remplir le doc ici
-            pass
-        chemain=os.path.join(os.path.dirname(__file__), "Doc", str(filename))
+        self._ajouterUnFichierDansUnDossier(filename,"LLMOutput")
+        self._ajouterUnFichierDansUnDossier(filename,"Doc")
+
+    def _ajouterUnFichierDansUnDossier(self, filename,lieu):
+        chemain=os.path.join(os.path.dirname(__file__), lieu, str(filename))
         chemain=chemain.replace(".png",".txt").replace(".jpg",".txt")
         with open(chemain,"w") as c:
             ##remplir le doc ici

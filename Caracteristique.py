@@ -14,9 +14,18 @@ class Caracteristique:
     def isCaracteristique(self,nom):
         return self.nom==nom
     def getValeur(self):
-        return self.valeur
+        if self.valeur is None:
+            return ""
+        if isinstance(self.valeur, (list, tuple, set)):
+            return ", ".join(str(v).strip() for v in self.valeur if str(v).strip())
+        return str(self.valeur)
     def setValeur(self,valeur):
-        self.valeur=valeur
+        if valeur is None:
+            self.valeur = ""
+        elif isinstance(valeur, (list, tuple, set)):
+            self.valeur = [str(v).strip() for v in valeur if str(v).strip()]
+        else:
+            self.valeur = str(valeur).strip()
     def getProba(self):
         return self.proba
     def setProba(self, proba):
