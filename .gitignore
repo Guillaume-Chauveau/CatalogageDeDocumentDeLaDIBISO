@@ -5,3 +5,5 @@ LLMOutput/
 Sortie/
 build/
 dist/
+.venv/
+tests/__pycache__
