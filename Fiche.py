@@ -393,6 +393,8 @@ class Fiche:
             tailleWidget = self.window.gridLayout.itemAtPosition(self.getCaracteristiqueParNom("Taille").id, 2).widget()
             if isinstance(tailleWidget, QtWidgets.QLineEdit):
                 tailleWidget.setText(taille)
+            self.changeEdit(self.getCaracteristiqueParNom("Taille").id)
+            
         elif len(parts) >= 3:
             taille = parts[1]
             volume = parts[2]
@@ -403,8 +405,10 @@ class Fiche:
             volumeWidget = self.window.gridLayout.itemAtPosition(self.getCaracteristiqueParNom("Volume").id, 2).widget()
             if isinstance(tailleWidget, QtWidgets.QLineEdit):
                 tailleWidget.setText(taille)
+                self.changeEdit(self.getCaracteristiqueParNom("Taille").id)
             if isinstance(volumeWidget, QtWidgets.QLineEdit):
                 volumeWidget.setText(volume)
+                self.changeEdit(self.getCaracteristiqueParNom("Volume").id)
         
     
 def getListeDesNomDeCaracteristiquesMultiple():
