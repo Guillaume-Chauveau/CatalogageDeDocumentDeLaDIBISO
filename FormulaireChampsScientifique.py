@@ -20,7 +20,7 @@ class FormulaireChampsScientifique:
         self.window.buttonBox.accepted.connect(lambda: self.sauvegarderFormulaire())
 
     def remplirFormulaire(self):
-        for i in range(0, self.fiche.listeDesCaracteristiques[self.fiche.INDICECHAMPSCIENTIFIQUE].valeur.__len__()):
+        for i in range(0, len(self.fiche.listeDesCaracteristiques[self.fiche.INDICECHAMPSCIENTIFIQUE].valeur)):
             self.window.ChampsScientifiqueListe.addWidget(QtWidgets.QComboBox())
             combo = self.window.ChampsScientifiqueListe.itemAt(i).widget()
             combo.addItems(self.champs_scientifiques)

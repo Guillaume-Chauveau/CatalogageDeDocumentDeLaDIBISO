@@ -16,13 +16,13 @@ class Fiche:
     listeDesNomDeCaracteristiquesMultiple=["Champ Scientifique","Premier Auteur","Role Auteur","Co-Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire"]
     chemain=""
     nomDuFichier=""
-    INDICECHAMPSCIENTIFIQUE=10
-    INDICEAUTEUR=11
-    INDICEROLEAUTEUR=13
-    INDICECOAUTEUR=12
-    INDICEROLECOAUTEUR=14
-    INDICEAUTEURSECONDAIRE=15
-    INDICEROLEAUTEURSECONDAIRE=16
+    INDICECHAMPSCIENTIFIQUE=11
+    INDICEAUTEUR=12
+    INDICEROLEAUTEUR=14
+    INDICECOAUTEUR=13
+    INDICEROLECOAUTEUR=15
+    INDICEAUTEURSECONDAIRE=16
+    INDICEROLEAUTEURSECONDAIRE=17
     chemainScan=""
 
     def __init__(self,nomDuFichier,w, afficherAuteur, afficherChamps,chemainScan ):
@@ -363,23 +363,23 @@ class Fiche:
     def nettoyerCaracteristiques(self):
         for caracteristique in self.listeDesCaracteristiques:
             if isinstance(caracteristique, cm.CaracteristiqueMultiple):
-                # Pour les caractéristiques multiples, nettoyer chaque élément de la liste
                 if caracteristique.valeur:
-                    caracteristique.valeur = [valeur.strip() for valeur in caracteristique.valeur if valeur.strip()]
+                    caracteristique.setValeur(caracteristique.valeur)
             else:
-                # Pour les caractéristiques simples, nettoyer la valeur
-                if caracteristique.valeur:
-                    caracteristique.valeur = caracteristique.valeur.strip()
-        # Mettre à jour les boutons et les widgets après nettoyage
+                if isinstance(caracteristique.valeur, (list, tuple, set)):
+                    caracteristique.setValeur(caracteristique.valeur)
+                elif isinstance(caracteristique.valeur, str):
+                    caracteristique.setValeur(caracteristique.valeur.strip())
         self.updateButtons()
         for caracteristique in self.listeDesCaracteristiques:
             fieldItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 2)
             if fieldItem is not None:
                 widget = fieldItem.widget()
+                valeur = caracteristique.getValeur()
                 if isinstance(widget, QtWidgets.QLineEdit):
-                    widget.setText(caracteristique.getValeur())
+                    widget.setText(valeur)
                 elif isinstance(widget, QtWidgets.QPushButton):
-                    widget.setText(caracteristique.getValeur())
+                    widget.setText(valeur)
 
     def extrationDesDonnéeDuTitreDuFichier(self):
         # Extraction de la taille et du volume à partir du nom du fichier
