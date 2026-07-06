@@ -101,6 +101,32 @@ Gère le catalogue des documents à traiter.
   - `creerCatalogue()` : Affichage selon filtre
   - `openFileDialog()` : Ajout de nouveaux documents
 
+### Classe FormulaireAuteur
+
+**Fichier** : `FormulaireAuteur.py`
+
+Permet de saisir plusieurs auteurs, co-auteurs et auteurs secondaires avec leurs rôles respectifs à l’aide de lignes dynamiques ajoutables/supprimables.
+
+### Classe FormulaireChampsScientifique
+
+**Fichier** : `FormulaireChampsScientifique.py`
+
+Permet de sélectionner plusieurs champs scientifiques depuis une liste dynamique et d’ajouter de nouveaux libellés si nécessaire.
+
+### Classe Statistique
+
+**Fichier** : `Statistique.py`
+
+Calcule des indicateurs de qualité et de complétion des fiches, tels que le ratio de saisie humaine, le pourcentage de fiches traitées et les erreurs constatées par caractéristique.
+
+## Éléments récemment ajoutés
+
+- Gestion de formulaires secondaires pour les auteurs et les champs scientifiques
+- Import de nouveaux documents à partir d’images sélectionnées dans le système
+- Choix du répertoire de scans depuis le catalogue
+- Affichage d’éléments statistiques graphiques dans une fenêtre dédiée
+- Redimensionnement dynamique de l’interface et zoom sur l’image scannée
+
 ## Flux d'Utilisation
 
 1. **Démarrage** : `main.py` lance l'application et affiche le catalogue
@@ -114,14 +140,16 @@ Gère le catalogue des documents à traiter.
 
 ### Fichiers d'Entrée (LLMOutput/ et Doc/)
 
-Format : `label:valeur:probabilite:edite`
+Format : `label$valeur$probabilite$edite`
 
 Exemple :
 ```
-Titre:Influence des agents physiques:85:0
-Auteur:Liebig, Justus:92:1
-Annee:1850:78:0
+Titre$Influence des agents physiques$85$0
+Auteur$Liebig, Justus$92$1
+Annee$1850$78$0
 ```
+
+Les champs multi-valués, comme les auteurs et les champs scientifiques, sont remplis dans des formulaires spécifiques puis réinjectés dans la fiche principale. Les valeurs sont ensuite sauvegardées dans les fichiers texte au format ci-dessus.
 
 ### Format d'Export (Sortie/)
 
@@ -138,8 +166,8 @@ Format MARC simplifié avec codes spécifiques :
 ### Fenêtres Principales
 
 1. **Catalogue** (`changementDePage.ui`)
-   - Liste des documents
-   - Boutons : Actualiser, Paramètres, Ajouter fichier
+   - Liste des documents avec filtre "Voir fini"
+   - Boutons : Actualiser, Paramètres, Ajouter fichier, Statistiques, Choisir un nouveau dossier de base
 
 2. **Formulaire** (`Formulaire.ui`)
    - Grille d'édition des caractéristiques
@@ -148,10 +176,13 @@ Format MARC simplifié avec codes spécifiques :
 
 3. **Rendu** (`RenduFormulaire.ui`)
    - Affichage du texte exporté
-   - Boutons : Copier, Retour
+   - Boutons : Copier, Retour au formulaire, Retour au catalogue
 
 4. **Paramètres** (`Parametre.ui`)
-   - Configuration des types de traitement
+   - Configuration des types de traitement et des paramètres à afficher
+
+5. **Statistiques** (`Statistiques.ui`)
+   - Graphiques de progression, de saisie humaine et d’erreurs par caractéristique
 
 ### Gestion Dynamique du Layout
 
