@@ -198,16 +198,6 @@ class Fiche:
                 text += ("$h" + str(numeroVolume))
             text += "; "
 
-        if  ville != "" or editeur != "":
-            text += "210 ##"
-            if ville != "":
-                text += ("$a" + str(ville))
-            if editeur != "":
-                text += ("$c" + str(editeur))
-            if annee != "":
-                text += ("$d" + str(annee))
-            text += "; "
-
         if ville != "" or editeur != "" or annee != "":
             text += "214 #0"
             if ville != "":
