@@ -193,6 +193,10 @@ class Fiche:
                 text += ("1#$a@" + str(titre))
             if auteur != "":
                 text += ("$f" + str(auteur))
+                if coAuteur != "":
+                    text += ("," + str(coAuteur))
+                if auteurSecondaire != "":
+                    text += ("," + str(auteurSecondaire))
             if complementTitre != "":
                 text += ("$e" + str(complementTitre))
             if numeroVolume != "":
