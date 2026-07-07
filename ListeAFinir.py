@@ -24,6 +24,7 @@ class ListeAFinir:
         self.ajouterFicheNonFinie()
         self.creerCatalogueNonFini()
         self.repertoirDesScan=repertoire
+        self.setAfficheDossier(repertoire)
 
     def creerCatalogueNonFini(self):
         list=self.window.listWidget
@@ -112,6 +113,7 @@ class ListeAFinir:
             directories = dialog.selectedFiles()
             if directories:
                 self.changerDeRepertoireDeScan(directories[0])
+                self.setAfficheDossier(directories[0])
                 self._lectureDeToutLesScanDansLeRepertoireCoutrant()
                 if callback is not None:
                     callback(self.repertoirDesScan)
@@ -121,3 +123,6 @@ class ListeAFinir:
             if filename.endswith(".png") or filename.endswith(".jpg"):
                 if filename not in self.Fiches:
                     self._ajouterUnFichier(filename)
+    
+    def setAfficheDossier(self,valeur):
+        self.window.AfficheDossier.setText(valeur)
