@@ -18,27 +18,50 @@ class ListeAFinir:
     repertoirDesScan =""
 
     def __init__(self,w,repertoire):
+        self.repertoirDesScan=repertoire
         self.window=w
         self.window.setWindowTitle("Catalogue de documents")
         self.ajouterFicheAuto()
         self.ajouterFicheNonFinie()
         self.creerCatalogueNonFini()
-        self.repertoirDesScan=repertoire
         self.setAfficheDossier(repertoire)
+        
 
     def creerCatalogueNonFini(self):
         list=self.window.listWidget
         list.clear()
         for i in self.FichesNonFinies:
-            item = QtWidgets.QListWidgetItem(self.retirerLextension(i))
-            list.addItem(item)
+            self._ajouterItemAuCatalogue(list, i)
 
     def creerCatalogueComplet(self):
         list=self.window.listWidget
         list.clear()
         for i in self.Fiches:
-            item = QtWidgets.QListWidgetItem(self.retirerLextension(i))
-            list.addItem(item)
+            self._ajouterItemAuCatalogue(list, i)
+
+    def _ajouterItemAuCatalogue(self, list_widget, nomFichier):
+        item = QtWidgets.QListWidgetItem(self.retirerLextension(nomFichier))
+        self._gestionIcon(nomFichier, item)
+        list_widget.addItem(item)
+
+    ## fonctions sur les icones
+    def _gestionIcon(self, nomFichier, item):
+        if not self._testImageExiste(nomFichier):
+            self._ajoutIcon(item)
+        else:
+            self._retirerIcon(item)
+
+    def _ajoutIcon(self, item):
+        icon = self.window.style().standardIcon(
+                QtWidgets.QStyle.StandardPixmap.SP_MessageBoxWarning
+            )
+        item.setIcon(icon)
+        item.setToolTip("Aucune image associée")
+
+    def _retirerIcon(self, item):
+        item.setIcon(QtGui.QIcon())
+        item.setToolTip("")
+    ##fin des fonctions sur les icones    
     
     def retirerLextension(self,nomFichier):
         return os.path.splitext(nomFichier)[0]
@@ -117,6 +140,7 @@ class ListeAFinir:
                 self._lectureDeToutLesScanDansLeRepertoireCoutrant()
                 if callback is not None:
                     callback(self.repertoirDesScan)
+        self.creerCatalogue()
 
     def _lectureDeToutLesScanDansLeRepertoireCoutrant(self):
         for filename in os.listdir(os.path.join(BASE_DIR, self.repertoirDesScan)):
@@ -126,3 +150,10 @@ class ListeAFinir:
     
     def setAfficheDossier(self,valeur):
         self.window.AfficheDossier.setText(valeur)
+
+    def _testImageExiste(self,filename):
+        print(self.repertoirDesScan)
+        for extension in [".png", ".jpg", ".jpeg"]:
+            if os.path.exists(os.path.join(self.repertoirDesScan, os.path.splitext(filename)[0] + extension)):
+                return True
+        return False
