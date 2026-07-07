@@ -17,8 +17,8 @@
    <widget class="QFrame" name="frame">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>20</y>
+      <x>40</x>
+      <y>-540</y>
       <width>831</width>
       <height>1041</height>
      </rect>
@@ -885,7 +885,7 @@ QProgressBar::chunk {
            <item>
             <widget class="QPushButton" name="Restart">
              <property name="text">
-              <string>Recommencer</string>
+              <string>Charger</string>
              </property>
             </widget>
            </item>
