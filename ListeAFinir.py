@@ -152,7 +152,6 @@ class ListeAFinir:
         self.window.AfficheDossier.setText(valeur)
 
     def _testImageExiste(self,filename):
-        print(self.repertoirDesScan)
         for extension in [".png", ".jpg", ".jpeg"]:
             if os.path.exists(os.path.join(self.repertoirDesScan, os.path.splitext(filename)[0] + extension)):
                 return True
