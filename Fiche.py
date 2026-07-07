@@ -39,6 +39,7 @@ class Fiche:
         self.calculeDeLaBareCentrale()
         self.setImage()
         self.extrationDesDonnéeDuTitreDuFichier()
+        self.ajoutTitreDeLaFenetre()
 
     def clearFormRows(self):
         for row in range(self.window.gridLayout.rowCount()):
@@ -196,7 +197,7 @@ class Fiche:
                 text += ("$e" + str(complementTitre))
             if numeroVolume != "":
                 text += ("$h" + str(numeroVolume))
-            text += "; "
+            text += ".\n "
 
         if ville != "" or editeur != "" or annee != "":
             text += "214 #0"
@@ -206,7 +207,7 @@ class Fiche:
                 text += ("$c" + str(editeur))
             if annee != "":
                 text += ("$d" + str(annee))
-            text += "; "
+            text += ".\n "
 
         if volume != "" or illustration != "" or taille != "":
             text += "215 ##"
@@ -216,10 +217,10 @@ class Fiche:
                 text += ("$c" + str(illustration))
             if taille != "":
                 text += ("$d" + str(taille))
-            text += "; "
+            text += ".\n "
 
         if champsScientifique is not None and champsScientifique.getValeur() != "":
-            text += ("606 ##$" + str(champsScientifique.getValeurChampsScientifique()) + "; ")
+            text += ("606 ##$" + str(champsScientifique.getValeurChampsScientifique()) + ".\n ")
 
         if premierAuteur != "" or roleAuteur != "":
             text += "700 "
@@ -227,7 +228,7 @@ class Fiche:
                 text += ("#1$3" + str(premierAuteur))
             if roleAuteur != "":
                 text += ("$40" + str(roleAuteur))
-            text += "; "
+            text += ".\n"
 
         if coAuteur != "" or roleCoauteur != "":
             text += "701 "
@@ -235,7 +236,7 @@ class Fiche:
                 text += ("#1$3" + str(coAuteur))
             if roleCoauteur != "":
                 text += ("$40" + str(roleCoauteur))
-            text += "; "
+            text += ".\n "
 
         if auteurSecondaire != "" or roleAuteurSecondaire != "":
             text += "702 "
@@ -243,7 +244,7 @@ class Fiche:
                 text += ("#1$3" + str(auteurSecondaire))
             if roleAuteurSecondaire != "":
                 text += ("$4" + str(roleAuteurSecondaire))
-            text += "; "
+            text += ".\n "
 
         if collectivite != "" or roleCollectivite != "":
             text += "712 "
@@ -399,6 +400,15 @@ class Fiche:
             if isinstance(volumeWidget, QtWidgets.QLineEdit):
                 volumeWidget.setText(volume)
                 self.changeEdit(self.getCaracteristiqueParNom("Volume").id)
+
+    def ajoutTitreDeLaFenetre(self):
+        self.window.setWindowTitle(self.nomDuFichier)
+        self.window.BoutonTitre.setText(self.nomDuFichier)
+    
+    def copieFileName(self):
+        clipboard = QtWidgets.QApplication.clipboard()
+        clipboard.setText(self.nomDuFichier)
+        print(f"Nom du fichier copié dans le presse-papiers: {self.nomDuFichier}")
         
     
 def getListeDesNomDeCaracteristiquesMultiple():
