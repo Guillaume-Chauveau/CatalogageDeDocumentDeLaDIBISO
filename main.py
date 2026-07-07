@@ -131,6 +131,7 @@ def ajouterBoutonFormulaire(w):
     w.window.Sauvgarde.clicked.connect(lambda: w.sauvgarde())
     w.window.Reset.clicked.connect(lambda: w.lecture(w.chemainOrigine))
     w.window.Reset.clicked.connect(lambda:w.calculeDeLaBareCentrale())
+    w.window.BoutonTitre.clicked.connect(lambda: w.copieFileName())
     for i in range(0,w.window.gridLayout.rowCount()):
         if w.window.gridLayout.itemAtPosition(i,2)!=None:
             field = w.window.gridLayout.itemAtPosition(i,2).widget()
