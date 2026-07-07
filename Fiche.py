@@ -174,16 +174,16 @@ class Fiche:
         annee = self.getValeurParNom("Annee")
         volume = self.getValeurParNom("Volume")
         illustration = self.getValeurParNom("Illustration")
-        taille = self.getValeurParNom("Taille")
-        champsScientifique = self.getCaracteristiqueParNom("Champ Scientifique")
-        premierAuteur = self.getValeurParNom("Premier Auteur")
+        taille = self.getValeurParNom("Dimension")
+        champsScientifique = self.getCaracteristiqueParNom("Indexation Rameau")
+        premierAuteur = self.getValeurParNom("Auteur Principal")
         coAuteur = self.getValeurParNom("Co-Auteur")
-        roleAuteur = self.getValeurParNom("Role Auteur")
-        roleCoauteur = self.getValeurParNom("Role CoAuteur")
+        fonctionAuteur = self.getValeurParNom("Fonction Auteur")
+        fonctionCoauteur = self.getValeurParNom("Fonction CoAuteur")
         auteurSecondaire = self.getValeurParNom("Auteur Secondaire")
-        roleAuteurSecondaire = self.getValeurParNom("Role Auteur Secondaire")
+        fonctionAuteurSecondaire = self.getValeurParNom("Fonction Auteur Secondaire")
         collectivite = self.getValeurParNom("Nom de la Collectivite")
-        roleCollectivite = self.getValeurParNom("Role de la Collectivite")
+        fonctionCollectivite = self.getValeurParNom("Fonction de la Collectivite")
 
         if article != "" or titre != "" or auteur != "" or complementTitre != "":
             text += "200 "
@@ -201,7 +201,7 @@ class Fiche:
                 text += ("$e" + str(complementTitre))
             if numeroVolume != "":
                 text += ("$h" + str(numeroVolume))
-            text += ".\n "
+            text += ";\n "
 
         if ville != "" or editeur != "" or annee != "":
             text += "214 #0"
@@ -211,7 +211,7 @@ class Fiche:
                 text += ("$c" + str(editeur))
             if annee != "":
                 text += ("$d" + str(annee))
-            text += ".\n "
+            text += ";\n "
 
         if volume != "" or illustration != "" or taille != "":
             text += "215 ##"
@@ -221,41 +221,41 @@ class Fiche:
                 text += ("$c" + str(illustration))
             if taille != "":
                 text += ("$d" + str(taille))
-            text += ".\n "
+            text += ";\n "
 
         if champsScientifique is not None and champsScientifique.getValeur() != "":
             text += ("606 ##$" + str(champsScientifique.getValeurChampsScientifique()) + ".\n ")
 
-        if premierAuteur != "" or roleAuteur != "":
+        if premierAuteur != "" or fonctionAuteur != "":
             text += "700 "
             if premierAuteur != "":
                 text += ("#1$3" + str(premierAuteur))
-            if roleAuteur != "":
-                text += ("$40" + str(roleAuteur))
+            if fonctionAuteur != "":
+                text += ("$40" + str(fonctionAuteur))
             text += ".\n"
 
-        if coAuteur != "" or roleCoauteur != "":
+        if coAuteur != "" or fonctionCoauteur != "":
             text += "701 "
             if coAuteur != "":
                 text += ("#1$3" + str(coAuteur))
-            if roleCoauteur != "":
-                text += ("$40" + str(roleCoauteur))
+            if fonctionCoauteur != "":
+                text += ("$40" + str(fonctionCoauteur))
             text += ".\n "
 
-        if auteurSecondaire != "" or roleAuteurSecondaire != "":
+        if auteurSecondaire != "" or fonctionAuteurSecondaire != "":
             text += "702 "
             if auteurSecondaire != "":
                 text += ("#1$3" + str(auteurSecondaire))
-            if roleAuteurSecondaire != "":
-                text += ("$4" + str(roleAuteurSecondaire))
+            if fonctionAuteurSecondaire != "":
+                text += ("$4" + str(fonctionAuteurSecondaire))
             text += ".\n "
 
-        if collectivite != "" or roleCollectivite != "":
+        if collectivite != "" or fonctionCollectivite != "":
             text += "712 "
             if collectivite != "":
                 text += ("02$3" + str(collectivite))
-            if roleCollectivite != "":
-                text += ("$4" + str(roleCollectivite))
+            if fonctionCollectivite != "":
+                text += ("$4" + str(fonctionCollectivite))
 
         print(f"Affichage de la fiche: {titre} de {auteur} ({annee})")
         print(text)
