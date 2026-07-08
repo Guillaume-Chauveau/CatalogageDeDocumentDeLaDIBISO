@@ -184,6 +184,7 @@ class Fiche:
         fonctionAuteurSecondaire = self.getValeurParNom("Fonction Auteur Secondaire")
         collectivite = self.getValeurParNom("Nom de la Collectivite")
         fonctionCollectivite = self.getValeurParNom("Fonction de la Collectivite")
+        mentionEdition = self.getValeurParNom("Mention d'edition")
 
         if article != "" or titre != "" or auteur != "" or complementTitre != "":
             text += "200 "
@@ -202,7 +203,8 @@ class Fiche:
             if numeroVolume != "":
                 text += ("$h" + str(numeroVolume))
             text += ";\n"
-
+        if mentionEdition != "":
+            text += "205 ##"+mentionEdition+"\n"
         if ville != "" or editeur != "" or annee != "":
             text += "214 #0"
             text += self._formatagePourVilleEditeurAnnee(ville, editeur, annee)
