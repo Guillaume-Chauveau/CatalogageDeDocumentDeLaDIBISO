@@ -17,8 +17,8 @@
    <widget class="QFrame" name="frame">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>-250</y>
+      <x>20</x>
+      <y>-80</y>
       <width>881</width>
       <height>1041</height>
      </rect>

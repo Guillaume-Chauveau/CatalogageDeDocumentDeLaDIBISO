@@ -205,12 +205,7 @@ class Fiche:
 
         if ville != "" or editeur != "" or annee != "":
             text += "214 #0"
-            if ville != "":
-                text += ("$a" + str(ville))
-            if editeur != "":
-                text += ("$c" + str(editeur))
-            if annee != "":
-                text += ("$d" + str(annee))
+            text += self._formatagePourVilleEditeurAnnee(ville, editeur, annee)
             text += ";\n"
 
         if volume != "" or illustration != "" or dimension != "":
@@ -266,6 +261,24 @@ class Fiche:
             text = text[:-1]
         if text.endswith(";"):
             return text[:-1]
+        return text
+    
+
+    def _formatagePourVilleEditeurAnnee(self,ville,editeur,annee):
+        ville = [v.strip() for v in ville.split(",") if v.strip()]
+        editeur = [e.strip() for e in editeur.split(",") if e.strip()]
+        annee = [a.strip() for a in annee.split(",") if a.strip()]
+        text = ""
+        for i in range(max(len(ville), len(editeur), len(annee))):
+            
+            if ville != "":
+                text += ("$a" + str(ville[i]) if i < len(ville) else "")
+            if editeur != "":
+                text += ("$c" + str(editeur[i]) if i < len(editeur) else "")
+            if annee != "":
+                text += ("$d" + str(annee[i]) if i < len(annee) else "")
+            text += ","
+        text = text.rstrip(",")
         return text
 
 
