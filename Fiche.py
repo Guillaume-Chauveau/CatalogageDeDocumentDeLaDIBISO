@@ -201,7 +201,7 @@ class Fiche:
                 text += ("$e" + str(complementTitre))
             if numeroVolume != "":
                 text += ("$h" + str(numeroVolume))
-            text += ";\n "
+            text += ";\n"
 
         if ville != "" or editeur != "" or annee != "":
             text += "214 #0"
@@ -211,7 +211,7 @@ class Fiche:
                 text += ("$c" + str(editeur))
             if annee != "":
                 text += ("$d" + str(annee))
-            text += ";\n "
+            text += ";\n"
 
         if volume != "" or illustration != "" or taille != "":
             text += "215 ##"
@@ -221,7 +221,7 @@ class Fiche:
                 text += ("$c" + str(illustration))
             if taille != "":
                 text += ("$d" + str(taille))
-            text += ";\n "
+            text += ";\n"
 
         if champsScientifique is not None and champsScientifique.getValeur() != "":
             text += ("606 ##$" + str(champsScientifique.getValeurChampsScientifique()) + ".\n ")
@@ -232,7 +232,7 @@ class Fiche:
                 text += ("#1$3" + str(premierAuteur))
             if fonctionAuteur != "":
                 text += ("$40" + str(fonctionAuteur))
-            text += ".\n"
+            text += ";\n"
 
         if coAuteur != "" or fonctionCoauteur != "":
             text += "701 "
@@ -240,7 +240,7 @@ class Fiche:
                 text += ("#1$3" + str(coAuteur))
             if fonctionCoauteur != "":
                 text += ("$40" + str(fonctionCoauteur))
-            text += ".\n "
+            text += ";\n"
 
         if auteurSecondaire != "" or fonctionAuteurSecondaire != "":
             text += "702 "
@@ -248,7 +248,7 @@ class Fiche:
                 text += ("#1$3" + str(auteurSecondaire))
             if fonctionAuteurSecondaire != "":
                 text += ("$4" + str(fonctionAuteurSecondaire))
-            text += ".\n "
+            text += ";\n"
 
         if collectivite != "" or fonctionCollectivite != "":
             text += "712 "
@@ -256,9 +256,16 @@ class Fiche:
                 text += ("02$3" + str(collectivite))
             if fonctionCollectivite != "":
                 text += ("$4" + str(fonctionCollectivite))
-
+        text = self._retirerLeDernierPointVigule(text)
         print(f"Affichage de la fiche: {titre} de {auteur} ({annee})")
         print(text)
+        return text
+
+    def _retirerLeDernierPointVigule(text):
+        while text.endswith("\n") or text.endswith(" "):
+            text = text[:-1]
+        if text.endswith(";"):
+            return text[:-1]
         return text
 
 
