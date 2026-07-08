@@ -289,7 +289,7 @@ class Fiche:
         elif os.path.exists(chemainJPG):
             image = QtGui.QImage(chemainJPG)
         else:
-            image= QtGui.QImage(os.path.join(os.path.dirname(__file__), "Image", "PasDImage.jpg"))
+            image= QtGui.QImage(os.path.join(os.path.dirname(__file__), "Image", "PasDImage.png"))
         scene = QtWidgets.QGraphicsScene()
         image = image.scaled((image.size()/4), QtCore.Qt.IgnoreAspectRatio, QtCore.Qt.SmoothTransformation)
         pixmap = QtGui.QPixmap.fromImage(image)
