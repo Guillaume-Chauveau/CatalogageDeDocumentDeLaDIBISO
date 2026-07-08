@@ -12,8 +12,8 @@ import CaracteristiqueMultiple as cm
 class Fiche:
     window=None
     listeDesCaracteristiques=[]
-    listeDesNomDeCaracteristiques=["Article","Titre","Complement du titre","Auteur","Numero du volume","Collection","Ville","Editeur","Mention d'edition","Annee","Volume","Illustration","Taille","Champ Scientifique","Premier Auteur","Co-Auteur","Role Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire","Nom de la Collectivite","Role de la Collectivite"]
-    listeDesNomDeCaracteristiquesMultiple=["Champ Scientifique","Premier Auteur","Role Auteur","Co-Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire"]
+    listeDesNomDeCaracteristiques=["Article","Titre","Complement du titre","Auteur","Numero du volume","Collection","Ville","Editeur","Mention d'edition","Annee","Volume","Illustration","Dimension","Indexation Rameau","Premier Auteur","Co-Auteur","Role Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire","Nom de la Collectivite","Role de la Collectivite"]
+    listeDesNomDeCaracteristiquesMultiple=["Indexation Rameau","Premier Auteur","Role Auteur","Co-Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire"]
     chemain=""
     nomDuFichier=""
     INDICECHAMPSCIENTIFIQUE=13
@@ -64,7 +64,7 @@ class Fiche:
             label = QtWidgets.QLabel(nom)
             if isinstance(caracteristique, cm.CaracteristiqueMultiple):
                 field = QtWidgets.QPushButton()
-                if nom == "Champ Scientifique":
+                if nom == "Indexation Rameau":
                     field.clicked.connect(lambda checked, f=self: self.afficherChamps(f))
                 else:
                     field.clicked.connect(lambda checked, f=self: self.afficherAuteur(f))
@@ -174,8 +174,8 @@ class Fiche:
         annee = self.getValeurParNom("Annee")
         volume = self.getValeurParNom("Volume")
         illustration = self.getValeurParNom("Illustration")
-        taille = self.getValeurParNom("Dimension")
-        champsScientifique = self.getCaracteristiqueParNom("Indexation Rameau")
+        dimension = self.getValeurParNom("Dimension")
+        indexationRameau = self.getCaracteristiqueParNom("Indexation Rameau")
         premierAuteur = self.getValeurParNom("Auteur Principal")
         coAuteur = self.getValeurParNom("Co-Auteur")
         fonctionAuteur = self.getValeurParNom("Fonction Auteur")
@@ -213,18 +213,18 @@ class Fiche:
                 text += ("$d" + str(annee))
             text += ";\n"
 
-        if volume != "" or illustration != "" or taille != "":
+        if volume != "" or illustration != "" or dimension != "":
             text += "215 ##"
             if volume != "":
                 text += ("$a" + str(volume))
             if illustration != "":
                 text += ("$c" + str(illustration))
-            if taille != "":
-                text += ("$d" + str(taille))
+            if dimension != "":
+                text += ("$d" + str(dimension))
             text += ";\n"
 
-        if champsScientifique is not None and champsScientifique.getValeur() != "":
-            text += ("606 ##$" + str(champsScientifique.getValeurChampsScientifique()) + ".\n ")
+        if indexationRameau is not None and indexationRameau.getValeur() != "":
+            text += ("606 ##$" + str(indexationRameau.getValeurIndexationRameau()) + ";\n ")
 
         if premierAuteur != "" or fonctionAuteur != "":
             text += "700 "
@@ -261,7 +261,7 @@ class Fiche:
         print(text)
         return text
 
-    def _retirerLeDernierPointVigule(text):
+    def _retirerLeDernierPointVigule(self,text):
         while text.endswith("\n") or text.endswith(" "):
             text = text[:-1]
         if text.endswith(";"):
@@ -384,30 +384,30 @@ class Fiche:
                     widget.setText(valeur)
 
     def extrationDesDonnéeDuTitreDuFichier(self):
-        # Extraction de la taille et du volume à partir du nom du fichier
+        # Extraction de la Dimension et du volume à partir du nom du fichier
         nomDuFichier = os.path.basename(self.nomDuFichier)
         nomSansExtention = os.path.splitext(nomDuFichier)[0]
         parts = nomSansExtention.split('#')
         if len(parts) == 2: # Normalement inutile, mais on le laisse en cas d'érreur lors de la saisie du nom du fichier
-            taille = parts[1]
-            self.getCaracteristiqueParNom("Taille").setValeur(taille)
+            Dimension = parts[1]
+            self.getCaracteristiqueParNom("Dimension").setValeur(Dimension)
             # Mettre à jour les widgets correspondants
-            tailleWidget = self.window.gridLayout.itemAtPosition(self.getCaracteristiqueParNom("Taille").id, 2).widget()
-            if isinstance(tailleWidget, QtWidgets.QLineEdit):
-                tailleWidget.setText(taille)
-            self.changeEdit(self.getCaracteristiqueParNom("Taille").id)
+            DimensionWidget = self.window.gridLayout.itemAtPosition(self.getCaracteristiqueParNom("Dimension").id, 2).widget()
+            if isinstance(DimensionWidget, QtWidgets.QLineEdit):
+                DimensionWidget.setText(Dimension)
+            self.changeEdit(self.getCaracteristiqueParNom("Dimension").id)
             
         elif len(parts) >= 3:
-            taille = parts[1]
+            Dimension = parts[1]
             volume = parts[2]
-            self.getCaracteristiqueParNom("Taille").setValeur(taille)
+            self.getCaracteristiqueParNom("Dimension").setValeur(Dimension)
             self.getCaracteristiqueParNom("Volume").setValeur(volume)
             # Mettre à jour les widgets correspondants
-            tailleWidget = self.window.gridLayout.itemAtPosition(self.getCaracteristiqueParNom("Taille").id, 2).widget()
+            DimensionWidget = self.window.gridLayout.itemAtPosition(self.getCaracteristiqueParNom("Dimension").id, 2).widget()
             volumeWidget = self.window.gridLayout.itemAtPosition(self.getCaracteristiqueParNom("Volume").id, 2).widget()
-            if isinstance(tailleWidget, QtWidgets.QLineEdit):
-                tailleWidget.setText(taille)
-                self.changeEdit(self.getCaracteristiqueParNom("Taille").id)
+            if isinstance(DimensionWidget, QtWidgets.QLineEdit):
+                DimensionWidget.setText(Dimension)
+                self.changeEdit(self.getCaracteristiqueParNom("Dimension").id)
             if isinstance(volumeWidget, QtWidgets.QLineEdit):
                 volumeWidget.setText(volume)
                 self.changeEdit(self.getCaracteristiqueParNom("Volume").id)
@@ -423,6 +423,6 @@ class Fiche:
         
     
 def getListeDesNomDeCaracteristiquesMultiple():
-    return ["Champ Scientifique","Premier Auteur","Role Auteur","Co-Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire"]
+    return ["Indexation Rameau","Premier Auteur","Role Auteur","Co-Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire"]
 def getListeDesNomsDeCaracterisitiques():
-    return ["Article","Titre","Auteur","Complement du titre","Numero du volume","Ville","Editeur","Annee","Volume","Illustration","Taille","Champ Scientifique","Premier Auteur","Co-Auteur","Role Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire","Nom de la Collectivite","Role de la Collectivite"]
+    return ["Article","Titre","Complement du titre","Auteur","Numero du volume","Collection","Ville","Editeur","Mention d'edition","Annee","Volume","Illustration","Dimension","Indexation Rameau","Premier Auteur","Co-Auteur","Role Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire","Nom de la Collectivite","Role de la Collectivite"]
