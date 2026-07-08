@@ -12,17 +12,17 @@ import CaracteristiqueMultiple as cm
 class Fiche:
     window=None
     listeDesCaracteristiques=[]
-    listeDesNomDeCaracteristiques=["Article","Titre","Auteur","Complement du titre","Numero du volume","Ville","Editeur","Annee","Volume","Illustration","Taille","Champ Scientifique","Premier Auteur","Co-Auteur","Role Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire","Nom de la Collectivite","Role de la Collectivite"]
+    listeDesNomDeCaracteristiques=["Article","Titre","Complement du titre","Auteur","Numero du volume","Collection","Ville","Editeur","Mention d'edition","Annee","Volume","Illustration","Taille","Champ Scientifique","Premier Auteur","Co-Auteur","Role Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire","Nom de la Collectivite","Role de la Collectivite"]
     listeDesNomDeCaracteristiquesMultiple=["Champ Scientifique","Premier Auteur","Role Auteur","Co-Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire"]
     chemain=""
     nomDuFichier=""
-    INDICECHAMPSCIENTIFIQUE=11
-    INDICEAUTEUR=12
-    INDICEROLEAUTEUR=14
-    INDICECOAUTEUR=13
-    INDICEROLECOAUTEUR=15
-    INDICEAUTEURSECONDAIRE=16
-    INDICEROLEAUTEURSECONDAIRE=17
+    INDICECHAMPSCIENTIFIQUE=13
+    INDICEAUTEUR=14
+    INDICEROLEAUTEUR=16
+    INDICECOAUTEUR=15
+    INDICEROLECOAUTEUR=17
+    INDICEAUTEURSECONDAIRE=18
+    INDICEROLEAUTEURSECONDAIRE=19
     chemainScan=""
 
     def __init__(self,nomDuFichier,w, afficherAuteur, afficherChamps,chemainScan ):
