@@ -323,6 +323,7 @@ def afficherLeFormulaireCollection(fiche=None):
     formulaireCollection = loader.load(formulaireCollectionPath, None)
     formulaireCollectionWindow = fc.FormulaireCollection(formulaireCollection, fiche)
 
+    formulaireCollectionWindow.remplirFormulaire()
     activerRedimensionnementDynamique(formulaireCollectionWindow)
     window_manager.show("formulaire_collection", formulaireCollectionWindow)
 
