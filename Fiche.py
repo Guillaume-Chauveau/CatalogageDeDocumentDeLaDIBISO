@@ -13,7 +13,7 @@ class Fiche:
     window=None
     listeDesCaracteristiques=[]
     listeDesNomDeCaracteristiques=["Article","Titre","Complement du titre","Auteur","Numero du volume","Collection","Ville","Editeur","Mention d'edition","Annee","Volume","Illustration","Dimension","Indexation Rameau","Premier Auteur","Co-Auteur","Role Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire","Nom de la Collectivite","Role de la Collectivite"]
-    listeDesNomDeCaracteristiquesMultiple=["Indexation Rameau","Premier Auteur","Role Auteur","Co-Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire"]
+    listeDesNomDeCaracteristiquesMultiple=["Indexation Rameau","Premier Auteur","Role Auteur","Co-Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire","Collection"]
     chemain=""
     nomDuFichier=""
     INDICECHAMPSCIENTIFIQUE=13
@@ -23,16 +23,19 @@ class Fiche:
     INDICEROLECOAUTEUR=17
     INDICEAUTEURSECONDAIRE=18
     INDICEROLEAUTEURSECONDAIRE=19
+    INDICECOLLECTION=5
     chemainScan=""
 
-    def __init__(self,nomDuFichier,w, afficherAuteur, afficherChamps,chemainScan ):
+    def __init__(self, nomDuFichier, w, afficherAuteur, afficherChamps, afficherCollection, chemainScan):
         self.window = w
         self.afficherAuteur = afficherAuteur
         self.afficherChamps = afficherChamps
+        self.afficherCollection = afficherCollection
         self.chemain = os.path.join(os.path.dirname(__file__), "Doc", str(nomDuFichier))
-        self.chemainOrigine =os.path.join(os.path.dirname(__file__), "LLMOutput", str(nomDuFichier))
+        self.chemainOrigine = os.path.join(os.path.dirname(__file__), "LLMOutput", str(nomDuFichier))
         self.chemainScan = os.path.join(os.path.dirname(__file__), chemainScan, str(nomDuFichier))
-        self.nomDuFichier=nomDuFichier
+        self.nomDuFichier = nomDuFichier
+        self.formulaireCollection = None
         self.listeDesCaracteristiques = []
         self.creerLignesFormulaire()
         self.lecture(self.chemain)
@@ -66,6 +69,8 @@ class Fiche:
                 field = QtWidgets.QPushButton()
                 if nom == "Indexation Rameau":
                     field.clicked.connect(lambda checked, f=self: self.afficherChamps(f))
+                elif nom == "Collection":
+                    field.clicked.connect(lambda checked, f=self: self.afficherCollection(f))
                 else:
                     field.clicked.connect(lambda checked, f=self: self.afficherAuteur(f))
             else:
@@ -93,6 +98,11 @@ class Fiche:
     def getValeurParNom(self, nom):
         caracteristique = self.getCaracteristiqueParNom(nom)
         return caracteristique.getValeur() if caracteristique is not None else ""
+    def getValeursFormulaireCollection(self):
+        form = getattr(self, "formulaireCollection", None)
+        if form is not None and hasattr(form, "getValeurs"):
+            return form.getValeurs()
+        return {}
 
     def lecture(self,page):
         print(self.chemainOrigine)
@@ -162,8 +172,9 @@ class Fiche:
         
 
     def affichage(self):
-        text=""
+        text = ""
         self.nettoyerCaracteristiques()
+
         article = self.getValeurParNom("Article")
         titre = self.getValeurParNom("Titre")
         auteur = self.getValeurParNom("Auteur")
@@ -186,6 +197,19 @@ class Fiche:
         fonctionCollectivite = self.getValeurParNom("Fonction de la Collectivite")
         mentionEdition = self.getValeurParNom("Mention d'edition")
 
+        valeurs_collection = self.getValeursFormulaireCollection()
+        article_formulaire_collection = valeurs_collection.get("article", "")
+        collection = valeurs_collection.get("collection", "")
+        section = valeurs_collection.get("section", "")
+        reference = valeurs_collection.get("reference", "")
+        print(f"Valeurs du formulaire collection: {valeurs_collection}")
+        if article_formulaire_collection:
+            article = article_formulaire_collection
+
+        if not collection:
+            collection = self.getValeurParNom("Collection")
+        text="008 $aAax3\n104 ##$ak$bzy$cy$dba$ffre\n106 ##$ar\n181 ##$P01$ctxt\n182 ##$P01$cn\n183 ##$P01$anga\n"
+
         if article != "" or titre != "" or auteur != "" or complementTitre != "":
             text += "200 "
             if article != "":
@@ -203,8 +227,10 @@ class Fiche:
             if numeroVolume != "":
                 text += ("$h" + str(numeroVolume))
             text += ";\n"
+
         if mentionEdition != "":
-            text += "205 ##"+mentionEdition+"\n"
+            text += "205 ##" + mentionEdition + "\n"
+
         if ville != "" or editeur != "" or annee != "":
             text += "214 #0"
             text += self._formatagePourVilleEditeurAnnee(ville, editeur, annee)
@@ -220,6 +246,15 @@ class Fiche:
                 text += ("$d" + str(dimension))
             text += ";\n"
 
+        if collection or section or reference:
+            text += "225 ##"
+            if collection:
+                text += f"$a{collection}"
+            if section:
+                text += f"$i{section}"
+            text += ";\n"
+        if reference:
+            text += f"410 ##$0@{reference}"
         if indexationRameau is not None and indexationRameau.getValeur() != "":
             text += ("606 ##$" + str(indexationRameau.getValeurIndexationRameau()) + ";\n ")
 
@@ -441,3 +476,4 @@ def getListeDesNomDeCaracteristiquesMultiple():
     return ["Indexation Rameau","Premier Auteur","Role Auteur","Co-Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire"]
 def getListeDesNomsDeCaracterisitiques():
     return ["Article","Titre","Complement du titre","Auteur","Numero du volume","Collection","Ville","Editeur","Mention d'edition","Annee","Volume","Illustration","Dimension","Indexation Rameau","Premier Auteur","Co-Auteur","Role Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire","Nom de la Collectivite","Role de la Collectivite"]
+
