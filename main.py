@@ -5,7 +5,8 @@ from PySide6.QtUiTools import QUiLoader
 import ListeAFinir as Catalogue
 import Fiche as f
 import FormulaireAuteur as fa
-import FormulaireChampsScientifique as FC
+import FormulaireChampsScientifique as FCs
+import FormulaireCollection as fc
 import Parametre as p
 import Statistique as s
 import matplotlib.pyplot as plt
@@ -13,10 +14,56 @@ from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 
 BASE_DIR = os.path.dirname(__file__)
 loader = QUiLoader()
+
+
+class WindowManager:
+    """Centralise l'affichage et la fermeture des fenêtres principales."""
+    def __init__(self):
+        self._windows = {}
+
+    def register(self, name, obj):
+        self._windows[name] = obj
+        return obj
+
+    def get(self, name, default=None):
+        return self._windows.get(name, default)
+
+    def close(self, name):
+        obj = self._windows.pop(name, None)
+        if obj is None:
+            return None
+
+        target = getattr(obj, "window", obj)
+        if hasattr(target, "close"):
+            try:
+                target.close()
+            except Exception:
+                pass
+        return obj
+
+    def show(self, name, obj):
+        if obj is None:
+            return None
+
+        self.close(name)
+        self._windows[name] = obj
+
+        target = getattr(obj, "window", obj)
+        if hasattr(target, "setAttribute"):
+            target.setAttribute(QtCore.Qt.WA_DeleteOnClose, False)
+        if hasattr(target, "show"):
+            target.show()
+
+        return obj
+
+
+window_manager = WindowManager()
+
 currentCatalogue = None
 currentFiche = None
 currentParametre = None
 currentStatistiques = None
+currentRenduFormulaire = None
 chemainScan = "Scan"  # Répertoire par défaut pour les scans
 
 def mettreAJourChemainScan(repertoire):
@@ -27,19 +74,24 @@ def afficherUnFormulaire(w, page):
     global currentFiche, chemainScan
     if currentCatalogue is not None:
         chemainScan = currentCatalogue.repertoirDesScan
+
     formulairePath = os.path.join(BASE_DIR, "UI", "Formulaire.ui")
     formulaire = loader.load(formulairePath, None)
-    currentFiche = f.Fiche(page, formulaire, afficherLeFormulaireAuteur, afficherLeFormulaireChampsScientifique, chemainScan)
+    currentFiche = f.Fiche(page, formulaire, afficherLeFormulaireAuteur, afficherLeFormulaireChampsScientifique,afficherLeFormulaireCollection, chemainScan)
     activerRedimensionnementDynamique(currentFiche)
     ajouterBoutonFormulaire(currentFiche)
-    w.close()
+
+    if w is not None:
+        w.close()
+
+    window_manager.show("fiche", currentFiche)
     print(currentFiche)
-    currentFiche.window.show()
 
 def afficherLesParametres():
     global currentParametre
     parametrePath = os.path.join(BASE_DIR, "UI", "Parametre.ui")
     parametre = loader.load(parametrePath, None)
+
     currentParametre = p.Parametre(parametre)
     currentParametre.window.ParametreCommun.clicked.connect(lambda: currentParametre.clickFixe())
     currentParametre.window.ParametreHebdomadaire.clicked.connect(lambda: currentParametre.clickHebdo())
@@ -50,7 +102,7 @@ def afficherLesParametres():
     currentParametre.window.Annuler.clicked.connect(lambda: currentParametre.window.close())
 
     activerRedimensionnementDynamique(currentParametre)
-    currentParametre.window.show()
+    window_manager.show("parametre", currentParametre)
 
 def activerRedimensionnementDynamique(w):
     # Accept either an object with a `.window` attribute (wrapper) or the window/widget itself
@@ -101,32 +153,50 @@ def _configurer_enfants_layout(widget):
     """Configurer les enfants d'un widget pour qu'ils s'étendent correctement."""
     if not hasattr(widget, "layout") or widget.layout() is None:
         return
+
     layout = widget.layout()
-    # Mettre un stretch factor élevé sur le premier item (généralement le contenu principal)
+
+    if isinstance(layout, QtWidgets.QFormLayout):
+        layout.setFieldGrowthPolicy(QtWidgets.QFormLayout.ExpandingFieldsGrow)
+
     for i in range(layout.count()):
         item = layout.itemAt(i)
         if item and item.widget():
             child = item.widget()
-            # Pour les QLabel et autres widgets, mettre une policy Expanding
+
             if isinstance(child, QtWidgets.QLabel):
                 child.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
                 child.setWordWrap(True)
             elif isinstance(child, (QtWidgets.QFrame, QtWidgets.QWidget)):
                 child.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-            
-            # Mettre un stretch élevé sur le premier item s'il est un label ou un texte
-            if i == 0 and isinstance(child, QtWidgets.QLabel):
+
+            if i == 0 and isinstance(child, QtWidgets.QLabel) and hasattr(layout, "setStretch"):
                 layout.setStretch(i, 1)
 
 def ajouterBoutonFormulaire(w):
-    w.window.Validation.clicked.connect(lambda: w.affichage())
-    w.window.Validation.clicked.connect(lambda: w.ecriture())
-    w.window.Validation.clicked.connect(lambda: afficherRenduFormulaire(w))
+    def _on_validation():
+        try:
+            w.affichage()
+        except Exception as exc:
+            print(f"[Validation] Erreur dans affichage(): {exc}")
+
+        try:
+            w.ecriture()
+        except Exception as exc:
+            print(f"[Validation] Erreur dans ecriture(): {exc}")
+
+        try:
+            afficherRenduFormulaire(w)
+        except Exception as exc:
+            print(f"[Validation] Erreur dans afficherRenduFormulaire(): {exc}")
+
+    w.window.Validation.clicked.connect(_on_validation)
     w.window.Validation.setToolTip("Exporte cette fiche au format Unimarc")
+
     w.window.Quiter.clicked.connect(lambda: afficherLeCatalogue(w.window, w.chemainScan))
     w.window.Quiter.setToolTip("Quite la page et retourne au menu de sélection du fichier")
     w.window.Restart.clicked.connect(lambda: w.lecture(w.chemain))
-    w.window.Restart.clicked.connect(lambda:w.calculeDeLaBareCentrale())
+    w.window.Restart.clicked.connect(lambda: w.calculeDeLaBareCentrale())
     w.window.Restart.setToolTip("Charge la dernière sauvegarde")
     w.window.zoomInButton.clicked.connect(lambda: w.zoom(1.2))
     w.window.zoomOutButton.clicked.connect(lambda: w.zoom(0.8))
@@ -134,20 +204,32 @@ def ajouterBoutonFormulaire(w):
     w.window.Sauvgarde.clicked.connect(lambda: w.sauvgarde())
     w.window.Sauvgarde.setToolTip("Effectu une sauvagede de l'état actuelle de la fiche")
     w.window.Reset.clicked.connect(lambda: w.lecture(w.chemainOrigine))
-    w.window.Reset.clicked.connect(lambda:w.calculeDeLaBareCentrale())
+    w.window.Reset.clicked.connect(lambda: w.calculeDeLaBareCentrale())
     w.window.Reset.setToolTip("Charge les valeur initialle de cette fiche")
     w.window.BoutonTitre.clicked.connect(lambda: w.copieFileName())
-    for i in range(0,w.window.gridLayout.rowCount()):
-        if w.window.gridLayout.itemAtPosition(i,2)!=None:
-            field = w.window.gridLayout.itemAtPosition(i,2).widget()
+
+    for i in range(0, w.window.gridLayout.rowCount()):
+        if w.window.gridLayout.itemAtPosition(i, 2) is not None:
+            field = w.window.gridLayout.itemAtPosition(i, 2).widget()
             if isinstance(field, QtWidgets.QLineEdit):
                 field.textChanged.connect(lambda: w.changeEdit(w.actualiserValeur()))
-            #print(f"connection entre le champ de texte et la fonction changeEdit pour la ligne {i}")
 
 def afficherRenduFormulaire(fiche=None):
-    global current_Rendu
+    global currentRenduFormulaire
+
     parametrePath = os.path.join(BASE_DIR, "UI", "RenduFormulaire.ui")
     parametre = loader.load(parametrePath, None)
+
+    if parametre is None:
+        print("Erreur: impossible de charger RenduFormulaire.ui")
+        return
+
+    if hasattr(parametre, "setWindowTitle"):
+        parametre.setWindowTitle("Rendu du formulaire")
+    if hasattr(parametre, "resize"):
+        parametre.resize(800, 600)
+    if hasattr(parametre, "setAttribute"):
+        parametre.setAttribute(QtCore.Qt.WA_DeleteOnClose, False)
 
     def _get_response_text():
         try:
@@ -158,44 +240,56 @@ def afficherRenduFormulaire(fiche=None):
             except Exception:
                 return ""
 
-    # Bouton Home: retour au catalogue
-    parametre.BoutonHome.clicked.connect(lambda: afficherLeCatalogue(fiche.window, fiche.chemainScan))
-    parametre.BoutonHome.clicked.connect(lambda: parametre.close())
-
-    # Bouton Formulaire: revenir au formulaire courant
-    if fiche is not None and hasattr(fiche, 'page'):
-        parametre.BoutonFormulaire.clicked.connect(lambda: afficherUnFormulaire(currentCatalogue.window, fiche.page))
-    else:
-        parametre.BoutonFormulaire.clicked.connect(lambda:afficherUnFormulaire(currentCatalogue.window, currentCatalogue.window.listWidget.currentItem().text()))
-    parametre.BoutonHome.clicked.connect(lambda: parametre.close())
-    # Remplir le champ de rendu avec le texte renvoyé par fiche.affichage()
     try:
-        rendu_text = fiche.affichage() if fiche is not None else ""
-    except Exception:
+        rendu_text = fiche.affichage() if fiche is not None and hasattr(fiche, "affichage") else ""
+    except Exception as exc:
+        print(f"[Rendu] Erreur dans fiche.affichage(): {exc}")
         rendu_text = ""
 
     try:
-        # Si Reponce est un QTextEdit
-        parametre.Reponce.setPlainText(rendu_text)
+        parametre.Reponce.setText(rendu_text)
     except Exception:
         try:
-            # Si Reponce est un QLabel ou similaire
-            parametre.Reponce.setText(rendu_text)
-        except Exception:
-            pass
+            parametre.Reponce.setPlainText(rendu_text)
+        except Exception as exc:
+            print(f"[Rendu] Impossible d'écrire dans Reponce: {exc}")
 
-    # Bouton Copier: copie le texte du rendu dans le presse-papier
-    parametre.BoutonCopier.clicked.connect(lambda: QtWidgets.QApplication.clipboard().setText(_get_response_text()))
+    parametre.BoutonCopier.clicked.connect(
+        lambda: QtWidgets.QApplication.clipboard().setText(_get_response_text())
+    )
 
-    # Fermer la fiche source si elle est ouverte
+    if fiche is not None:
+        page = getattr(fiche, "nomDuFichier", None)
+        if page is None:
+            page = getattr(fiche, "page", None)
+
+        parametre.BoutonFormulaire.clicked.connect(
+            lambda: afficherUnFormulaire(getattr(fiche, "window", None), page)
+        )
+        parametre.BoutonHome.clicked.connect(
+            lambda: afficherLeCatalogue(getattr(fiche, "window", None), getattr(fiche, "chemainScan", "Scan"))
+        )
+    else:
+        parametre.BoutonFormulaire.clicked.connect(lambda: None)
+        parametre.BoutonHome.clicked.connect(lambda: None)
+
     try:
-        if fiche is not None and hasattr(fiche, 'window'):
+        if fiche is not None and hasattr(fiche, "window") and fiche.window is not None:
             fiche.window.close()
-    except Exception:
-        pass
+    except Exception as exc:
+        print(f"[Rendu] Erreur lors de la fermeture de la fiche: {exc}")
 
-    activerRedimensionnementDynamique(parametre)
+    currentRenduFormulaire = parametre
+
+    # On ferme d'abord une éventuelle ancienne fenêtre de rendu
+    window_manager.close("rendu")
+
+    # On l'affiche explicitement
+    window_manager.show("rendu", parametre)
     parametre.show()
+    parametre.raise_()
+    parametre.activateWindow()
+    QtWidgets.QApplication.processEvents()
 
 def afficherLeCatalogue(w=None, repertoire="Scan"):
     global currentCatalogue, chemainScan
@@ -204,11 +298,13 @@ def afficherLeCatalogue(w=None, repertoire="Scan"):
 
     mettreAJourChemainScan(repertoire)
     print(f"Répertoire de scan utilisé pour le catalogue: {repertoire}")
+
     if w is not None:
         w.close()
 
     cataloguePath = os.path.join(BASE_DIR, "UI", "changementDePage.ui")
     catalogue = loader.load(cataloguePath, None)
+
     currentCatalogue = Catalogue.ListeAFinir(catalogue, repertoire)
     currentCatalogue.window.Reactualiser.clicked.connect(lambda: afficherLeCatalogue(currentCatalogue.window, repertoire))
     currentCatalogue.window.listWidget.currentItemChanged.connect(lambda: afficherUnFormulaire(currentCatalogue.window, currentCatalogue.window.listWidget.currentItem().text()))
@@ -218,30 +314,39 @@ def afficherLeCatalogue(w=None, repertoire="Scan"):
     currentCatalogue.window.AjouterUnFichier.clicked.connect(lambda: afficherLeCatalogue(currentCatalogue.window, repertoire))
     currentCatalogue.window.Statistique.clicked.connect(lambda: afficherLesStatistiques())
     currentCatalogue.window.ChoisirUnNouveauDossierDeBase.clicked.connect(lambda: currentCatalogue.choisirRepertoireDeScan(mettreAJourChemainScan))
+
     activerRedimensionnementDynamique(currentCatalogue)
-    
-    currentCatalogue.window.show()
+    window_manager.show("catalogue", currentCatalogue)
+
+def afficherLeFormulaireCollection(fiche=None):
+    formulaireCollectionPath = os.path.join(BASE_DIR, "UI", "FormulaireCollection.ui")
+    formulaireCollection = loader.load(formulaireCollectionPath, None)
+    formulaireCollectionWindow = fc.FormulaireCollection(formulaireCollection, fiche)
+
+    activerRedimensionnementDynamique(formulaireCollectionWindow)
+    window_manager.show("formulaire_collection", formulaireCollectionWindow)
 
 def afficherLeFormulaireAuteur(fiche=None):
     formulaireAuteurPath = os.path.join(BASE_DIR, "UI", "FormulaireAuteur.ui")
     formulaireAuteur = loader.load(formulaireAuteurPath, None)
     formulaireAuteurWindow = fa.FormulaireAuteur(formulaireAuteur,fiche)
+
     activerRedimensionnementDynamique(formulaireAuteurWindow)
-    formulaireAuteurWindow.window.show()
+    window_manager.show("formulaire_auteur", formulaireAuteurWindow)
 
 def afficherLeFormulaireChampsScientifique(fiche=None):
     formulaireChampsScientifiquePath = os.path.join(BASE_DIR, "UI", "FormulaireChampsScientifique.ui")
     formulaireChampsScientifique = loader.load(formulaireChampsScientifiquePath, None)
-    formulaireChampsScientifiqueWindow = FC.FormulaireChampsScientifique(formulaireChampsScientifique,fiche)
+    formulaireChampsScientifiqueWindow = FCs.FormulaireChampsScientifique(formulaireChampsScientifique,fiche)
+
     activerRedimensionnementDynamique(formulaireChampsScientifiqueWindow)
-    formulaireChampsScientifiqueWindow.window.show()
+    window_manager.show("formulaire_champs", formulaireChampsScientifiqueWindow)
 
 def afficherLesStatistiques():
     global currentStatistiques
     statistiquesPath = os.path.join(BASE_DIR, "UI", "Statistiques.ui")
     statistiques = loader.load(statistiquesPath, None)
-    
-    # Configurer les size policies avant activerRedimensionnementDynamique
+
     statistiques.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
 
     statistiques.Retour.clicked.connect(lambda: statistiques.close())
@@ -250,7 +355,7 @@ def afficherLesStatistiques():
     centralWidget = QtWidgets.QWidget()
     gridL = QtWidgets.QGridLayout()
     centralWidget.setLayout(gridL)
-    statistiques.setCentralWidget(centralWidget)   
+    statistiques.setCentralWidget(centralWidget)
     gridL.setContentsMargins(5, 5, 64, 64)
     gridL.setSpacing(10)
     gridL.setColumnStretch(0, 1)
@@ -278,9 +383,8 @@ def afficherLesStatistiques():
         canvas.draw()
 
     statistiques.resize(1500, 950)
-    statistiques.show()
-
     currentStatistiques = statistiques
+    window_manager.show("statistiques", statistiques)
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
