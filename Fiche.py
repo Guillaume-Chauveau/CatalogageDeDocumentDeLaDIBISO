@@ -175,39 +175,35 @@ class Fiche:
         text = ""
         self.nettoyerCaracteristiques()
 
-        article = self.getValeurParNom("Article")
-        titre = self.getValeurParNom("Titre")
-        auteur = self.getValeurParNom("Auteur")
-        complementTitre = self.getValeurParNom("Complement du titre")
-        numeroVolume = self.getValeurParNom("Numero du volume")
-        ville = self.getValeurParNom("Ville")
-        editeur = self.getValeurParNom("Editeur")
-        annee = self.getValeurParNom("Annee")
-        volume = self.getValeurParNom("Volume")
-        illustration = self.getValeurParNom("Illustration")
-        dimension = self.getValeurParNom("Dimension")
-        indexationRameau = self.getCaracteristiqueParNom("Indexation Rameau")
+        article = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom("Article"))
+        titre = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom("Titre"))
+        auteur = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom("Auteur"))
+        complementTitre = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom("Complement du titre"))
+        numeroVolume = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom("Numero du volume"))
+        ville = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom("Ville"))
+        editeur = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom("Editeur"))
+        annee = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom("Annee"))
+        volume = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom("Volume"))
+        illustration = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom("Illustration"))
+        dimension = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom("Dimension"))
+        indexationRameau =self.getCaracteristiqueParNom("Indexation Rameau")
         premierAuteur = self.getValeurParNom("Auteur Principal")
         coAuteur = self.getValeurParNom("Co-Auteur")
         fonctionAuteur = self.getValeurParNom("Fonction Auteur")
         fonctionCoauteur = self.getValeurParNom("Fonction CoAuteur")
         auteurSecondaire = self.getValeurParNom("Auteur Secondaire")
         fonctionAuteurSecondaire = self.getValeurParNom("Fonction Auteur Secondaire")
-        collectivite = self.getValeurParNom("Nom de la Collectivite")
-        fonctionCollectivite = self.getValeurParNom("Fonction de la Collectivite")
-        mentionEdition = self.getValeurParNom("Mention d'edition")
+        collectivite = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom("Nom de la Collectivite"))
+        fonctionCollectivite = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom("Fonction de la Collectivite"))
+        mentionEdition = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom("Mention d'edition"))
 
-        valeurs_collection = self.getValeursFormulaireCollection()
-        article_formulaire_collection = valeurs_collection.get("article", "")
-        collection = valeurs_collection.get("collection", "")
-        section = valeurs_collection.get("section", "")
-        reference = valeurs_collection.get("reference", "")
-        print(f"Valeurs du formulaire collection: {valeurs_collection}")
-        if article_formulaire_collection:
-            article = article_formulaire_collection
+        valeursCollection = self.getValeursFormulaireCollection()
+        articleFormulaireCollection = self._majusculeEnDebutDeCaracteristique(valeursCollection.get("article", ""))
+        collection = self._majusculeEnDebutDeCaracteristique(valeursCollection.get("collection", ""))
+        section = self._majusculeEnDebutDeCaracteristique(valeursCollection.get("section", ""))
+        reference = self._majusculeEnDebutDeCaracteristique(valeursCollection.get("reference", ""))
+        print(f"Valeurs du formulaire collection: {valeursCollection}")
 
-        if not collection:
-            collection = self.getValeurParNom("Collection")
         text="008 $aAax3\n104 ##$ak$bzy$cy$dba$ffre\n106 ##$ar\n181 ##$P01$ctxt\n182 ##$P01$cn\n183 ##$P01$anga\n"
 
         if article != "" or titre != "" or auteur != "" or complementTitre != "":
@@ -246,10 +242,10 @@ class Fiche:
                 text += ("$d" + str(dimension))
             text += ";\n"
 
-        if collection or section or reference:
-            text += "225 ##"
+        if collection or section:
+            text += "225 2#"
             if collection:
-                text += f"$a{collection}"
+                text += f"$a@{collection}"
             if section:
                 text += f"$i{section}"
             text += ";\n"
@@ -291,6 +287,15 @@ class Fiche:
         text = self._retirerLeDernierPointVigule(text)
         print(f"Affichage de la fiche: {titre} de {auteur} ({annee})")
         print(text)
+        return text
+    def _majusculeEnDebutDeCaracteristique(self, text):
+        if isinstance(text, list):
+            for i in range(len(text)):
+                if text[i]:
+                    text[i] = text[i][0].upper() + text[i][1:]
+        else:
+            if text:
+                text = text[0].upper() + text[1:]
         return text
 
     def _retirerLeDernierPointVigule(self,text):
