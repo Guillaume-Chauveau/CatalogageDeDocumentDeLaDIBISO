@@ -32,7 +32,7 @@ class CaracteristiqueMultiple(Caracteristique):
         else:
             return "{{"+" | ".join(self.valeur)+"}}"
     
-    def getValeurChampsScientifique(self):
+    def getValeurIndexationRameau(self):
         texte="{{"+self.valeur[0]+"}} | rameau"
         for i in range(1,len(self.valeur)):
             texte+=" | {{"+self.valeur[i]+"}} | rameau"

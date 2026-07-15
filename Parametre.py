@@ -8,8 +8,6 @@ from PySide6 import QtGui, QtWidgets
 
 class Parametre:
     listeParametreFixe =["Article","Titre","Auteur","Complement du titre","Numero du volume","Ville","Editeur","Annee","Illustration","Dimension","Indexation Rameau","Premier Auteur","Co-Auteur","Role Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire","Nom de la Collectivite","Role de la Collectivite"]
-    listeParametreHebdo =["TesteHebdo1","TesteHebdo2","TesteHebdo3","TesteHebdo4","TesteHebdo5","TesteHebdo6","TesteHebdo7","TesteHebdo8","TesteHebdo9","TesteHebdo10"]
-    listeParametreClassique =["TesteClassique1","TesteClassique2","TesteClassique3","TesteClassique4","TesteClassique5","TesteClassique6","TesteClassique7","TesteClassique8","TesteClassique9","TesteClassique10"]
     listeAfficher = []
     listeDesCocher =["Article"]
     

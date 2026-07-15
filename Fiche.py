@@ -207,87 +207,171 @@ class Fiche:
         text="008 $aAax3\n104 ##$ak$bzy$cy$dba$ffre\n106 ##$ar\n181 ##$P01$ctxt\n182 ##$P01$cn\n183 ##$P01$anga\n"
 
         if article != "" or titre != "" or auteur != "" or complementTitre != "":
-            text += "200 "
-            if article != "":
-                text += ("0#$a" + str(article) + " @" + str(titre))
-            else:
-                text += ("1#$a@" + str(titre))
-            if auteur != "":
-                text += ("$f" + str(auteur))
-                if coAuteur != "":
-                    text += ("," + str(coAuteur))
-                if auteurSecondaire != "":
-                    text += ("," + str(auteurSecondaire))
-            if complementTitre != "":
-                text += ("$e" + str(complementTitre))
-            if numeroVolume != "":
-                text += ("$h" + str(numeroVolume))
+            text +=self._champs200(article, titre, auteur, complementTitre, numeroVolume, coAuteur, auteurSecondaire)
             text += "\n"
 
         if mentionEdition != "":
             text += "205 ##" + mentionEdition + "\n"
 
         if ville != "" or editeur != "" or annee != "":
-            text += "214 #0"
             text += self._formatagePourVilleEditeurAnnee(ville, editeur, annee)
             text += "\n"
 
         if volume != "" or illustration != "" or dimension != "":
-            text += "215 ##"
-            if volume != "":
-                text += ("$a" + str(volume))
-            if illustration != "":
-                text += ("$c" + str(illustration))
-            if dimension != "":
-                text += ("$d" + str(dimension))
-            text += "\n"
+            text += self._champs215(volume, illustration, dimension)
 
         if collection or section:
-            text += "225 2#"
-            if collection:
-                text += f"$a@{collection}"
-            if section:
-                text += f"$i{section}"
-            text += "\n"
+            text += self._champs225(collection, section)
         if reference:
             text += f"410 ##$0@{reference}"
         if indexationRameau is not None and indexationRameau.getValeur() != "":
             text += ("606 ##$" + str(indexationRameau.getValeurIndexationRameau()) + "\n ")
 
         if premierAuteur != "" or fonctionAuteur != "":
-            text += "700 "
-            if premierAuteur != "":
-                text += ("#1$3" + str(premierAuteur))
-            if fonctionAuteur != "":
-                text += ("$40" + str(fonctionAuteur))
-            text += "\n"
+            text +=self._champs700(premierAuteur, fonctionAuteur)
 
         if coAuteur != "" or fonctionCoauteur != "":
-            text += "701 "
-            if coAuteur != "":
-                text += ("#1$3" + str(coAuteur))
-            if fonctionCoauteur != "":
-                text += ("$40" + str(fonctionCoauteur))
-            text += "\n"
+            text += self._champs701(coAuteur, fonctionCoauteur)
 
         if auteurSecondaire != "" or fonctionAuteurSecondaire != "":
-            text += "702 "
-            if auteurSecondaire != "":
-                text += ("#1$3" + str(auteurSecondaire))
-            if fonctionAuteurSecondaire != "":
-                text += ("$4" + str(fonctionAuteurSecondaire))
-            text += "\n"
+            text += self._champs702(auteurSecondaire, fonctionAuteurSecondaire)
 
         if collectivite != "" or fonctionCollectivite != "":
-            text += "712 "
-            if collectivite != "":
-                text += ("02$3" + str(collectivite))
-            if fonctionCollectivite != "":
-                text += ("$4" + str(fonctionCollectivite))
+            text += self._champs712(collectivite, fonctionCollectivite)
         #text = self._retirerLeDernierPointVigule(text)
         print(f"Affichage de la fiche: {titre} de {auteur} ({annee})")
         print(text)
         return text
+
+    def _decouperMorceaux(self, *valeurs):
+        morceauxParValeur = []
+        for valeur in valeurs:
+            if valeur is None:
+                morceauxParValeur.append([])
+            elif isinstance(valeur, (list, tuple, set)):
+                morceauxParValeur.append([str(v).strip() for v in valeur if str(v).strip()])
+            else:
+                texte = str(valeur)
+                morceauxParValeur.append([part.strip() for part in texte.split(";") if part.strip()])
+        return morceauxParValeur
+
+    def _champs712(self, collectivite, fonctionCollectivite):
+        collectivite_morceaux, fonction_morceaux = self._decouperMorceaux(collectivite, fonctionCollectivite)
+        resultats = []
+        max_len = max([len(collectivite_morceaux), len(fonction_morceaux), 0])
+        for i in range(max_len):
+            text = "712 "
+            if i < len(collectivite_morceaux) and collectivite_morceaux[i] != "":
+                text += ("02$3" + str(collectivite_morceaux[i]))
+            if i < len(fonction_morceaux) and fonction_morceaux[i] != "":
+                text += ("$4" + str(fonction_morceaux[i]))
+            if text != "712 ":
+                resultats.append(text)
+        return "\n".join(resultats)
+
+    def _champs702(self, auteurSecondaire, fonctionAuteurSecondaire):
+        auteur_secondaire_morceaux, fonction_morceaux = self._decouperMorceaux(auteurSecondaire, fonctionAuteurSecondaire)
+        resultats = []
+        max_len = max([len(auteur_secondaire_morceaux), len(fonction_morceaux), 0])
+        for i in range(max_len):
+            text = "702 "
+            if i < len(auteur_secondaire_morceaux) and auteur_secondaire_morceaux[i] != "":
+                text += ("#1$3" + str(auteur_secondaire_morceaux[i]))
+            if i < len(fonction_morceaux) and fonction_morceaux[i] != "":
+                text += ("$4" + str(fonction_morceaux[i]))
+            if text != "702 ":
+                resultats.append(text)
+        return "\n".join(resultats)
+    
+    def _champs701(self, coAuteur, fonctionCoauteur):
+        co_auteur_morceaux, fonction_morceaux = self._decouperMorceaux(coAuteur, fonctionCoauteur)
+        resultats = []
+        max_len = max([len(co_auteur_morceaux), len(fonction_morceaux), 0])
+        for i in range(max_len):
+            text = "701 "
+            if i < len(co_auteur_morceaux) and co_auteur_morceaux[i] != "":
+                text += ("#1$3" + str(co_auteur_morceaux[i]))
+            if i < len(fonction_morceaux) and fonction_morceaux[i] != "":
+                text += ("$40" + str(fonction_morceaux[i]))
+            if text != "701 ":
+                resultats.append(text)
+        return "\n".join(resultats)
+
+    def _champs700(self, premierAuteur, fonctionAuteur):
+        premier_auteur_morceaux, fonction_morceaux = self._decouperMorceaux(premierAuteur, fonctionAuteur)
+        resultats = []
+        max_len = max([len(premier_auteur_morceaux), len(fonction_morceaux), 0])
+        for i in range(max_len):
+            text = "700 "
+            if i < len(premier_auteur_morceaux) and premier_auteur_morceaux[i] != "":
+                text += ("#1$3" + str(premier_auteur_morceaux[i]))
+            if i < len(fonction_morceaux) and fonction_morceaux[i] != "":
+                text += ("$40" + str(fonction_morceaux[i]))
+            if text != "700 ":
+                resultats.append(text)
+        return "\n".join(resultats)
+    
+    def _champs225(self, collection, section):
+        collection_morceaux, section_morceaux = self._decouperMorceaux(collection, section)
+        resultats = []
+        max_len = max([len(collection_morceaux), len(section_morceaux), 0])
+        for i in range(max_len):
+            text = "225 2#"
+            if i < len(collection_morceaux) and collection_morceaux[i] != "":
+                text += f"$a@{collection_morceaux[i]}"
+            if i < len(section_morceaux) and section_morceaux[i] != "":
+                text += f"$i{section_morceaux[i]}"
+            if text != "225 2#":
+                resultats.append(text)
+        return "\n".join(resultats)
+
+    def _champs215(self, volume, illustration, dimension):
+        volume_morceaux, illustration_morceaux, dimension_morceaux = self._decouperMorceaux(volume, illustration, dimension)
+        resultats = []
+        max_len = max([len(volume_morceaux), len(illustration_morceaux), len(dimension_morceaux), 0])
+        for i in range(max_len):
+            text = "215 ##"
+            if i < len(volume_morceaux) and volume_morceaux[i] != "":
+                text += ("$a" + str(volume_morceaux[i]))
+            if i < len(illustration_morceaux) and illustration_morceaux[i] != "":
+                text += ("$c" + str(illustration_morceaux[i]))
+            if i < len(dimension_morceaux) and dimension_morceaux[i] != "":
+                text += ("$d" + str(dimension_morceaux[i]))
+            if text != "215 ##":
+                resultats.append(text)
+        return "\n".join(resultats)
+
+    def _champs200(self, article, titre, auteur, complementTitre, numeroVolume, coAuteur, auteurSecondaire):
+        article_morceaux, titre_morceaux, auteur_morceaux, complement_morceaux, numero_volume_morceaux, co_auteur_morceaux, auteur_secondaire_morceaux = self._decouperMorceaux(article, titre, auteur, complementTitre, numeroVolume, coAuteur, auteurSecondaire)
+        resultats = []
+        max_len = max([len(article_morceaux), len(titre_morceaux), len(auteur_morceaux), len(complement_morceaux), len(numero_volume_morceaux), len(co_auteur_morceaux), len(auteur_secondaire_morceaux), 0])
+        for i in range(max_len):
+            article_val = article_morceaux[i] if i < len(article_morceaux) else ""
+            titre_val = titre_morceaux[i] if i < len(titre_morceaux) else ""
+            auteur_val = auteur_morceaux[i] if i < len(auteur_morceaux) else ""
+            complement_val = complement_morceaux[i] if i < len(complement_morceaux) else ""
+            numero_volume_val = numero_volume_morceaux[i] if i < len(numero_volume_morceaux) else ""
+            co_auteur_val = co_auteur_morceaux[i] if i < len(co_auteur_morceaux) else ""
+            auteur_secondaire_val = auteur_secondaire_morceaux[i] if i < len(auteur_secondaire_morceaux) else ""
+
+            text = "200 "
+            if article_val != "":
+                text += ("0#$a" + str(article_val) + " @" + str(titre_val))
+            else:
+                text += ("1#$a@" + str(titre_val))
+            if auteur_val != "":
+                text += ("$f" + str(auteur_val))
+                if co_auteur_val != "":
+                    text += ("," + str(co_auteur_val))
+                if auteur_secondaire_val != "":
+                    text += ("," + str(auteur_secondaire_val))
+            if complement_val != "":
+                text += ("$e" + str(complement_val))
+            if numero_volume_val != "":
+                text += ("$h" + str(numero_volume_val))
+            if text != "200 ":
+                resultats.append(text)
+        return "\n".join(resultats)
     def _majusculeEnDebutDeCaracteristique(self, text):
         if isinstance(text, list):
             for i in range(len(text)):
@@ -312,7 +396,7 @@ class Fiche:
         annee = [a.strip() for a in annee.split(",") if a.strip()]
         text = ""
         for i in range(max(len(ville), len(editeur), len(annee))):
-            
+            text += "214 #0"
             if ville != "":
                 text += ("$a" + str(ville[i]) if i < len(ville) else "")
             if editeur != "":
