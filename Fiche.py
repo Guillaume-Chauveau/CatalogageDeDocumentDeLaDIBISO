@@ -222,7 +222,7 @@ class Fiche:
                 text += ("$e" + str(complementTitre))
             if numeroVolume != "":
                 text += ("$h" + str(numeroVolume))
-            text += ";\n"
+            text += "\n"
 
         if mentionEdition != "":
             text += "205 ##" + mentionEdition + "\n"
@@ -230,7 +230,7 @@ class Fiche:
         if ville != "" or editeur != "" or annee != "":
             text += "214 #0"
             text += self._formatagePourVilleEditeurAnnee(ville, editeur, annee)
-            text += ";\n"
+            text += "\n"
 
         if volume != "" or illustration != "" or dimension != "":
             text += "215 ##"
@@ -240,7 +240,7 @@ class Fiche:
                 text += ("$c" + str(illustration))
             if dimension != "":
                 text += ("$d" + str(dimension))
-            text += ";\n"
+            text += "\n"
 
         if collection or section:
             text += "225 2#"
@@ -248,11 +248,11 @@ class Fiche:
                 text += f"$a@{collection}"
             if section:
                 text += f"$i{section}"
-            text += ";\n"
+            text += "\n"
         if reference:
             text += f"410 ##$0@{reference}"
         if indexationRameau is not None and indexationRameau.getValeur() != "":
-            text += ("606 ##$" + str(indexationRameau.getValeurIndexationRameau()) + ";\n ")
+            text += ("606 ##$" + str(indexationRameau.getValeurIndexationRameau()) + "\n ")
 
         if premierAuteur != "" or fonctionAuteur != "":
             text += "700 "
@@ -260,7 +260,7 @@ class Fiche:
                 text += ("#1$3" + str(premierAuteur))
             if fonctionAuteur != "":
                 text += ("$40" + str(fonctionAuteur))
-            text += ";\n"
+            text += "\n"
 
         if coAuteur != "" or fonctionCoauteur != "":
             text += "701 "
@@ -268,7 +268,7 @@ class Fiche:
                 text += ("#1$3" + str(coAuteur))
             if fonctionCoauteur != "":
                 text += ("$40" + str(fonctionCoauteur))
-            text += ";\n"
+            text += "\n"
 
         if auteurSecondaire != "" or fonctionAuteurSecondaire != "":
             text += "702 "
@@ -276,7 +276,7 @@ class Fiche:
                 text += ("#1$3" + str(auteurSecondaire))
             if fonctionAuteurSecondaire != "":
                 text += ("$4" + str(fonctionAuteurSecondaire))
-            text += ";\n"
+            text += "\n"
 
         if collectivite != "" or fonctionCollectivite != "":
             text += "712 "
@@ -284,7 +284,7 @@ class Fiche:
                 text += ("02$3" + str(collectivite))
             if fonctionCollectivite != "":
                 text += ("$4" + str(fonctionCollectivite))
-        text = self._retirerLeDernierPointVigule(text)
+        #text = self._retirerLeDernierPointVigule(text)
         print(f"Affichage de la fiche: {titre} de {auteur} ({annee})")
         print(text)
         return text
