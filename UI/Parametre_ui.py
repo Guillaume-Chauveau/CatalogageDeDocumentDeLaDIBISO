@@ -16,9 +16,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QFrame, QGridLayout,
-    QHBoxLayout, QMainWindow, QMenuBar, QPushButton,
-    QSizePolicy, QSpacerItem, QStatusBar, QVBoxLayout,
-    QWidget)
+    QHBoxLayout, QLineEdit, QMainWindow, QMenuBar,
+    QPushButton, QSizePolicy, QSpacerItem, QStatusBar,
+    QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -80,6 +80,11 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.CodeConnexionAPI = QLineEdit(self.verticalLayoutWidget)
+        self.CodeConnexionAPI.setObjectName(u"CodeConnexionAPI")
+
+        self.horizontalLayout_3.addWidget(self.CodeConnexionAPI)
+
         self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_3.addItem(self.horizontalSpacer)

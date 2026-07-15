@@ -88,6 +88,9 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
+         <widget class="QLineEdit" name="CodeConnexionAPI"/>
+        </item>
+        <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
            <enum>Qt::Orientation::Horizontal</enum>
