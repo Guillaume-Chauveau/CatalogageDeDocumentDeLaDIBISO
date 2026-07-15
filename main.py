@@ -99,6 +99,7 @@ def afficherLesParametres():
     currentParametre.window.ToutVrai.clicked.connect(lambda: currentParametre.clickVraiTout())
     currentParametre.window.ToutFaux.clicked.connect(lambda: currentParametre.clickFauxTout())
     currentParametre.window.Valider.clicked.connect(lambda: currentParametre.retour())
+    currentParametre.window.Valider.clicked.connect(lambda: currentParametre.window.close())
     currentParametre.window.Annuler.clicked.connect(lambda: currentParametre.window.close())
 
     activerRedimensionnementDynamique(currentParametre)
