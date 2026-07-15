@@ -8,3 +8,4 @@ dist/
 .venv/
 tests/__pycache__
 Doc/briefe_von_justus_liebig.txt
+champs_scientifiques.txt
