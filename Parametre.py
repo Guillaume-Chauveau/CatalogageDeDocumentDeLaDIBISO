@@ -7,7 +7,7 @@ from PySide6 import QtWidgets
 from PySide6 import QtGui, QtWidgets
 
 class Parametre:
-    listeParametreFixe =["Article","Titre","Auteur","Complement du titre","Numero du volume","Ville","Editeur","Annee","Illustration","Taille","Champ Scientifique","Premier Auteur","Co-Auteur","Role Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire","Nom de la Collectivite","Role de la Collectivite"]
+    listeParametreFixe =["Article","Titre","Auteur","Complement du titre","Numero du volume","Ville","Editeur","Annee","Illustration","Dimension","Indexation Rameau","Premier Auteur","Co-Auteur","Role Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire","Nom de la Collectivite","Role de la Collectivite"]
     listeParametreHebdo =["TesteHebdo1","TesteHebdo2","TesteHebdo3","TesteHebdo4","TesteHebdo5","TesteHebdo6","TesteHebdo7","TesteHebdo8","TesteHebdo9","TesteHebdo10"]
     listeParametreClassique =["TesteClassique1","TesteClassique2","TesteClassique3","TesteClassique4","TesteClassique5","TesteClassique6","TesteClassique7","TesteClassique8","TesteClassique9","TesteClassique10"]
     listeAfficher = []
@@ -92,7 +92,7 @@ class Parametre:
 
     def afficherLaListe(self):
         self.remiseAZero()
-        nbColonne = self.calculeTaille()
+        nbColonne = self.calculeDimension()
         id=0
         for i in self.listeAfficher:
             item = QtWidgets.QCheckBox(i)
@@ -140,7 +140,7 @@ class Parametre:
                 self.listeAfficher.remove(i)
         self.afficherLaListe()
     
-    def calculeTaille(self):
+    def calculeDimension(self):
         return round(sqrt(len(self.listeAfficher)))
 
     def clickClassique(self):
@@ -209,7 +209,7 @@ class Parametre:
         self.sauvegarderCodeConnexionAPI()
         print(self.getCodeConnexionAPI())
         print(self.listeDesCocher)
-        
+
 def getCodeConnexionAPI():
     """Retourne le CodeConnexionAPI depuis le fichier caché"""
     config_file = Parametre._getConfigFile()

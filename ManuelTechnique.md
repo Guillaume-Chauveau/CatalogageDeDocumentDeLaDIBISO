@@ -230,7 +230,7 @@ La liste des caractéristiques est définie dans `Fiche.listeDesNom` :
 ```python
 listeDesNom = ["Article", "Titre", "Auteur", "Complement du titre",
                "Numero du volume", "Ville", "Editeur", "Annee",
-               "Illustration", "Taille", "Champ Scientifique",
+               "Illustration", "Dimension", "Indexation Rameau",
                "Premier Auteur", "Co-Auteur", "Role Auteur", "Role CoAuteur",
                "Auteur Secondaire", "Role Auteur Secondaire",
                "Nom de la Collectivite", "Role de la Collectivite"]
