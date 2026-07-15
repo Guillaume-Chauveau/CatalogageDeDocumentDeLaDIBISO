@@ -1,4 +1,7 @@
 from math import sqrt
+import json
+import os
+from pathlib import Path
 
 from PySide6 import QtWidgets
 from PySide6 import QtGui, QtWidgets
@@ -9,9 +12,71 @@ class Parametre:
     listeParametreClassique =["TesteClassique1","TesteClassique2","TesteClassique3","TesteClassique4","TesteClassique5","TesteClassique6","TesteClassique7","TesteClassique8","TesteClassique9","TesteClassique10"]
     listeAfficher = []
     listeDesCocher =["Article"]
+    
+    # Chemin du fichier caché pour stocker le CodeConnexionAPI
+    @staticmethod
+    def _getConfigFile():
+        config_dir = Path.home() / ".app_config"
+        config_dir.mkdir(exist_ok=True)
+        return config_dir / "config.json"
+    
+    CONFIG_FILE = _getConfigFile()
     def __init__(self,w):
         self.window=w
         self.window.setWindowTitle("Liste des paramètres")
+        self.chargerCodeConnexionAPI()
+
+    def chargerCodeConnexionAPI(self):
+        """Charge le CodeConnexionAPI depuis le fichier caché"""
+        try:
+            if self.CONFIG_FILE.exists():
+                with open(self.CONFIG_FILE, 'r') as f:
+                    config = json.load(f)
+                    code = config.get("CodeConnexionAPI", "")
+                    self.window.CodeConnexionAPI.setText(code)
+        except Exception as e:
+            print(f"Erreur lors du chargement du CodeConnexionAPI: {e}")
+
+    def sauvegarderCodeConnexionAPI(self):
+        """Sauvegarde le CodeConnexionAPI dans un fichier caché"""
+        try:
+            code = self.window.CodeConnexionAPI.text()
+            config = {}
+            
+            # S'assurer que le répertoire parent existe
+            self.CONFIG_FILE.parent.mkdir(parents=True, exist_ok=True)
+            
+            # Charger la config existante si elle existe
+            if self.CONFIG_FILE.exists():
+                try:
+                    with open(self.CONFIG_FILE, 'r') as f:
+                        config = json.load(f)
+                except Exception as load_error:
+                    print(f"Avertissement: impossible de charger la config existante: {load_error}")
+                    config = {}
+            
+            # Mettre à jour avec la nouvelle valeur
+            config["CodeConnexionAPI"] = code
+            
+            # Sauvegarder
+            with open(self.CONFIG_FILE, 'w') as f:
+                json.dump(config, f, indent=2)
+            
+            # Rendre le fichier caché sur Windows
+            if os.name == 'nt':  # Windows
+                try:
+                    os.system(f'attrib +h "{self.CONFIG_FILE}"')
+                except Exception as attr_error:
+                    print(f"Avertissement: impossible de rendre le fichier caché: {attr_error}")
+            
+            print(f"CodeConnexionAPI sauvegardé avec succès dans {self.CONFIG_FILE}")
+            
+        except Exception as e:
+            print(f"Erreur lors de la sauvegarde du CodeConnexionAPI: {e}")
+    
+    def getCodeConnexionAPI(self):
+        """Retourne le CodeConnexionAPI"""
+        return self.window.CodeConnexionAPI.text()
 
     def remiseAZero(self):
         for i in range(self.window.ListeParametre.count() - 1, -1, -1):
@@ -141,4 +206,18 @@ class Parametre:
         print(self.listeDesCocher)
 
     def retour(self):
+        self.sauvegarderCodeConnexionAPI()
+        print(self.getCodeConnexionAPI())
         print(self.listeDesCocher)
+        
+def getCodeConnexionAPI():
+    """Retourne le CodeConnexionAPI depuis le fichier caché"""
+    config_file = Parametre._getConfigFile()
+    try:
+        if config_file.exists():
+            with open(config_file, 'r') as f:
+                config = json.load(f)
+                return config.get("CodeConnexionAPI", "")
+    except Exception as e:
+        print(f"Erreur lors de la lecture du CodeConnexionAPI: {e}")
+    return ""

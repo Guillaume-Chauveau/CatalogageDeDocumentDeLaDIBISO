@@ -6,6 +6,8 @@ from pathlib import Path
 import shutil
 import os
 
+from Parametre import getCodeConnexionAPI
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 if hasattr(sys, '_MEIPASS'):
@@ -132,12 +134,14 @@ class ListeAFinir:
         dialog.setDirectory(str(Path.home()))
         dialog.setFileMode(QFileDialog.FileMode.Directory)
         dialog.setViewMode(QFileDialog.ViewMode.List)
+        print(getCodeConnexionAPI())
         if dialog.exec():
             directories = dialog.selectedFiles()
             if directories:
                 self.changerDeRepertoireDeScan(directories[0])
                 self.setAfficheDossier(directories[0])
                 self._lectureDeToutLesScanDansLeRepertoireCoutrant()
+                
                 if callback is not None:
                     callback(self.repertoirDesScan)
         self.creerCatalogue()
