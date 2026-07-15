@@ -20,11 +20,12 @@ class FormulaireChampsScientifique:
         self.window.buttonBox.accepted.connect(lambda: self.sauvegarderFormulaire())
 
     def remplirFormulaire(self):
-        for i in range(0, len(self.fiche.listeDesCaracteristiques[self.fiche.INDICECHAMPSCIENTIFIQUE].valeur)):
+        valeurs = self.fiche.listeDesCaracteristiques[self.fiche.INDICECHAMPSCIENTIFIQUE].valeur or []
+        for i in range(len(valeurs)):
             self.window.ChampsScientifiqueListe.addWidget(QtWidgets.QComboBox())
             combo = self.window.ChampsScientifiqueListe.itemAt(i).widget()
             combo.addItems(self.champs_scientifiques)
-            combo.setCurrentText(self.fiche.listeDesCaracteristiques[self.fiche.INDICECHAMPSCIENTIFIQUE].valeur[i])
+            combo.setCurrentText(valeurs[i])
     
     def sauvegarderFormulaire(self):
         champs_selectionnes = []
@@ -60,7 +61,7 @@ class FormulaireChampsScientifique:
             self.sauvegarderChampsScientifiques()
 
     def annulerNouveauChamp(self):
-        self.NouveauChampsScientifique.clear()
+        self.window.NouveauChampsScientifique.clear()
 
     def updateAllCombos(self):
         # Mettre à jour les autres comboBoxes dans la liste

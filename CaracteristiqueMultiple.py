@@ -3,10 +3,7 @@ from Caracteristique import Caracteristique
 class CaracteristiqueMultiple(Caracteristique):
     def __init__(self, id, nom, valeur=None, edite=False, proba=0):
         super().__init__(id, nom, valeur, edite, proba)
-        if valeur is None:
-            valeur = []
-        else:
-            self.valeur = valeur
+        self.valeur = [] if valeur is None else valeur
 
     def getValeur(self):
         return ", ".join(self.valeur) if self.valeur else ""
