@@ -586,8 +586,25 @@ class Fiche:
         clipboard = QtWidgets.QApplication.clipboard()
         clipboard.setText(self.nomDuFichier)
         print(f"Nom du fichier copié dans le presse-papiers: {self.nomDuFichier}")
-        
+
+    def _caractéristiqueARomanisée(self, Caractéristique):
+        if Caractéristique is None:
+            return ""
+        if self._langueARomaninsée():
+            if self._besoinDeRomanisée(self,Caractéristique):
+                return Caractéristique+" Romanisée"
+        return Caractéristique
     
+    def _langueARomanisée(self):
+        return self.langue in getlangueNonRomaine()
+
+    def _besoinDeRomanisée(self,Caractéristique):
+        return Caractéristique in getCaracéristiquesARomanisée()
+
+def getCaracéristiquesARomanisée():
+    return ["Titre","Complement du titre","Auteur","Numero du volume","Collection","Ville","Editeur","Mention d'edition","Illustration"]
+def getlangueNonRomaine():
+    return ["ar","fa","he","ja","ko","zh"]
 def getListeDesNomDeCaracteristiquesMultiple():
     return ["Indexation Rameau","Premier Auteur","Role Auteur","Co-Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire"]
 def getListeDesNomsDeCaracterisitiques():
