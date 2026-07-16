@@ -1,0 +1,85 @@
+﻿retro_catalogage.exe : [PYI-12608:DEBUG] PyInstaller Bootloader 6.x
+Au caractère Ligne:1 : 148
++ ... NNING EXE'; & '.\dist\retro_catalogage\retro_catalogage.exe' 2>&1 | O ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([PYI-12608:DEBU... Bootloader 6.x 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[PYI-12608:DEBUG] LOADER: argv[0]: C:\Users\PC 
+Útude\OneDrive\IUT\StageS6\app\dist\retro_catalogage\retro_catalogage.exe
+[PYI-12608:DEBUG] LOADER: executable file: C:\Users\PC 
+Útude\OneDrive\IUT\StageS6\app\dist\retro_catalogage\retro_catalogage.exe
+[PYI-12608:DEBUG] LOADER: trying to load executable-embedded archive...
+[PYI-12608:DEBUG] LOADER: attempting to open archive C:\Users\PC 
+Útude\OneDrive\IUT\StageS6\app\dist\retro_catalogage\retro_catalogage.exe
+[PYI-12608:DEBUG] LOADER: cookie found at offset 0xC99FDC
+[PYI-12608:DEBUG] LOADER: archive file: C:\Users\PC 
+Útude\OneDrive\IUT\StageS6\app\dist\retro_catalogage\retro_catalogage.exe
+[PYI-12608:DEBUG] LOADER: application has onedir semantics...
+[PYI-12608:DEBUG] LOADER: _PYI_ARCHIVE_FILE not defined...
+[PYI-12608:DEBUG] LOADER: parent process level = -2
+[PYI-12608:DEBUG] LOADER: process level = 1
+[PYI-12608:DEBUG] LOADER: application's top-level directory: C:\Users\PC 
+Útude\OneDrive\IUT\StageS6\app\dist\retro_catalogage\_internal
+[PYI-12608:DEBUG] LOADER: calling SetDllDirectoryW: C:\Users\PC 
+Útude\OneDrive\IUT\StageS6\app\dist\retro_catalogage\_internal
+[PYI-12608:DEBUG] LOADER: splash screen is unavailable.
+[PYI-12608:DEBUG] DYLIB: loading Python DLL: C:\Users\PC 
+Útude\OneDrive\IUT\StageS6\app\dist\retro_catalogage\_internal\python311.dll
+[PYI-12608:DEBUG] DYLIB: loaded Python shared library.
+[PYI-12608:DEBUG] DYLIB: imported symbols from Python shared library.
+[PYI-12608:DEBUG] LOADER: pre-initializing embedded python interpreter...
+[PYI-12608:DEBUG] LOADER: using PEP-587 API...
+[PYI-12608:DEBUG] LOADER: creating PyConfig structure...
+[PYI-12608:DEBUG] LOADER: initializing interpreter configuration...
+[PYI-12608:DEBUG] LOADER: setting program name...
+[PYI-12608:DEBUG] LOADER: setting python home path...
+[PYI-12608:DEBUG] LOADER: setting module search paths...
+[PYI-12608:DEBUG] LOADER: setting sys.argv...
+[PYI-12608:DEBUG] LOADER: applying run-time options...
+[PYI-12608:DEBUG] LOADER: starting embedded python interpreter...
+[PYI-12608:DEBUG] LOADER: setting sys._MEIPASS
+[PYI-12608:DEBUG] LOADER: importing modules from PKG/CArchive
+[PYI-12608:DEBUG] LOADER: extracted struct
+[PYI-12608:DEBUG] LOADER: running unmarshalled code object for module struct...
+[PYI-12608:DEBUG] LOADER: extracted pyimod01_archive
+[PYI-12608:DEBUG] LOADER: running unmarshalled code object for module 
+pyimod01_archive...
+[PYI-12608:DEBUG] LOADER: extracted pyimod02_importers
+[PYI-12608:DEBUG] LOADER: running unmarshalled code object for module 
+pyimod02_importers...
+[PYI-12608:DEBUG] LOADER: extracted pyimod03_ctypes
+[PYI-12608:DEBUG] LOADER: running unmarshalled code object for module 
+pyimod03_ctypes...
+[PYI-12608:DEBUG] LOADER: extracted pyimod04_pywin32
+[PYI-12608:DEBUG] LOADER: running unmarshalled code object for module 
+pyimod04_pywin32...
+[PYI-12608:DEBUG] LOADER: looking for PYZ archive TOC entry...
+[PYI-12608:DEBUG] LOADER: path to PYZ archive stored into 
+sys._pyinstaller_pyz...
+[PYI-12608:DEBUG] LOADER: running pyiboot01_bootstrap.py
+[PYI-12608:DEBUG] LOADER: running pyi_rth_inspect.py
+[PYI-12608:DEBUG] LOADER: running pyi_rth_setuptools.py
+[PYI-12608:DEBUG] LOADER: running pyi_rth_pkgutil.py
+[PYI-12608:DEBUG] LOADER: running pyi_rth_multiprocessing.py
+[PYI-12608:DEBUG] LOADER: running pyi_rth_mplconfig.py
+[PYI-12608:DEBUG] LOADER: running pyi_rth_pyside6.py
+[PYI-12608:DEBUG] LOADER: running main.py
+2026-07-16 15:04:55,339 - WARNING - Matplotlib is building the font cache; 
+this may take a moment.
+2026-07-16 15:04:55,658 - INFO - generated new fontManager
+[PYI-12608:DEBUG] LOADER: running Fiche.py
+[PYI-12608:DEBUG] LOADER: running FormulaireAuteur.py
+[PYI-12608:DEBUG] LOADER: running Caracteristique.py
+[PYI-12608:DEBUG] LOADER: running CaracteristiqueMultiple.py
+[PYI-12608:DEBUG] LOADER: running FormulaireChampsScientifique.py
+[PYI-12608:DEBUG] LOADER: running ListeAFinir.py
+[PYI-12608:DEBUG] LOADER: running Parametre.py
+[PYI-12608:DEBUG] LOADER: OK.
+[PYI-12608:DEBUG] LOADER: manually flushing stdout and stderr...
+RÚpertoire de scan utilisÚ pour le catalogue: Scan
+[PYI-12608:DEBUG] LOADER: cleaning up Python interpreter...
+[PYI-12608:DEBUG] DYLIB: unloading Python shared library...
+[PYI-12608:DEBUG] DYLIB: unloaded Python shared library.
+[PYI-12608:DEBUG] LOADER: end of process reached!
