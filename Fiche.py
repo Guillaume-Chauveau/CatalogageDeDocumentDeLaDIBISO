@@ -110,6 +110,7 @@ class Fiche:
         print(f"lecture de la page: {pageL}")
         with open(pageL, "r") as f:
             for line in f:
+                print(line)
                 labelText, fieldText, proba, edit = line.strip().split("$")
                 for caracteristique in self.listeDesCaracteristiques:
                     if caracteristique.isCaracteristique(labelText):
@@ -133,6 +134,9 @@ class Fiche:
                             editItem.widget().setText(edit)
                             if edit=="1":
                                    self.changeEdit(caracteristique.id)
+                if labelText == "Traducteur":
+                    self.listeDesCaracteristiques[self.INDICECOAUTEUR].valeur.append(fieldText)
+                    self.listeDesCaracteristiques[self.INDICEROLECOAUTEUR].valeur.append("Traducteur")
         f.close()                         
 
     def changeColor(self,bar):
