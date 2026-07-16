@@ -22,6 +22,8 @@ class Parametre:
     def __init__(self,w):
         self.window=w
         self.window.setWindowTitle("Liste des paramètres")
+        self.ajouterParametreFixe()
+        self.afficherLaListe()
         self.chargerCodeConnexionAPI()
 
     def chargerCodeConnexionAPI(self):
@@ -108,11 +110,6 @@ class Parametre:
                 self.listeAfficher.append(i)
         self.afficherLaListe()
 
-    def ajouterParametreHebdo(self):
-        for i in self.listeParametreHebdo:
-            if i not in self.listeAfficher:
-                self.listeAfficher.append(i)
-        self.afficherLaListe()
 
     def ajouterParametreClassique(self):
         for i in self.listeParametreClassique:
@@ -122,12 +119,6 @@ class Parametre:
 
     def supprimerParametreFixe(self):
         for i in self.listeParametreFixe:
-            if i in self.listeAfficher:
-                self.listeAfficher.remove(i)
-        self.afficherLaListe()
-
-    def supprimerParametreHebdo(self):
-        for i in self.listeParametreHebdo:
             if i in self.listeAfficher:
                 self.listeAfficher.remove(i)
         self.afficherLaListe()
@@ -146,12 +137,6 @@ class Parametre:
             self.ajouterParametreClassique()
         else:
             self.supprimerParametreClassique()
-    
-    def clickHebdo(self):
-        if self.window.ParametreHebdomadaire.isChecked():
-            self.ajouterParametreHebdo()
-        else:
-            self.supprimerParametreHebdo()
     
     def clickFixe(self):
         if self.window.ParametreCommun.isChecked():

@@ -40,31 +40,6 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QCheckBox" name="ParametreCommun">
-          <property name="text">
-           <string>Paramètres Commun</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="ParametreClassique">
-          <property name="text">
-           <string>Paramètres Classique</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="ParametreHebdomadaire">
-          <property name="text">
-           <string>Paramètres Hebdomadaire</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
        <layout class="QGridLayout" name="ListeParametre"/>
       </item>
       <item>
