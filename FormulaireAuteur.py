@@ -99,27 +99,27 @@ class FormulaireAuteur:
             nvRoleAuteurs.append(self.window.formLayoutAuteur.itemAt(i, QtWidgets.QFormLayout.FieldRole).widget().text())
         if nvAuteurs != self.fiche.listeDesCaracteristiques[self.fiche.INDICEAUTEUR].valeur or nvRoleAuteurs != self.fiche.listeDesCaracteristiques[self.fiche.INDICEROLEAUTEUR].valeur:
             self.fiche.listeDesCaracteristiques[self.fiche.INDICEAUTEUR].setValeur(nvAuteurs)
-            self.fiche.changeEdit(self.fiche.INDICEAUTEUR+1)
+            self.fiche.changeEdit(self.fiche.INDICEAUTEUR)
             self.fiche.listeDesCaracteristiques[self.fiche.INDICEROLEAUTEUR].setValeur(nvRoleAuteurs)
-            self.fiche.changeEdit(self.fiche.INDICEROLEAUTEUR+1)
+            self.fiche.changeEdit(self.fiche.INDICEROLEAUTEUR)
 
         for i in range(0,self.window.formLayoutCoAuteur.rowCount()):
             nvCoAuteurs.append(self.window.formLayoutCoAuteur.itemAt(i, QtWidgets.QFormLayout.LabelRole).widget().text())
             nvRoleCoAuteurs.append(self.window.formLayoutCoAuteur.itemAt(i, QtWidgets.QFormLayout.FieldRole).widget().text())
         if nvCoAuteurs != self.fiche.listeDesCaracteristiques[self.fiche.INDICECOAUTEUR].valeur or nvRoleCoAuteurs != self.fiche.listeDesCaracteristiques[self.fiche.INDICEROLECOAUTEUR].valeur:
             self.fiche.listeDesCaracteristiques[self.fiche.INDICECOAUTEUR].setValeur(nvCoAuteurs)
-            self.fiche.changeEdit(self.fiche.INDICECOAUTEUR+1)
+            self.fiche.changeEdit(self.fiche.INDICECOAUTEUR)
             self.fiche.listeDesCaracteristiques[self.fiche.INDICEROLECOAUTEUR].setValeur(nvRoleCoAuteurs)
-            self.fiche.changeEdit(self.fiche.INDICEROLECOAUTEUR+1)
+            self.fiche.changeEdit(self.fiche.INDICEROLECOAUTEUR)
 
         for i in range(0,self.window.formLayoutAuteurSecondaire.rowCount()):
             nvAuteursSecondaires.append(self.window.formLayoutAuteurSecondaire.itemAt(i, QtWidgets.QFormLayout.LabelRole).widget().text())
             nvRoleAuteursSecondaires.append(self.window.formLayoutAuteurSecondaire.itemAt(i, QtWidgets.QFormLayout.FieldRole).widget().text())
         if nvAuteursSecondaires != self.fiche.listeDesCaracteristiques[self.fiche.INDICEAUTEURSECONDAIRE].valeur or nvRoleAuteursSecondaires != self.fiche.listeDesCaracteristiques[self.fiche.INDICEROLEAUTEURSECONDAIRE].valeur:
             self.fiche.listeDesCaracteristiques[self.fiche.INDICEAUTEURSECONDAIRE].setValeur(nvAuteursSecondaires)
-            self.fiche.changeEdit(self.fiche.INDICEAUTEURSECONDAIRE+1)
+            self.fiche.changeEdit(self.fiche.INDICEAUTEURSECONDAIRE)
             self.fiche.listeDesCaracteristiques[self.fiche.INDICEROLEAUTEURSECONDAIRE].setValeur(nvRoleAuteursSecondaires)
-            self.fiche.changeEdit(self.fiche.INDICEROLEAUTEURSECONDAIRE+1)
+            self.fiche.changeEdit(self.fiche.INDICEROLEAUTEURSECONDAIRE)
         self.window.close()
 
         
