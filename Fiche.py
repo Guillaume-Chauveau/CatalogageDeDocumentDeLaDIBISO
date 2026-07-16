@@ -102,7 +102,7 @@ class Fiche:
         form = getattr(self, "formulaireCollection", None)
         if form is not None and hasattr(form, "getValeurs"):
             return form.getValeurs()
-        return {}
+        return ""
 
     @staticmethod
     def _parseProba(proba):
@@ -130,6 +130,7 @@ class Fiche:
         print(f"lecture de la page: {pageL}")
         with open(pageL, "r") as f:
             for line in f:
+                print(line)
                 labelText, fieldText, proba, edit = line.strip().split("$")
                 for caracteristique in self.listeDesCaracteristiques:
                     if caracteristique.isCaracteristique(labelText):
@@ -153,6 +154,9 @@ class Fiche:
                             editItem.widget().setText(edit)
                             if edit=="1":
                                    self.changeEdit(caracteristique.id)
+                if labelText == "Traducteur":
+                    self.listeDesCaracteristiques[self.INDICECOAUTEUR].valeur.append(fieldText)
+                    self.listeDesCaracteristiques[self.INDICEROLECOAUTEUR].valeur.append("Traducteur")
         f.close()                         
 
     def changeColor(self,bar):
@@ -219,17 +223,16 @@ class Fiche:
         mentionEdition = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom("Mention d'edition"))
 
         valeursCollection = self.getValeursFormulaireCollection()
-        articleFormulaireCollection = self._majusculeEnDebutDeCaracteristique(valeursCollection.get("article", ""))
-        collection = self._majusculeEnDebutDeCaracteristique(valeursCollection.get("collection", ""))
-        section = self._majusculeEnDebutDeCaracteristique(valeursCollection.get("section", ""))
-        reference = self._majusculeEnDebutDeCaracteristique(valeursCollection.get("reference", ""))
+        articleFormulaireCollection = self._majusculeEnDebutDeCaracteristique(valeursCollection.split("|")[0])
+        collection = self._majusculeEnDebutDeCaracteristique(valeursCollection.split("|")[1])
+        section = self._majusculeEnDebutDeCaracteristique(valeursCollection.split("|")[2])
+        reference = self._majusculeEnDebutDeCaracteristique(valeursCollection.split("|")[3])
         print(f"Valeurs du formulaire collection: {valeursCollection}")
 
         text="008 $aAax3\n104 ##$ak$bzy$cy$dba$ffre\n106 ##$ar\n181 ##$P01$ctxt\n182 ##$P01$cn\n183 ##$P01$anga\n"
 
         if article != "" or titre != "" or auteur != "" or complementTitre != "":
             text +=self._champs200(article, titre, auteur, complementTitre, numeroVolume, coAuteur, auteurSecondaire)
-            text += "\n"
 
         if mentionEdition != "":
             text += "205 ##" + mentionEdition + "\n"
@@ -244,7 +247,7 @@ class Fiche:
         if collection or section:
             text += self._champs225(collection, section)
         if reference:
-            text += f"410 ##$0@{reference}"
+            text += f"410 ##$0@{reference}\n"
         if indexationRameau is not None and indexationRameau.getValeur() != "":
             text += ("606 ##$" + str(indexationRameau.getValeurIndexationRameau()) + "\n ")
 
