@@ -9,8 +9,9 @@ import os
 
 from Parametre import getCodeConnexionAPI
 
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "Backend"))
-from document_processor import process_single_image, process_image_batch
+base_dir = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(base_dir))
+from Backend.document_processor import process_single_image, process_image_batch
 
 
 class OcrWorker(QThread):

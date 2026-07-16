@@ -9,6 +9,16 @@ import unicodedata
 import Caracteristique as c
 import CaracteristiqueMultiple as cm
 
+
+def get_app_dir():
+    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+        return os.path.abspath(sys._MEIPASS)
+    return os.path.dirname(os.path.abspath(__file__))
+
+
+APP_DIR = get_app_dir()
+
+
 class Fiche:
     window=None
     listeDesCaracteristiques=[]
@@ -31,9 +41,9 @@ class Fiche:
         self.afficherAuteur = afficherAuteur
         self.afficherChamps = afficherChamps
         self.afficherCollection = afficherCollection
-        self.chemain = os.path.join(os.path.dirname(__file__), "Doc", str(nomDuFichier))
-        self.chemainOrigine = os.path.join(os.path.dirname(__file__), "LLMOutput", str(nomDuFichier))
-        self.chemainScan = os.path.join(os.path.dirname(__file__), chemainScan, str(nomDuFichier))
+        self.chemain = os.path.join(APP_DIR, "Doc", str(nomDuFichier))
+        self.chemainOrigine = os.path.join(APP_DIR, "LLMOutput", str(nomDuFichier))
+        self.chemainScan = os.path.join(APP_DIR, chemainScan, str(nomDuFichier))
         self.nomDuFichier = nomDuFichier
         self.formulaireCollection = None
         self.listeDesCaracteristiques = []
@@ -128,7 +138,10 @@ class Fiche:
         print(self.chemainOrigine)
         pageL= page+".txt"
         print(f"lecture de la page: {pageL}")
-        with open(pageL, "r") as f:
+        source_path = os.path.join(APP_DIR, "Doc", pageL)
+        if not os.path.exists(source_path):
+            source_path = os.path.join(APP_DIR, "LLMOutput", pageL)
+        with open(source_path, "r", encoding="utf-8") as f:
             for line in f:
                 print(line)
                 labelText, fieldText, proba, edit = line.strip().split("$")
@@ -438,16 +451,18 @@ class Fiche:
 
     def sauvgarde(self):
         chemaintmp=self.chemain+".txt"
-        with open(chemaintmp, "w") as f:
+        os.makedirs(os.path.dirname(chemaintmp), exist_ok=True)
+        with open(chemaintmp, "w", encoding="utf-8") as f:
             for i in self.listeDesCaracteristiques:
                 texte = i.getValeur()
                 f.write(f"{self.window.gridLayout.itemAtPosition(i.id,1).widget().text()}${texte}${i.getProba()}${self.window.gridLayout.itemAtPosition(i.id,4).widget().text()}\n")
 
     def exportation(self):
-        chemain=os.path.join(os.path.dirname(__file__), "Sortie", str(self.nomDuFichier))
+        chemain=os.path.join(APP_DIR, "Sortie", str(self.nomDuFichier))
         chemain+=".txt"
         print (f"Exportation de la fiche:{chemain}")
-        with open(chemain,"w") as f:
+        os.makedirs(os.path.dirname(chemain), exist_ok=True)
+        with open(chemain,"w", encoding="utf-8") as f:
             f.write(self.affichage())
 
     def setImage(self):
@@ -462,7 +477,7 @@ class Fiche:
         elif os.path.exists(chemainJPEG):
             image = QtGui.QImage(chemainJPEG)
         else:
-            image= QtGui.QImage(os.path.join(os.path.dirname(__file__), "Image", "PasDImage.png"))
+            image= QtGui.QImage(os.path.join(APP_DIR, "Image", "PasDImage.png"))
         scene = QtWidgets.QGraphicsScene()
         image = image.scaled((image.size()/4), QtCore.Qt.IgnoreAspectRatio, QtCore.Qt.SmoothTransformation)
         pixmap = QtGui.QPixmap.fromImage(image)

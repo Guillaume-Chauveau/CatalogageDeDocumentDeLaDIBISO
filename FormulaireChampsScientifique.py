@@ -1,5 +1,20 @@
+import os
+import sys
+from pathlib import Path
+
 from PySide6 import QtWidgets
 from PySide6 import QtGui, QtWidgets
+
+
+def get_app_base_dir():
+    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+        return Path(sys._MEIPASS)
+    return Path(__file__).resolve().parent
+
+
+APP_BASE_DIR = get_app_base_dir()
+CHAMPS_SCIENTIFIQUES_FILE = APP_BASE_DIR / "champs_scientifiques.txt"
+
 
 class FormulaireChampsScientifique:
     def __init__(self,window,fiche):
@@ -74,14 +89,15 @@ class FormulaireChampsScientifique:
 
     def sauvegarderChampsScientifiques(self):
         # Sauvegarder la liste des champs scientifiques dans un fichier
-        with open("champs_scientifiques.txt", "w") as f:
+        CHAMPS_SCIENTIFIQUES_FILE.parent.mkdir(parents=True, exist_ok=True)
+        with open(CHAMPS_SCIENTIFIQUES_FILE, "w", encoding="utf-8") as f:
             for champ in self.champs_scientifiques:
                 f.write(champ + "\n")
 
     def chargerChampsScientifiques(self):
         # Charger la liste des champs scientifiques depuis un fichier
         try:
-            with open("champs_scientifiques.txt", "r") as f:
+            with open(CHAMPS_SCIENTIFIQUES_FILE, "r", encoding="utf-8") as f:
                 self.champs_scientifiques = [line.strip() for line in f if line.strip()]
                 self.updateAllCombos()
         except FileNotFoundError:
