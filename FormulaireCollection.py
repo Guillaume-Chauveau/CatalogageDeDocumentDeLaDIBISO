@@ -77,12 +77,7 @@ class FormulaireCollection:
         }
 
     def getValeurs(self):
-        return {
-            "article": self.article,
-            "collection": self.collection,
-            "section": self.section,
-            "reference": self.reference,
-        }
+        return self.article+"|"+self.collection+"|"+self.section+"|"+self.reference
 
     def remplirFormulaire(self):
         if self.fiche is not None:
