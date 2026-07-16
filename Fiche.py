@@ -187,12 +187,13 @@ class Fiche:
         illustration = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom("Illustration"))
         dimension = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom("Dimension"))
         indexationRameau =self.getCaracteristiqueParNom("Indexation Rameau")
-        premierAuteur = self.getValeurParNom("Auteur Principal")
-        coAuteur = self.getValeurParNom("Co-Auteur")
-        fonctionAuteur = self.getValeurParNom("Fonction Auteur")
-        fonctionCoauteur = self.getValeurParNom("Fonction CoAuteur")
-        auteurSecondaire = self.getValeurParNom("Auteur Secondaire")
-        fonctionAuteurSecondaire = self.getValeurParNom("Fonction Auteur Secondaire")
+        premierAuteur = self.listeDesCaracteristiques[self.INDICEAUTEUR].valeur
+        print("teste premierAuteur:", premierAuteur)
+        coAuteur = self.listeDesCaracteristiques[self.INDICECOAUTEUR].valeur
+        fonctionAuteur = self.listeDesCaracteristiques[self.INDICEROLEAUTEUR].valeur
+        fonctionCoauteur = self.listeDesCaracteristiques[self.INDICEROLECOAUTEUR].valeur
+        auteurSecondaire = self.listeDesCaracteristiques[self.INDICEAUTEURSECONDAIRE].valeur
+        fonctionAuteurSecondaire = self.listeDesCaracteristiques[self.INDICEROLEAUTEURSECONDAIRE].valeur
         collectivite = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom("Nom de la Collectivite"))
         fonctionCollectivite = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom("Fonction de la Collectivite"))
         mentionEdition = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom("Mention d'edition"))
@@ -267,7 +268,7 @@ class Fiche:
                 text += ("$4" + str(fonction_morceaux[i]))
             if text != "712 ":
                 resultats.append(text)
-        return "\n".join(resultats)
+        return "\n".join(resultats)+"\n"
 
     def _champs702(self, auteurSecondaire, fonctionAuteurSecondaire):
         auteur_secondaire_morceaux, fonction_morceaux = self._decouperMorceaux(auteurSecondaire, fonctionAuteurSecondaire)
@@ -281,7 +282,7 @@ class Fiche:
                 text += ("$4" + str(fonction_morceaux[i]))
             if text != "702 ":
                 resultats.append(text)
-        return "\n".join(resultats)
+        return "\n".join(resultats)+"\n"
     
     def _champs701(self, coAuteur, fonctionCoauteur):
         co_auteur_morceaux, fonction_morceaux = self._decouperMorceaux(coAuteur, fonctionCoauteur)
@@ -292,10 +293,10 @@ class Fiche:
             if i < len(co_auteur_morceaux) and co_auteur_morceaux[i] != "":
                 text += ("#1$3" + str(co_auteur_morceaux[i]))
             if i < len(fonction_morceaux) and fonction_morceaux[i] != "":
-                text += ("$40" + str(fonction_morceaux[i]))
+                text += ("$4" + str(fonction_morceaux[i]))
             if text != "701 ":
                 resultats.append(text)
-        return "\n".join(resultats)
+        return "\n".join(resultats)+"\n"
 
     def _champs700(self, premierAuteur, fonctionAuteur):
         premier_auteur_morceaux, fonction_morceaux = self._decouperMorceaux(premierAuteur, fonctionAuteur)
@@ -306,10 +307,10 @@ class Fiche:
             if i < len(premier_auteur_morceaux) and premier_auteur_morceaux[i] != "":
                 text += ("#1$3" + str(premier_auteur_morceaux[i]))
             if i < len(fonction_morceaux) and fonction_morceaux[i] != "":
-                text += ("$40" + str(fonction_morceaux[i]))
+                text += ("$4" + str(fonction_morceaux[i]))
             if text != "700 ":
                 resultats.append(text)
-        return "\n".join(resultats)
+        return "\n".join(resultats)+"\n"
     
     def _champs225(self, collection, section):
         collection_morceaux, section_morceaux = self._decouperMorceaux(collection, section)
@@ -323,7 +324,7 @@ class Fiche:
                 text += f"$i{section_morceaux[i]}"
             if text != "225 2#":
                 resultats.append(text)
-        return "\n".join(resultats)
+        return "\n".join(resultats)+"\n"
 
     def _champs215(self, volume, illustration, dimension):
         volume_morceaux, illustration_morceaux, dimension_morceaux = self._decouperMorceaux(volume, illustration, dimension)
@@ -339,7 +340,7 @@ class Fiche:
                 text += ("$d" + str(dimension_morceaux[i]))
             if text != "215 ##":
                 resultats.append(text)
-        return "\n".join(resultats)
+        return "\n".join(resultats)+"\n"
 
     def _champs200(self, article, titre, auteur, complementTitre, numeroVolume, coAuteur, auteurSecondaire):
         article_morceaux, titre_morceaux, auteur_morceaux, complement_morceaux, numero_volume_morceaux, co_auteur_morceaux, auteur_secondaire_morceaux = self._decouperMorceaux(article, titre, auteur, complementTitre, numeroVolume, coAuteur, auteurSecondaire)
@@ -371,7 +372,7 @@ class Fiche:
                 text += ("$h" + str(numero_volume_val))
             if text != "200 ":
                 resultats.append(text)
-        return "\n".join(resultats)
+        return "\n".join(resultats)+"\n"
     def _majusculeEnDebutDeCaracteristique(self, text):
         if isinstance(text, list):
             for i in range(len(text)):
