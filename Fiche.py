@@ -135,8 +135,8 @@ class Fiche:
                             if edit=="1":
                                    self.changeEdit(caracteristique.id)
                 if labelText == "Traducteur":
-                    self.listeDesCaracteristiques[self.INDICECOAUTEUR].valeur.append(fieldText)
-                    self.listeDesCaracteristiques[self.INDICEROLECOAUTEUR].valeur.append("Traducteur")
+                    self.listeDesCaracteristiques[self.INDICEAUTEURSECONDAIRE].valeur.append(fieldText)
+                    self.listeDesCaracteristiques[self.INDICEROLEAUTEURSECONDAIRE].valeur.append("Traducteur")
         f.close()                         
 
     def changeColor(self,bar):
