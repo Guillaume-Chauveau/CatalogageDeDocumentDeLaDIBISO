@@ -104,6 +104,26 @@ class Fiche:
             return form.getValeurs()
         return {}
 
+    @staticmethod
+    def _parseProba(proba):
+        """
+        Convertit la confiance lue dans le .txt (format produit par
+        convert_json_to_txt4.py : float sur l'échelle 0-1, ex. '0.8734',
+        ou chaîne vide si aucune confiance n'a été calculée) en un entier
+        0-100 utilisable par les widgets (dot / progress bar).
+        """
+        if proba is None or proba == "" or proba == "None":
+            return 0
+        try:
+            valeur = float(proba)
+        except ValueError:
+            return 0
+        # Les scores viennent en 0-1 (fmt_confidence), mais on tolère aussi
+        # une valeur déjà en 0-100 (ex. ancien format, ou "100").
+        if valeur <= 1:
+            valeur *= 100
+        return round(valeur)
+
     def lecture(self,page):
         print(self.chemainOrigine)
         pageL= page+".txt"
@@ -114,7 +134,7 @@ class Fiche:
                 for caracteristique in self.listeDesCaracteristiques:
                     if caracteristique.isCaracteristique(labelText):
                         caracteristique.setValeur(fieldText)
-                        caracteristique.setProba(int(proba) if proba != "None" else 0)
+                        caracteristique.setProba(self._parseProba(proba))
                         fieldItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 2)
                         barItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 3)
                         editItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 4)
@@ -431,10 +451,13 @@ class Fiche:
         chemain=self.chemainScan
         chemainPNG=chemain+".png"
         chemainJPG=chemain+".jpg"
+        chemainJPEG=chemain+".jpeg"
         if os.path.exists(chemainPNG):
             image = QtGui.QImage(chemainPNG)
         elif os.path.exists(chemainJPG):
             image = QtGui.QImage(chemainJPG)
+        elif os.path.exists(chemainJPEG):
+            image = QtGui.QImage(chemainJPEG)
         else:
             image= QtGui.QImage(os.path.join(os.path.dirname(__file__), "Image", "PasDImage.png"))
         scene = QtWidgets.QGraphicsScene()
@@ -566,4 +589,3 @@ def getListeDesNomDeCaracteristiquesMultiple():
     return ["Indexation Rameau","Premier Auteur","Role Auteur","Co-Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire"]
 def getListeDesNomsDeCaracterisitiques():
     return ["Article","Titre","Complement du titre","Auteur","Numero du volume","Collection","Ville","Editeur","Mention d'edition","Annee","Volume","Illustration","Dimension","Indexation Rameau","Premier Auteur","Co-Auteur","Role Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire","Nom de la Collectivite","Role de la Collectivite"]
-

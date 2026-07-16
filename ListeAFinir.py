@@ -1,12 +1,41 @@
 import sys
 from PySide6 import QtWidgets
 from PySide6 import QtGui, QtWidgets
+from PySide6.QtCore import QThread, Signal
 from PySide6.QtWidgets import QFileDialog
 from pathlib import Path
 import shutil
 import os
 
 from Parametre import getCodeConnexionAPI
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "Backend"))
+from document_processor import process_single_image, process_image_batch
+
+
+class OcrWorker(QThread):
+    finished_ok = Signal(list)
+    failed = Signal(str)
+
+    def __init__(self, mode, scan_dir, filenames, api_key):
+        super().__init__()
+        self.mode = mode
+        self.scan_dir = scan_dir
+        self.filenames = filenames or []
+        self.api_key = api_key
+
+    def run(self):
+        try:
+            if self.mode == "batch":
+                stems = process_image_batch(self.scan_dir, self.api_key)
+            else:
+                stems = []
+                for filename in self.filenames:
+                    image_path = os.path.join(self.scan_dir, filename)
+                    stems.append(process_single_image(image_path, self.api_key))
+            self.finished_ok.emit(stems)
+        except Exception as exc:
+            self.failed.emit(str(exc))
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -18,6 +47,7 @@ class ListeAFinir:
     FichesNonFinies =[]
     window=None
     repertoirDesScan =""
+    _worker = None
 
     def __init__(self,w,repertoire):
         self.repertoirDesScan=repertoire
@@ -96,35 +126,77 @@ class ListeAFinir:
             if i not in FichesFini:
                 self.FichesNonFinies.append(i)
     
+    def _get_scan_dir(self):
+        if os.path.isabs(self.repertoirDesScan):
+            return self.repertoirDesScan
+        return os.path.join(os.path.dirname(__file__), self.repertoirDesScan)
+
     def openFileDialog(self):
         dialog = QFileDialog(self.window)
         dialog.setDirectory(str(Path.home()))
         dialog.setFileMode(QFileDialog.FileMode.ExistingFiles)
-        dialog.setNameFilter("Images (*.png *.jpg)")
+        dialog.setNameFilter("Images (*.png *.jpg *.jpeg)")
         dialog.setViewMode(QFileDialog.ViewMode.List)
         if dialog.exec():
             filenames = dialog.selectedFiles()
             if filenames:
+                copied = []
+                scan_dir = self._get_scan_dir()
+                os.makedirs(scan_dir, exist_ok=True)
                 for origin in filenames:
                     filename = os.path.basename(origin)
-
-                    #fait une copie dans Scan
-                    destination=os.path.join(os.path.dirname(__file__), self.repertoirDesScan, str(filename))
+                    destination = os.path.join(scan_dir, str(filename))
                     shutil.copy(origin, destination)
-                    self._ajouterUnFichier(str(filename))
-                    
-    def _ajouterUnFichier(self,filename):
-        ##Todo: appelé le LLM ici
-        #créer le doc vide (solution tmp avant de faire appele au llm)
-        self._ajouterUnFichierDansUnDossier(filename,"LLMOutput")
-        self._ajouterUnFichierDansUnDossier(filename,"Doc")
+                    copied.append(str(filename))
+                self._lancerTraitement(mode="image", filenames=copied)
 
-    def _ajouterUnFichierDansUnDossier(self, filename,lieu):
-        chemain=os.path.join(os.path.dirname(__file__), lieu, str(filename))
-        chemain=chemain.replace(".png",".txt").replace(".jpg",".txt")
-        with open(chemain,"w") as c:
-            ##remplir le doc ici
-            pass
+    def _lancerTraitement(self, mode="image", filenames=None):
+        api_key = getCodeConnexionAPI()
+        if not api_key.strip():
+            QtWidgets.QMessageBox.warning(
+                self.window,
+                "Clé API manquante",
+                "Configurez votre clé API dans Paramètres avant d'analyser des documents.",
+            )
+            return
+
+        if self._worker is not None and self._worker.isRunning():
+            QtWidgets.QMessageBox.information(
+                self.window,
+                "Analyse en cours",
+                "Un traitement est déjà en cours. Veuillez patienter.",
+            )
+            return
+
+        self._set_processing_ui(True)
+        self._worker = OcrWorker(mode, self._get_scan_dir(), filenames, api_key)
+        self._worker.finished_ok.connect(self._apresTraitement)
+        self._worker.failed.connect(self._enCasErreur)
+        self._worker.start()
+
+    def _set_processing_ui(self, active: bool):
+        for name in ("AjouterUnFichier", "ChoisirUnNouveauDossierDeBase", "Reactualiser"):
+            widget = getattr(self.window, name, None)
+            if widget is not None:
+                widget.setEnabled(not active)
+
+    def _apresTraitement(self, stems):
+        self._worker = None
+        self._set_processing_ui(False)
+        self.ajouterFicheAuto()
+        self.ajouterFicheNonFinie()
+        self.creerCatalogue()
+        if stems:
+            QtWidgets.QMessageBox.information(
+                self.window,
+                "Analyse terminée",
+                f"{len(stems)} document(s) analysé(s) et ajouté(s) au catalogue.",
+            )
+
+    def _enCasErreur(self, message):
+        self._worker = None
+        self._set_processing_ui(False)
+        QtWidgets.QMessageBox.critical(self.window, "Erreur d'analyse", message)
     
     def changerDeRepertoireDeScan(self,repertoire):
         self.repertoirDesScan=repertoire
@@ -134,29 +206,23 @@ class ListeAFinir:
         dialog.setDirectory(str(Path.home()))
         dialog.setFileMode(QFileDialog.FileMode.Directory)
         dialog.setViewMode(QFileDialog.ViewMode.List)
-        print(getCodeConnexionAPI())
         if dialog.exec():
             directories = dialog.selectedFiles()
             if directories:
                 self.changerDeRepertoireDeScan(directories[0])
                 self.setAfficheDossier(directories[0])
-                self._lectureDeToutLesScanDansLeRepertoireCoutrant()
-                
                 if callback is not None:
                     callback(self.repertoirDesScan)
+                self._lancerTraitement(mode="batch")
+                return
         self.creerCatalogue()
-
-    def _lectureDeToutLesScanDansLeRepertoireCoutrant(self):
-        for filename in os.listdir(os.path.join(BASE_DIR, self.repertoirDesScan)):
-            if filename.endswith(".png") or filename.endswith(".jpg"):
-                if filename not in self.Fiches:
-                    self._ajouterUnFichier(filename)
     
     def setAfficheDossier(self,valeur):
         self.window.AfficheDossier.setText(valeur)
 
     def _testImageExiste(self,filename):
+        scan_dir = self._get_scan_dir()
         for extension in [".png", ".jpg", ".jpeg"]:
-            if os.path.exists(os.path.join(self.repertoirDesScan, os.path.splitext(filename)[0] + extension)):
+            if os.path.exists(os.path.join(scan_dir, os.path.splitext(filename)[0] + extension)):
                 return True
         return False
