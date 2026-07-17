@@ -21,7 +21,7 @@ class Statistique:
         for i in self.FichesFini:
                 self.chemain = os.path.join(os.path.dirname(__file__), "Doc", str(i))
                 if os.path.exists(self.chemain):
-                    with open(self.chemain, "r") as f:
+                    with open(self.chemain, "r",encoding="utf-8") as f:
                         for line in f:
                             labelText, fieldText, proba, edit = line.strip().split("$")   
                             self.totalCaractéristique+=1
@@ -49,7 +49,7 @@ class Statistique:
         for f in self.FichesFini:
             self.chemain = os.path.join(os.path.dirname(__file__), "Doc", str(f))
             if os.path.exists(self.chemain):
-                with open(self.chemain, "r") as f:
+                with open(self.chemain, "r",encoding="utf-8") as f:
                     for line in f:
                         labelText, fieldText, proba, edit = line.strip().split("$")
                         if labelText==Caracteristique:
