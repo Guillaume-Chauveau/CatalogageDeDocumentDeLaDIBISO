@@ -1,43 +1,60 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-a = Analysis(
-    ['main.py','Fiche.py','FormulaireAuteur.py','Caracteristique.py','CaracteristiqueMultiple.py','FormulaireChampsScientifique.py','ListeAFinir.py','Parametre.py','Statistique.py','FormulaireCollection.py'],
-    pathex=['.', 'Backend'],
-    binaries=[],
-    datas=[
-        ('UI', 'UI'),
-        ('Doc', 'Doc'),
-        ('Sortie', 'Sortie'),
-        ('Scan', 'Scan'),
-        ('Image', 'Image'),
-        ('LLMOutput', 'LLMOutput'),
-        ('champs_scientifiques.txt', '.'),
-    ],
-    hiddenimports=['PySide6.QtCore', 'PySide6.QtGui', 'PySide6.QtWidgets', 'PySide6.QtUiTools', 'openai'],
-    hookspath=[],
-    hooksconfig={},
-    runtime_hooks=[],
-    excludes=[],
-    noarchive=False,
-    optimize=0,
-)
-pyz = PYZ(a.pure)
+block_cipher = None
+from PyInstaller.utils.hooks import collect_submodules, collect_data_files
 
-exe = EXE(
-    pyz,
-    a.scripts,
-    [],
-    exclude_binaries=False,
-    name='retro_catalogage',
-    debug=False,
-    bootloader_ignore_signals=False,
-    strip=False,
-    upx=False,
-    console=False,
-    disable_windowed_traceback=False,
-    argv_emulation=False,
-    target_arch=None,
-    codesign_identity=None,
-    entitlements_file=None,
-    icon=None,
-)
+
+openai_hidden = collect_submodules('openai')
+openai_datas = collect_data_files('openai')
+
+base_datas = [
+   ('UI', 'UI'),
+   ('Doc', 'Doc'),
+   ('Sortie', 'Sortie'),
+   ('Scan', 'Scan'),
+   ('Image', 'Image'),
+   ('LLMOutput', 'LLMOutput'),
+   ('champs_scientifiques.txt', '.'),
+]
+
+hidden_imports = ['PySide6.QtCore', 'PySide6.QtGui', 'PySide6.QtWidgets', 'PySide6.QtUiTools'] + openai_hidden
+
+a = Analysis(['main.py','Caracteristique.py','CaracteristiqueMultiple.py','Fiche.py','FormulaireAuteur.py','FormulaireChampsScientifique.py','FormulaireCollection.py','ListeAFinir.py','Parametre.py','Statistique.py'],
+          pathex=['.','Backend'],
+          binaries=[],
+          datas=base_datas + openai_datas,
+         hiddenimports=hidden_imports,
+            hookspath=[],
+            hooksconfig={},
+             runtime_hooks=[],
+             excludes=[],
+             win_no_prefer_redirects=False,
+             win_private_assemblies=False,
+             cipher=block_cipher,
+             noarchive=False)
+pyz = PYZ(a.pure, a.zipped_data,
+             cipher=block_cipher)
+exe = EXE(pyz,
+          a.scripts,
+          [],
+          exclude_binaries=True,
+          name='retro_catalogage',
+          debug=False,
+          bootloader_ignore_signals=False,
+          strip=False,
+          upx=True,
+          console=False,
+            disable_windowed_traceback=False,
+            argv_emulation=False,
+            target_arch=None,
+            codesign_identity=None,
+            entitlements_file=None,
+            icon=None,)
+coll = COLLECT(exe,
+               a.binaries,
+               a.zipfiles,
+               a.datas,
+               strip=False,
+               upx=True,
+               upx_exclude=[],
+               name='retro_catalogage')
