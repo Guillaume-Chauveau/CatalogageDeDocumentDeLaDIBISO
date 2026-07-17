@@ -6,7 +6,7 @@ class CaracteristiqueMultiple(Caracteristique):
         self.valeur = [] if valeur is None else valeur
 
     def getValeur(self):
-        return ", ".join(self.valeur) if self.valeur else ""
+        return "; ".join(self.valeur) if self.valeur else ""
 
     def isCaracteristiqueEdite(self):
         return self.edite
@@ -16,10 +16,10 @@ class CaracteristiqueMultiple(Caracteristique):
         return self.nom==nom
     def setValeur(self, valeur):
         if isinstance(valeur, str):
-            if valeur.startswith('{{'):
-                self.valeur = [v.strip('{}') for v in valeur.split('}{') if v.strip('{}')]
-            else:
-                self.valeur = [v.strip() for v in valeur.split(',') if v.strip()]
+            #if valeur.startswith('{{'):
+            #    self.valeur = [v.strip('{}') for v in valeur.split('}{') if v.strip('{}')]
+            #else:
+                self.valeur = [v.strip() for v in valeur.split(';') if v.strip()]
         elif isinstance(valeur, list):
             self.valeur = valeur
         else:

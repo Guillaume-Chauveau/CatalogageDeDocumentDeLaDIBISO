@@ -168,8 +168,31 @@ class Fiche:
                             if edit=="1":
                                    self.changeEdit(caracteristique.id)
                 if labelText == "Traducteur":
-                    self.listeDesCaracteristiques[self.INDICEAUTEURSECONDAIRE].valeur.append(fieldText)
-                    self.listeDesCaracteristiques[self.INDICEROLEAUTEURSECONDAIRE].valeur.append("Traducteur")
+                    # Défensive : s'assurer que les indices existent et que la valeur est une liste
+                    try:
+                        target = self.listeDesCaracteristiques[self.INDICEAUTEURSECONDAIRE]
+                    except IndexError:
+                        # Créer un objet de sauvegarde minimal si la liste est trop courte
+                        target = cm.CaracteristiqueMultiple(self.INDICEAUTEURSECONDAIRE, self.listeDesNomDeCaracteristiques[self.INDICEAUTEURSECONDAIRE])
+                        # Étendre la liste pour garder la cohérence
+                        while len(self.listeDesCaracteristiques) <= self.INDICEAUTEURSECONDAIRE:
+                            self.listeDesCaracteristiques.append(c.Caracteristique(len(self.listeDesCaracteristiques), ""))
+                        self.listeDesCaracteristiques[self.INDICEAUTEURSECONDAIRE] = target
+
+                    if not isinstance(target.valeur, list):
+                        target.valeur = [str(target.valeur)] if target.valeur else []
+                    target.valeur.append(fieldText)
+
+                    try:
+                        role_target = self.listeDesCaracteristiques[self.INDICEROLEAUTEURSECONDAIRE]
+                    except IndexError:
+                        role_target = cm.CaracteristiqueMultiple(self.INDICEROLEAUTEURSECONDAIRE, self.listeDesNomDeCaracteristiques[self.INDICEROLEAUTEURSECONDAIRE])
+                        while len(self.listeDesCaracteristiques) <= self.INDICEROLEAUTEURSECONDAIRE:
+                            self.listeDesCaracteristiques.append(c.Caracteristique(len(self.listeDesCaracteristiques), ""))
+                        self.listeDesCaracteristiques[self.INDICEROLEAUTEURSECONDAIRE] = role_target
+                    if not isinstance(role_target.valeur, list):
+                        role_target.valeur = [str(role_target.valeur)] if role_target.valeur else []
+                    role_target.valeur.append("Traducteur")
         f.close()                         
 
     def changeColor(self,bar):
@@ -224,13 +247,22 @@ class Fiche:
         illustration = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom(self._caractéristiqueARomanisée("Illustration")))
         dimension = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom(self._caractéristiqueARomanisée("Dimension")))
         indexationRameau =self.getCaracteristiqueParNom("Indexation Rameau")
-        premierAuteur = self.listeDesCaracteristiques[self.INDICEAUTEUR].valeur
+        # Accès défensif aux caractéristiques par indice (évite IndexError en build distrib)
+        def _get_valeur_safe(idx):
+            try:
+                obj = self.listeDesCaracteristiques[idx]
+                return obj.getValeur() if hasattr(obj, "getValeur") else ""
+            except Exception:
+                # Retourne une valeur vide si l'indice est absent
+                return ""
+
+        premierAuteur = _get_valeur_safe(self.INDICEAUTEUR)
         print("teste premierAuteur:", premierAuteur)
-        coAuteur = self.listeDesCaracteristiques[self.INDICECOAUTEUR].valeur
-        fonctionAuteur = self.listeDesCaracteristiques[self.INDICEROLEAUTEUR].valeur
-        fonctionCoauteur = self.listeDesCaracteristiques[self.INDICEROLECOAUTEUR].valeur
-        auteurSecondaire = self.listeDesCaracteristiques[self.INDICEAUTEURSECONDAIRE].valeur
-        fonctionAuteurSecondaire = self.listeDesCaracteristiques[self.INDICEROLEAUTEURSECONDAIRE].valeur
+        coAuteur = _get_valeur_safe(self.INDICECOAUTEUR)
+        fonctionAuteur = _get_valeur_safe(self.INDICEROLEAUTEUR)
+        fonctionCoauteur = _get_valeur_safe(self.INDICEROLECOAUTEUR)
+        auteurSecondaire = _get_valeur_safe(self.INDICEAUTEURSECONDAIRE)
+        fonctionAuteurSecondaire = _get_valeur_safe(self.INDICEROLEAUTEURSECONDAIRE)
         collectivite = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom(self._caractéristiqueARomanisée("Nom de la Collectivite")))
         fonctionCollectivite = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom(self._caractéristiqueARomanisée("Fonction de la Collectivite")))
         mentionEdition = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom(self._caractéristiqueARomanisée("Mention d'edition")))
@@ -262,13 +294,13 @@ class Fiche:
             text += self._champs225(collection, section)
         if reference:
             text += f"410 ##$0@{reference}\n"
-        if indexationRameau is not None and indexationRameau.getValeur() != "":
-            text += ("606 ##$" + str(indexationRameau.getValeurIndexationRameau()) + "\n ")
+        if indexationRameau is not None and indexationRameau.getValeur() !="":
+            text += ("606 ##$" + str(indexationRameau.getValeurIndexationRameau()) + "\n")
 
-        if premierAuteur != "" or fonctionAuteur != "":
+        if premierAuteur !="" or fonctionAuteur !="":
             text +=self._champs700(premierAuteur, fonctionAuteur)
 
-        if coAuteur != "" or fonctionCoauteur != "":
+        if coAuteur !="" or fonctionCoauteur !="":
             text += self._champs701(coAuteur, fonctionCoauteur)
 
         if auteurSecondaire != "" or fonctionAuteurSecondaire != "":
@@ -307,10 +339,12 @@ class Fiche:
         max_len = max([len(collectivite_morceaux), len(fonction_morceaux), 0])
         for i in range(max_len):
             text = "712 "
-            if i < len(collectivite_morceaux) and collectivite_morceaux[i] != "":
-                text += ("02$3" + str(collectivite_morceaux[i]))
-            if i < len(fonction_morceaux) and fonction_morceaux[i] != "":
-                text += ("$4" + str(fonction_morceaux[i]))
+            if i < len(collectivite_morceaux):
+                if collectivite_morceaux[i] != "":
+                    text += ("02$3" + str(collectivite_morceaux[i]))
+            if i < len(fonction_morceaux):
+                if fonction_morceaux[i] != "":
+                    text += ("$4" + str(fonction_morceaux[i]))
             if text != "712 ":
                 resultats.append(text)
         return "\n".join(resultats)+"\n"
@@ -321,10 +355,12 @@ class Fiche:
         max_len = max([len(auteur_secondaire_morceaux), len(fonction_morceaux), 0])
         for i in range(max_len):
             text = "702 "
-            if i < len(auteur_secondaire_morceaux) and auteur_secondaire_morceaux[i] != "":
-                text += ("#1$3" + str(auteur_secondaire_morceaux[i]))
-            if i < len(fonction_morceaux) and fonction_morceaux[i] != "":
-                text += ("$4" + str(fonction_morceaux[i]))
+            if i < len(auteur_secondaire_morceaux):
+                if auteur_secondaire_morceaux[i] != "":
+                    text += ("#1$3" + str(auteur_secondaire_morceaux[i]))
+            if i < len(fonction_morceaux) :
+                if fonction_morceaux[i] != "":
+                    text += ("$4" + str(fonction_morceaux[i]))
             if text != "702 ":
                 resultats.append(text)
         return "\n".join(resultats)+"\n"
@@ -335,10 +371,12 @@ class Fiche:
         max_len = max([len(co_auteur_morceaux), len(fonction_morceaux), 0])
         for i in range(max_len):
             text = "701 "
-            if i < len(co_auteur_morceaux) and co_auteur_morceaux[i] != "":
-                text += ("#1$3" + str(co_auteur_morceaux[i]))
-            if i < len(fonction_morceaux) and fonction_morceaux[i] != "":
-                text += ("$4" + str(fonction_morceaux[i]))
+            if i < len(co_auteur_morceaux):
+                if co_auteur_morceaux[i] != "":
+                    text += ("#1$3" + str(co_auteur_morceaux[i]))
+            if i < len(fonction_morceaux): 
+                if fonction_morceaux[i] != "":
+                    text += ("$4" + str(fonction_morceaux[i]))
             if text != "701 ":
                 resultats.append(text)
         return "\n".join(resultats)+"\n"
@@ -349,10 +387,12 @@ class Fiche:
         max_len = max([len(premier_auteur_morceaux), len(fonction_morceaux), 0])
         for i in range(max_len):
             text = "700 "
-            if i < len(premier_auteur_morceaux) and premier_auteur_morceaux[i] != "":
-                text += ("#1$3" + str(premier_auteur_morceaux[i]))
-            if i < len(fonction_morceaux) and fonction_morceaux[i] != "":
-                text += ("$4" + str(fonction_morceaux[i]))
+            if i < len(premier_auteur_morceaux) :
+                if premier_auteur_morceaux[i]!="":
+                    text += ("#1$3" + str(premier_auteur_morceaux[i]))
+            if i < len(fonction_morceaux): 
+                if fonction_morceaux[i]!="":
+                    text += ("$4" + str(fonction_morceaux[i]))
             if text != "700 ":
                 resultats.append(text)
         return "\n".join(resultats)+"\n"
