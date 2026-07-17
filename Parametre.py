@@ -30,7 +30,7 @@ class Parametre:
         """Charge le CodeConnexionAPI depuis le fichier caché"""
         try:
             if self.CONFIG_FILE.exists():
-                with open(self.CONFIG_FILE, 'r') as f:
+                with open(self.CONFIG_FILE, 'r',encoding="utf-8") as f:
                     config = json.load(f)
                     code = config.get("CodeConnexionAPI", "")
                     self.window.CodeConnexionAPI.setText(code)
@@ -49,7 +49,7 @@ class Parametre:
             # Charger la config existante si elle existe
             if self.CONFIG_FILE.exists():
                 try:
-                    with open(self.CONFIG_FILE, 'r') as f:
+                    with open(self.CONFIG_FILE, 'r',encoding="utf-8") as f:
                         config = json.load(f)
                 except Exception as load_error:
                     print(f"Avertissement: impossible de charger la config existante: {load_error}")
@@ -59,7 +59,7 @@ class Parametre:
             config["CodeConnexionAPI"] = code
             
             # Sauvegarder
-            with open(self.CONFIG_FILE, 'w') as f:
+            with open(self.CONFIG_FILE, 'w',encoding="utf-8") as f:
                 json.dump(config, f, indent=2)
             
             # Rendre le fichier caché sur Windows
@@ -198,7 +198,7 @@ def getCodeConnexionAPI():
     config_file = Parametre._getConfigFile()
     try:
         if config_file.exists():
-            with open(config_file, 'r') as f:
+            with open(config_file, 'r',encoding="utf-8") as f:
                 config = json.load(f)
                 return config.get("CodeConnexionAPI", "")
     except Exception as e:
