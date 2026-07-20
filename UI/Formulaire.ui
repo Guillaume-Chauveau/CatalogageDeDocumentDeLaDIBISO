@@ -17,8 +17,8 @@
    <widget class="QFrame" name="frame">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>-530</y>
+      <x>20</x>
+      <y>-550</y>
       <width>881</width>
       <height>1041</height>
      </rect>
@@ -944,48 +944,55 @@ QProgressBar::chunk {
                  </property>
                 </widget>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_4">
-                 <item>
-                  <widget class="QPushButton" name="Validation">
-                   <property name="text">
-                    <string>Unimarc</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="Reset">
-                   <property name="text">
-                    <string>Réinitialiser</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="Restart">
-                   <property name="text">
-                    <string>Charger</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="Sauvgarde">
-                   <property name="text">
-                    <string>Sauvegarder</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="Quiter">
-                   <property name="text">
-                    <string>Quitter</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
               </layout>
              </item>
             </layout>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QPushButton" name="Validation">
+             <property name="text">
+              <string>Unimarc</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="Reset">
+             <property name="text">
+              <string>Réinitialiser</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButton">
+             <property name="text">
+              <string>Regénérer</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="Restart">
+             <property name="text">
+              <string>Charger</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="Sauvgarde">
+             <property name="text">
+              <string>Sauvegarder</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="Quiter">
+             <property name="text">
+              <string>Quitter</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
