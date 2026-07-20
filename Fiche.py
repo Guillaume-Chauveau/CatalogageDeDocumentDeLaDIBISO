@@ -619,24 +619,31 @@ class Fiche:
         nomSansExtention = os.path.splitext(nomDuFichier)[0]
         parts = nomSansExtention.split('#')
         if len(parts) == 2: # Normalement inutile, mais on le laisse en cas d'érreur lors de la saisie du nom du fichier
-            Dimension = parts[1]
-            self.getCaracteristiqueParNom("Dimension").setValeur(Dimension)
+            dimension = parts[1]
+            self.getCaracteristiqueParNom("Dimension").setValeur(dimension)
             # Mettre à jour les widgets correspondants
             DimensionWidget = self.window.gridLayout.itemAtPosition(self.getCaracteristiqueParNom("Dimension").id, 2).widget()
             if isinstance(DimensionWidget, QtWidgets.QLineEdit):
-                DimensionWidget.setText(Dimension)
+                DimensionWidget.setText(dimension)
             self.changeEdit(self.getCaracteristiqueParNom("Dimension").id)
             
         elif len(parts) >= 3:
-            Dimension = parts[1]
+            dimension = parts[1]
             volume = parts[2]
-            self.getCaracteristiqueParNom("Dimension").setValeur(Dimension)
+            #ajout des espace entre le nombre de cm et "cm"
+            dimension=dimension[:len(dimension)-2]+" "+dimension[len(dimension)-2:]
+            #ajout de l'espace entre le nombre de page et "pages"
+            if len(volume)==5:
+                volume=volume[:1]+" "+volume[1:]
+            else:
+                volume=volume[:len(volume)-5]+" "+volume[len(volume)-5:]
+            self.getCaracteristiqueParNom("Dimension").setValeur(dimension)
             self.getCaracteristiqueParNom("Volume").setValeur(volume)
             # Mettre à jour les widgets correspondants
             DimensionWidget = self.window.gridLayout.itemAtPosition(self.getCaracteristiqueParNom("Dimension").id, 2).widget()
             volumeWidget = self.window.gridLayout.itemAtPosition(self.getCaracteristiqueParNom("Volume").id, 2).widget()
             if isinstance(DimensionWidget, QtWidgets.QLineEdit):
-                DimensionWidget.setText(Dimension)
+                DimensionWidget.setText(dimension)
                 self.changeEdit(self.getCaracteristiqueParNom("Dimension").id)
             if isinstance(volumeWidget, QtWidgets.QLineEdit):
                 volumeWidget.setText(volume)
