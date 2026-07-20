@@ -282,6 +282,13 @@ Le format d'export suit une structure MARC simplifiée avec des codes spécifiqu
 - Indicateurs visuels (points colorés, barres de progression)
 - Validation des chemins de fichiers
 
+### Création de son propre build
+- Utiliser `pyinstaller` avec un fichier `editor.spec` adapté pour inclure toutes les dépendances et ressources nécessaires.
+- Lancer le build avec la commande:
+ ``` bash
+ python -m PyInstaller --clean --noconfirm editor.spec
+ ``` 
+
 ## Conclusion
 
 Cette application fournit une interface efficace pour le catalogage semi-automatisé de documents scientifiques, combinant les capacités des LLM avec l'édition manuelle experte. Son architecture modulaire facilite la maintenance et l'extension pour de nouveaux types de documents ou formats d'export.
