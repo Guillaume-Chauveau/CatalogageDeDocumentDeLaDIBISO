@@ -672,6 +672,10 @@ class Fiche:
     def _besoinDeRomanisée(self,Caractéristique):
         return Caractéristique in getCaracéristiquesARomanisée()
 
+    def Regenerer(self):
+        #todo
+        pass
+    
 def getCaracéristiquesARomanisée():
     return ["Titre","Complement du titre","Auteur","Numero du volume","Collection","Ville","Editeur","Mention d'edition","Illustration"]
 def getlangueNonRomaine():
