@@ -368,6 +368,9 @@ def afficherLesStatistiques():
     gridL.setRowStretch(0, 1)
     gridL.setRowStretch(1, 1)
 
+    #activerRedimensionnementDynamique(formulaireChampsScientifiqueWindow)
+    #window_manager.show("formulaire_champs", formulaireChampsScientifiqueWindow)
+
     def _ajouterCanvas(figure):
         canvas = FigureCanvas(figure)
         canvas.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)

@@ -27,52 +27,12 @@ class Parametre:
         self.chargerCodeConnexionAPI()
 
     def chargerCodeConnexionAPI(self):
-        """Charge le CodeConnexionAPI depuis le fichier caché"""
-        try:
-            if self.CONFIG_FILE.exists():
-                with open(self.CONFIG_FILE, 'r',encoding="utf-8") as f:
-                    config = json.load(f)
-                    code = config.get("CodeConnexionAPI", "")
-                    self.window.CodeConnexionAPI.setText(code)
-        except Exception as e:
-            print(f"Erreur lors du chargement du CodeConnexionAPI: {e}")
+        with open(".clef.txt", "r",encoding="utf-8") as f:
+            self.window.CodeConnexionAPI.setText(f.read().strip())
 
     def sauvegarderCodeConnexionAPI(self):
-        """Sauvegarde le CodeConnexionAPI dans un fichier caché"""
-        try:
-            code = self.window.CodeConnexionAPI.text()
-            config = {}
-            
-            # S'assurer que le répertoire parent existe
-            self.CONFIG_FILE.parent.mkdir(parents=True, exist_ok=True)
-            
-            # Charger la config existante si elle existe
-            if self.CONFIG_FILE.exists():
-                try:
-                    with open(self.CONFIG_FILE, 'r',encoding="utf-8") as f:
-                        config = json.load(f)
-                except Exception as load_error:
-                    print(f"Avertissement: impossible de charger la config existante: {load_error}")
-                    config = {}
-            
-            # Mettre à jour avec la nouvelle valeur
-            config["CodeConnexionAPI"] = code
-            
-            # Sauvegarder
-            with open(self.CONFIG_FILE, 'w',encoding="utf-8") as f:
-                json.dump(config, f, indent=2)
-            
-            # Rendre le fichier caché sur Windows
-            if os.name == 'nt':  # Windows
-                try:
-                    os.system(f'attrib +h "{self.CONFIG_FILE}"')
-                except Exception as attr_error:
-                    print(f"Avertissement: impossible de rendre le fichier caché: {attr_error}")
-            
-            print(f"CodeConnexionAPI sauvegardé avec succès dans {self.CONFIG_FILE}")
-            
-        except Exception as e:
-            print(f"Erreur lors de la sauvegarde du CodeConnexionAPI: {e}")
+        with open(".clef.txt", "w",encoding="utf-8") as f:
+            f.write(self.window.CodeConnexionAPI.text())
     
     def getCodeConnexionAPI(self):
         """Retourne le CodeConnexionAPI"""
@@ -194,13 +154,5 @@ class Parametre:
         print(self.listeDesCocher)
 
 def getCodeConnexionAPI():
-    """Retourne le CodeConnexionAPI depuis le fichier caché"""
-    config_file = Parametre._getConfigFile()
-    try:
-        if config_file.exists():
-            with open(config_file, 'r',encoding="utf-8") as f:
-                config = json.load(f)
-                return config.get("CodeConnexionAPI", "")
-    except Exception as e:
-        print(f"Erreur lors de la lecture du CodeConnexionAPI: {e}")
-    return ""
+    with open(".clef.txt", "r") as f:
+        return f.read().strip()

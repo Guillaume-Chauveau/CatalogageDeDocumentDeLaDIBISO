@@ -1,7 +1,16 @@
 import Fiche as F
 import os
 import matplotlib.pyplot as plt
+import sys
 from matplotlib.figure import Figure
+
+def get_app_dir():
+    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+        return os.path.abspath(sys._MEIPASS)
+    return os.path.dirname(os.path.abspath(__file__))
+
+
+APP_DIR = get_app_dir()
 
 
 ## classe pour la réalisation des statistique
@@ -9,17 +18,18 @@ from matplotlib.figure import Figure
 class Statistique:
 
     def __init__(self):
-        self.Fiches=os.listdir("./Doc")
-        self.FichesFini= os.listdir("./Sortie")
-        self.FichesOriginale= os.listdir("./LLMOutput")
+        self.Fiches=os.path.join(APP_DIR, "Doc")
+        self.FichesFini= os.path.join(APP_DIR, "Sortie")
+        self.FichesOriginale= os.path.join(APP_DIR, "LLMOutput")
         self.totalCaractéristique=0
         self.totalHumain=0
         self.getRatioHumain()
 
     ## renvoi le ratio de caractistique qui on été rempli par un humain  
     def getRatioHumain(self):
-        for i in self.FichesFini:
-                self.chemain = os.path.join(os.path.dirname(__file__), "Doc", str(i))
+        #fait une boucle sur le docier Sortie
+        for i in os.listdir(self.FichesFini):
+                self.chemain = os.path.join(self.Fiches, str(i))
                 if os.path.exists(self.chemain):
                     with open(self.chemain, "r",encoding="utf-8") as f:
                         for line in f:
@@ -32,7 +42,7 @@ class Statistique:
     
     ## renvoi le pourcentage de complétion des fiches (fiche complaite= fiche qui a eu une Sortie)
     def pourcentageFait(self):
-        return ((len(self.FichesFini))*100/(len(self.Fiches)))
+        return ((len(os.listdir(self.FichesFini)))*100/(len(os.listdir(self.Fiches))))
     
     ##fonction auxiliaire de caracteristiquesLesPlusAutomatique pour initialiser le dictionnaire et le remplire
     def ratioParCaracteristiques(self):
@@ -46,8 +56,8 @@ class Statistique:
     def ratioParCaracteristique(self,Caracteristique):
         compteurDeLaCaracteristique=0
         compteurDeLaCaracteristiqueHumaine=0
-        for f in self.FichesFini:
-            self.chemain = os.path.join(os.path.dirname(__file__), "Doc", str(f))
+        for f in os.listdir(self.FichesFini):
+            self.chemain = os.path.join(self.Fiches, str(f))
             if os.path.exists(self.chemain):
                 with open(self.chemain, "r",encoding="utf-8") as f:
                     for line in f:
@@ -116,9 +126,9 @@ class Statistique:
         erreurs = {nom: 0 for nom in F.getListeDesNomsDeCaracterisitiques()}
         totaux = {nom: 0 for nom in F.getListeDesNomsDeCaracterisitiques()}
 
-        for fichier in self.Fiches:
-            chemin_doc = os.path.join(os.path.dirname(__file__), "Doc", str(fichier))
-            chemin_llm = os.path.join(os.path.dirname(__file__), "LLMOutput", str(fichier))
+        for fichier in os.listdir(self.Fiches):
+            chemin_doc = os.path.join(self.Fiches, str(fichier))
+            chemin_llm = os.path.join(self.FichesOriginale, str(fichier))
             if not os.path.exists(chemin_llm):
                 continue
 
@@ -154,9 +164,9 @@ class Statistique:
 
     def calculerNombreDeCaracteristiqueCorrigeParFichierParFichier(self):
         erreurs = {}
-        for fichier in self.Fiches:
-            cheminDoc = os.path.join(os.path.dirname(__file__), "Doc", str(fichier))
-            cheminLLM = os.path.join(os.path.dirname(__file__), "LLMOutput", str(fichier))
+        for fichier in os.listdir(self.Fiches):
+            cheminDoc = os.path.join(self.Fiches, str(fichier))
+            cheminLLM = os.path.join(self.FichesOriginale, str(fichier))
             if not os.path.exists(cheminLLM):
                 continue
 
