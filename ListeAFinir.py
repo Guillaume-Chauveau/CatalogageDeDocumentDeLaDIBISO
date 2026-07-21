@@ -153,6 +153,7 @@ class ListeAFinir:
 
     def _lancerTraitement(self, mode="image", filenames=None):
         api_key = getCodeConnexionAPI()
+        print(api_key)
         if not api_key.strip():
             QtWidgets.QMessageBox.warning(
                 self.window,
@@ -170,6 +171,7 @@ class ListeAFinir:
             return
 
         self._set_processing_ui(True)
+        
         self._worker = OcrWorker(mode, self._get_scan_dir(), filenames, api_key)
         self._worker.finished_ok.connect(self._apresTraitement)
         self._worker.failed.connect(self._enCasErreur)

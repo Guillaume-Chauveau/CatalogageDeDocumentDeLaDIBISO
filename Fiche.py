@@ -679,7 +679,7 @@ class Fiche:
 def getCaracéristiquesARomanisée():
     return ["Titre","Complement du titre","Auteur","Numero du volume","Collection","Ville","Editeur","Mention d'edition","Illustration"]
 def getlangueNonRomaine():
-    return ["ru","ja","ko","zh","el"]
+    return ["russe","japonais","coréen","chinois","grec","arabe"]
 def getListeDesNomDeCaracteristiquesMultiple():
     return ["Indexation Rameau","Premier Auteur","Role Auteur","Co-Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire"]
 def getListeDesNomsDeCaracterisitiques():
