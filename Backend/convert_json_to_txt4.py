@@ -287,6 +287,7 @@ def build_lines(result: Dict[str, Any]) -> List[str]:
         ("translators", "traducteur"),
         ("illustrators", "illustrateur"),
         ("prefaciers", "préfacier"),
+        ("editors", "éditeur scientifique"),
     ]
 
     secondary_names: List[str] = []
