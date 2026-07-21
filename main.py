@@ -211,6 +211,8 @@ def ajouterBoutonFormulaire(w):
     w.window.Reset.clicked.connect(lambda: w.lecture(w.chemainOrigine))
     w.window.Reset.clicked.connect(lambda: w.calculeDeLaBareCentrale())
     w.window.Reset.setToolTip("Charge les valeur initialle de cette fiche")
+    w.window.pushButton.clicked.connect(lambda: w.Regenerer())
+    w.window.pushButton.setToolTip("Relance l’analyse via l’API sur l’image courante")
     w.window.BoutonTitre.clicked.connect(lambda: w.copieFileName())
 
     for i in range(0, w.window.gridLayout.rowCount()):
