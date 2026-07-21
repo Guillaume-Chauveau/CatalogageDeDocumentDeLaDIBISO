@@ -6,8 +6,12 @@ from PySide6 import QtCore
 import os
 import unicodedata
 
+from PySide6 import QtWidgets
+
 import Caracteristique as c
 import CaracteristiqueMultiple as cm
+from Parametre import getCodeConnexionAPI
+from Backend.document_processor import process_single_image
 
 
 def get_app_dir():
@@ -143,8 +147,35 @@ class Fiche:
             valeur *= 100
         return round(valeur)
 
+    def _resetFormValues(self):
+        for caracteristique in self.listeDesCaracteristiques:
+            if isinstance(caracteristique, cm.CaracteristiqueMultiple):
+                caracteristique.setValeur([])
+            else:
+                caracteristique.setValeur("")
+            caracteristique.setProba(0)
+
+        for row in range(self.window.gridLayout.rowCount()):
+            for col in (2, 3, 4):
+                item = self.window.gridLayout.itemAtPosition(row, col)
+                if item is None:
+                    continue
+                widget = item.widget()
+                if widget is None:
+                    continue
+                if col == 2:
+                    if isinstance(widget, QtWidgets.QLineEdit):
+                        widget.clear()
+                    elif isinstance(widget, QtWidgets.QPushButton):
+                        widget.setText("")
+                elif col == 3 and isinstance(widget, (QtWidgets.QLabel, QtWidgets.QProgressBar)):
+                    self._setDotColor(widget, 0)
+                elif col == 4 and isinstance(widget, QtWidgets.QLineEdit):
+                    widget.setText("0")
+
     def lecture(self,page):
-        #print(self.chemainOrigine)
+        print(self.chemainOrigine)
+        self._resetFormValues()
         pageL= page+".txt"
         #print(f"lecture de la page: {pageL}")
         source_path = os.path.join(APP_DIR, "Doc", pageL)
@@ -692,9 +723,62 @@ class Fiche:
         print (Caractéristique+" "+Caractéristique in getCaracéristiquesARomanisée())
         return Caractéristique in getCaracéristiquesARomanisée()
 
+    def _resolveCurrentImagePath(self):
+        candidates = [self.chemainScan]
+        for ext in (".png", ".jpg", ".jpeg", ".bmp", ".tiff"):
+            candidates.append(self.chemainScan + ext)
+        for candidate in candidates:
+            if os.path.exists(candidate):
+                return candidate
+        return None
+
     def Regenerer(self):
-        #todo
-        pass
+        api_key = (getCodeConnexionAPI() or "").strip()
+        if not api_key:
+            QtWidgets.QMessageBox.critical(
+                self.window,
+                "Clé API manquante",
+                "Veuillez renseigner la clé API dans Paramètres avant de régénérer cette fiche.",
+            )
+            return
+
+        image_path = self._resolveCurrentImagePath()
+        if image_path is None:
+            QtWidgets.QMessageBox.critical(
+                self.window,
+                "Image introuvable",
+                "Impossible de trouver l’image courante à analyser.",
+            )
+            return
+
+        self.window.setEnabled(False)
+        QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
+        try:
+            process_single_image(image_path, api_key)
+        except Exception as exc:
+            QtWidgets.QApplication.restoreOverrideCursor()
+            self.window.setEnabled(True)
+            QtWidgets.QMessageBox.critical(
+                self.window,
+                "Échec de la régénération",
+                f"La régénération a échoué : {exc}",
+            )
+            return
+        finally:
+            if self.window.isEnabled() is False:
+                self.window.setEnabled(True)
+                QtWidgets.QApplication.restoreOverrideCursor()
+
+        self.lecture(self.chemain)
+        self.calculeDeLaBareCentrale()
+        self.setImage()
+        self.ajoutTitreDeLaFenetre()
+        self.updateButtons()
+        QtWidgets.QMessageBox.information(
+            self.window,
+            "Régénération terminée",
+            "Le modèle a été relancé sur l’image courante et les champs ont été mis à jour.",
+        )
     
 def getCaracéristiquesARomanisée():
     return ["Titre","Complement du titre","Auteur","Numero du volume","Collection","Ville","Editeur","Mention d'edition","Illustration"]
