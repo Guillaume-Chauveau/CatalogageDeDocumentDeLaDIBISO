@@ -113,7 +113,16 @@ class Fiche:
         if form is not None and hasattr(form, "getValeurs"):
             return form.getValeurs()
         return ""
-
+    def getValeursDUneCaracteristiqueDansLeFichier(self,nom):
+        print(nom)
+        with open(self.chemain+".txt", "r", encoding="utf-8") as f:
+            for line in f:
+                print(line)
+                labelText, fieldText, proba, edit = line.strip().split("$")
+                if labelText == nom:
+                    print(fieldText)
+                    return fieldText
+        return ""
     @staticmethod
     def _parseProba(proba):
         """
@@ -135,15 +144,15 @@ class Fiche:
         return round(valeur)
 
     def lecture(self,page):
-        print(self.chemainOrigine)
+        #print(self.chemainOrigine)
         pageL= page+".txt"
-        print(f"lecture de la page: {pageL}")
+        #print(f"lecture de la page: {pageL}")
         source_path = os.path.join(APP_DIR, "Doc", pageL)
         if not os.path.exists(source_path):
             source_path = os.path.join(APP_DIR, "LLMOutput", pageL)
         with open(source_path, "r", encoding="utf-8") as f:
             for line in f:
-                print(line)
+                #print(line)
                 labelText, fieldText, proba, edit = line.strip().split("$")
                 for caracteristique in self.listeDesCaracteristiques:
                     if caracteristique.isCaracteristique(labelText):
@@ -193,6 +202,8 @@ class Fiche:
                     if not isinstance(role_target.valeur, list):
                         role_target.valeur = [str(role_target.valeur)] if role_target.valeur else []
                     role_target.valeur.append("Traducteur")
+                if labelText == "Langue":
+                    self.langue = fieldText
         f.close()                         
 
     def changeColor(self,bar):
@@ -235,17 +246,18 @@ class Fiche:
         text = ""
         self.nettoyerCaracteristiques()
 
-        article = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom("Article"))
-        titre = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom(self._caractéristiqueARomanisée("Titre")))
-        auteur = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom(self._caractéristiqueARomanisée("Auteur")))
-        complementTitre = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom(self._caractéristiqueARomanisée("Complement du titre")))
-        numeroVolume = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom(self._caractéristiqueARomanisée("Numero du volume")))
-        ville = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom(self._caractéristiqueARomanisée("Ville")))
-        editeur = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom(self._caractéristiqueARomanisée("Editeur")))
-        annee = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom(self._caractéristiqueARomanisée("Annee")))
-        volume = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom(self._caractéristiqueARomanisée("Volume")))
-        illustration = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom(self._caractéristiqueARomanisée("Illustration")))
-        dimension = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom(self._caractéristiqueARomanisée("Dimension")))
+        article = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Article")))
+        titre = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Titre")))
+       
+        auteur = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Auteur")))
+        complementTitre = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Complement du titre")))
+        numeroVolume = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Numero du volume")))
+        ville = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Ville")))
+        editeur = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Editeur")))
+        annee = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Annee")))
+        volume = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Volume")))
+        illustration = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Illustration")))
+        dimension = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Dimension")))
         indexationRameau =self.getCaracteristiqueParNom("Indexation Rameau")
         # Accès défensif aux caractéristiques par indice (évite IndexError en build distrib)
         def _get_valeur_safe(idx):
@@ -257,15 +269,14 @@ class Fiche:
                 return ""
 
         premierAuteur = _get_valeur_safe(self.INDICEAUTEUR)
-        print("teste premierAuteur:", premierAuteur)
         coAuteur = _get_valeur_safe(self.INDICECOAUTEUR)
         fonctionAuteur = _get_valeur_safe(self.INDICEROLEAUTEUR)
         fonctionCoauteur = _get_valeur_safe(self.INDICEROLECOAUTEUR)
         auteurSecondaire = _get_valeur_safe(self.INDICEAUTEURSECONDAIRE)
         fonctionAuteurSecondaire = _get_valeur_safe(self.INDICEROLEAUTEURSECONDAIRE)
-        collectivite = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom(self._caractéristiqueARomanisée("Nom de la Collectivite")))
-        fonctionCollectivite = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom(self._caractéristiqueARomanisée("Fonction de la Collectivite")))
-        mentionEdition = self._majusculeEnDebutDeCaracteristique(self.getValeurParNom(self._caractéristiqueARomanisée("Mention d'edition")))
+        collectivite = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Nom de la Collectivite")))
+        fonctionCollectivite = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Fonction de la Collectivite")))
+        mentionEdition = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Mention d'edition")))
 
         valeursCollection = self.getValeursFormulaireCollection()
         articleFormulaireCollection, collection, section, reference = self._extraireValeursCollection(valeursCollection)
@@ -273,7 +284,7 @@ class Fiche:
         collection = self._majusculeEnDebutDeCaracteristique(collection)
         section = self._majusculeEnDebutDeCaracteristique(section)
         reference = self._majusculeEnDebutDeCaracteristique(reference)
-        print(f"Valeurs du formulaire collection: {valeursCollection}")
+        
 
         text="008 $aAax3\n104 ##$ak$bzy$cy$dba$ffre\n106 ##$ar\n181 ##$P01$ctxt\n182 ##$P01$cn\n183 ##$P01$anga\n"
 
@@ -309,7 +320,6 @@ class Fiche:
         if collectivite != "" or fonctionCollectivite != "":
             text += self._champs712(collectivite, fonctionCollectivite)
         #text = self._retirerLeDernierPointVigule(text)
-        print(f"Affichage de la fiche: {titre} de {auteur} ({annee})")
         print(text)
         return text
 
@@ -495,7 +505,7 @@ class Fiche:
 
 
     def ecriture(self):
-        self.sauvgarde()
+        #self.sauvgarde()
         self.exportation()
 
     def sauvgarde(self):
@@ -504,7 +514,12 @@ class Fiche:
         with open(chemaintmp, "w", encoding="utf-8") as f:
             for i in self.listeDesCaracteristiques:
                 texte = i.getValeur()
-                f.write(f"{self.window.gridLayout.itemAtPosition(i.id,1).widget().text()}${texte}${i.getProba()}${self.window.gridLayout.itemAtPosition(i.id,4).widget().text()}\n")
+                tmp = f.split("$")
+                print("Test Sauvgarde")
+                print(tmp[0])
+                print(self.window.gridLayout.itemAtPosition(i.id,1).widget().text())
+                if tmp[0]==self.window.gridLayout.itemAtPosition(i.id,1).widget().text():
+                    f.write(f"{self.window.gridLayout.itemAtPosition(i.id,1).widget().text()}${texte}${i.getProba()}${self.window.gridLayout.itemAtPosition(i.id,4).widget().text()}\n")
 
     def exportation(self):
         chemain=os.path.join(APP_DIR, "Sortie", str(self.nomDuFichier))
@@ -662,14 +677,19 @@ class Fiche:
         if Caractéristique is None:
             return ""
         if self._langueARomanisée():
-            if self._besoinDeRomanisée(self, Caractéristique):
-                return Caractéristique + " Romanisée"
+            if self._besoinDeRomanisée(Caractéristique):
+                return self._RomaniséOuRomanisée(Caractéristique)
         return Caractéristique
-    
+    def _RomaniséOuRomanisée(self,Caractéristique):
+        if Caractéristique+" Romanisé" in getListeRomanisé():
+            return Caractéristique+" Romanisé"
+        else:
+            return Caractéristique+" Romanisée"
     def _langueARomanisée(self):
-        return getattr(self, "langue", "") in getlangueNonRomaine()
+        return self.langue in getlangueNonRomaine()
 
     def _besoinDeRomanisée(self,Caractéristique):
+        print (Caractéristique+" "+Caractéristique in getCaracéristiquesARomanisée())
         return Caractéristique in getCaracéristiquesARomanisée()
 
     def Regenerer(self):
@@ -684,3 +704,5 @@ def getListeDesNomDeCaracteristiquesMultiple():
     return ["Indexation Rameau","Premier Auteur","Role Auteur","Co-Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire"]
 def getListeDesNomsDeCaracterisitiques():
     return ["Article","Titre","Complement du titre","Auteur","Numero du volume","Collection","Ville","Editeur","Mention d'edition","Annee","Volume","Illustration","Dimension","Indexation Rameau","Premier Auteur","Co-Auteur","Role Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire","Nom de la Collectivite","Role de la Collectivite"]
+def getListeRomanisé():
+    return ["Titre Romanisé","Complement du titre Romanisé","Auteur Romanisé","Numero du volume Romanisé","Collection Romanisée","Ville Romanisée","Editeur Romanisé","Mention d'edition Romanisée","Illustration Romanisée"]
