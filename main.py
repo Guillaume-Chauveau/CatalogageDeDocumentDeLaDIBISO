@@ -212,6 +212,7 @@ def ajouterBoutonFormulaire(w):
     w.window.Reset.clicked.connect(lambda: w.calculeDeLaBareCentrale())
     w.window.Reset.setToolTip("Charge les valeur initialle de cette fiche")
     w.window.BoutonTitre.clicked.connect(lambda: w.copieFileName())
+    w.window.Recalculer.clicked.connect(lambda: w.Regenerer())
 
     for i in range(0, w.window.gridLayout.rowCount()):
         if w.window.gridLayout.itemAtPosition(i, 2) is not None:

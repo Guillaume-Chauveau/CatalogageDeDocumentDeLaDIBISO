@@ -967,9 +967,9 @@ QProgressBar::chunk {
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton">
+            <widget class="QPushButton" name="Recalculer">
              <property name="text">
-              <string>Regénérer</string>
+              <string>Recalculer</string>
              </property>
             </widget>
            </item>
