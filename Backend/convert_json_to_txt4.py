@@ -29,10 +29,12 @@ Mapping retenu (validé avec l'utilisateur) :
     en passe d'enrichissement.
   - Role Auteur / Role CoAuteur <- author_titles (1er / 2e titre de la
     liste ' ; '-séparée, dans le même ordre que les auteurs).
-  - Auteur Secondaire <- metadata["translators"] (le/les traducteur(s)).
-  - Role Auteur Secondaire <- "traducteur" (littéral) si un traducteur est
-    présent, vide sinon (aucune donnée de "rôle" n'est extraite pour les
-    traducteurs par le VLM ; ASSOMPTION à ajuster si besoin).
+  - Auteur Secondaire <- concaténation de metadata["translators"],
+    metadata["illustrators"] et metadata["prefaciers"] (tous extraits en
+    passe 1, exactement comme "translators"), dans cet ordre.
+  - Role Auteur Secondaire <- rôle littéral associé à chaque nom ci-dessus,
+    dans le même ordre ("traducteur" / "illustrateur" / "préfacier"),
+    aucune donnée de "rôle" n'étant extraite telle quelle par le VLM.
   - Champs "* Romanisé(e)" <- metadata["romanization"][...] (passe 2,
     déclenchée uniquement si le script détecté n'est pas latin). Reprennent
     exactement le même champ source que leur pendant non-romanisé (ex:
@@ -275,16 +277,40 @@ def build_lines(result: Dict[str, Any]) -> List[str]:
     lines.append(f"Role Auteur${fmt_value(role_auteur)}${fmt_confidence(titles_conf if role_auteur else None)}$0")
     lines.append(f"Role CoAuteur${fmt_value(role_coauteur)}${fmt_confidence(titles_conf if role_coauteur else None)}$0")
 
-    # --- Auteur Secondaire (= translators) / Role Auteur Secondaire ---
-    translators_raw = metadata.get("translators", "")
-    auteur_secondaire = join_multi(split_multi(translators_raw))
-    translators_conf = get_confidence(conf_root, "translators")
-    lines.append(f"Auteur Secondaire${auteur_secondaire}${fmt_confidence(translators_conf)}$0")
+    # --- Auteur Secondaire (traducteurs, illustrateurs, préfaciers) / Role Auteur Secondaire ---
+    # Chacun des trois champs est extrait en passe 1 exactement comme
+    # "translators" (metadata["translators"] / ["illustrators"] / ["prefaciers"]),
+    # aucune donnée de "rôle" n'étant produite telle quelle par le VLM : le rôle
+    # est donc forcé littéralement selon le champ source, dans l'ordre de
+    # concaténation ci-dessous (traducteurs, puis illustrateurs, puis préfaciers).
+    secondary_sources = [
+        ("translators", "traducteur"),
+        ("illustrators", "illustrateur"),
+        ("prefaciers", "préfacier"),
+    ]
 
-    # ASSOMPTION : pas de donnée de "rôle" extraite pour les traducteurs ->
-    # on force le libellé "traducteur" si un traducteur est présent, sinon vide.
-    role_secondaire = "traducteur" if auteur_secondaire else ""
-    lines.append(f"Role Auteur Secondaire${role_secondaire}$$0")
+    secondary_names: List[str] = []
+    secondary_roles: List[str] = []
+    secondary_confs: List[Optional[float]] = []
+
+    for metadata_key, role_label in secondary_sources:
+        names = split_multi(metadata.get(metadata_key, ""))
+        if not names:
+            continue
+        conf = get_confidence(conf_root, metadata_key)
+        secondary_names.extend(names)
+        secondary_roles.extend([role_label] * len(names))
+        secondary_confs.extend([conf] * len(names))
+
+    auteur_secondaire = join_multi(secondary_names)
+    role_auteur_secondaire = join_multi(secondary_roles)
+    secondaire_conf = min_conf(secondary_confs)
+
+    lines.append(f"Auteur Secondaire${auteur_secondaire}${fmt_confidence(secondaire_conf)}$0")
+    lines.append(
+        f"Role Auteur Secondaire${role_auteur_secondaire}"
+        f"${fmt_confidence(secondaire_conf if role_auteur_secondaire else None)}$0"
+    )
 
     # --- Collectivité : non généré ---
     add_empty("Nom de la Collectivite")
