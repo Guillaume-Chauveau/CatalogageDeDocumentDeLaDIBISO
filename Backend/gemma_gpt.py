@@ -399,7 +399,7 @@ class AristoteDocumentAnalyzer:
         return self._call_api(messages, max_tokens=max_tokens)
 
     def _generate_enrichment(
-        self, fields: Dict[str, Any], include_romanization: bool, max_tokens: int = 900,
+        self, fields: Dict[str, Any], include_romanization: bool, max_tokens: int = 4500,
     ) -> tuple[str, Optional[List[Dict[str, Any]]], Optional[str]]:
         """
         Passe 2, TEXTE SEUL (pas d'image), exécutée sur `self.enrichment_model`
@@ -545,10 +545,48 @@ class AristoteDocumentAnalyzer:
                 max_tokens=max_tokens,
                 messages=messages,
             )
-            text = response.choices[0].message.content.strip()
+            message = response.choices[0].message
+            finish_reason = getattr(response.choices[0], "finish_reason", None)
+            content = message.content
+
+            if content is None:
+                # Cas typique des modèles de raisonnement (ex: gpt-oss) : le contenu
+                # final peut être vide si le modèle a épuisé max_tokens pendant sa
+                # phase de raisonnement (finish_reason == "length"), ou si le
+                # contenu se trouve dans un champ séparé (ex: reasoning_content)
+                # selon l'implémentation du endpoint.
+                reasoning_content = getattr(message, "reasoning_content", None)
+                logger.warning(
+                    f"content est None pour le modèle {model_name} "
+                    f"(finish_reason={finish_reason!r}"
+                    f"{', reasoning_content présent' if reasoning_content else ''}). "
+                    "Réponse traitée comme vide."
+                )
+                content = ""
+
+            text = content.strip()
             return text, None, f"logprobs indisponibles sur ce endpoint/modèle: {e}"
 
-        text = response.choices[0].message.content.strip()
+        message = response.choices[0].message
+        finish_reason = getattr(response.choices[0], "finish_reason", None)
+        content = message.content
+
+        if content is None:
+            # Cas typique des modèles de raisonnement (ex: gpt-oss) : le contenu
+            # final peut être vide si le modèle a épuisé max_tokens pendant sa
+            # phase de raisonnement (finish_reason == "length"), ou si le
+            # contenu se trouve dans un champ séparé (ex: reasoning_content)
+            # selon l'implémentation du endpoint.
+            reasoning_content = getattr(message, "reasoning_content", None)
+            logger.warning(
+                f"content est None pour le modèle {model_name} "
+                f"(finish_reason={finish_reason!r}"
+                f"{', reasoning_content présent' if reasoning_content else ''}). "
+                "Réponse traitée comme vide."
+            )
+            content = ""
+
+        text = content.strip()
 
         token_logprobs: Optional[List[Dict[str, Any]]] = None
         choice_logprobs = getattr(response.choices[0], "logprobs", None)
