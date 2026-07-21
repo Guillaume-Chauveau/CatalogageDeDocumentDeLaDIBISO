@@ -15,6 +15,7 @@ base_datas = [
    ('Image', 'Image'),
    ('LLMOutput', 'LLMOutput'),
    ('champs_scientifiques.txt', '.'),
+   ('.clef.txt', '.'),
 ]
 
 hidden_imports = ['PySide6.QtCore', 'PySide6.QtGui', 'PySide6.QtWidgets', 'PySide6.QtUiTools'] + openai_hidden
@@ -39,11 +40,11 @@ exe = EXE(pyz,
           [],
           exclude_binaries=True,
           name='retro_catalogage',
-          debug=False,
+          debug=True,
           bootloader_ignore_signals=False,
           strip=False,
           upx=True,
-          console=False,
+          console=True,
             disable_windowed_traceback=False,
             argv_emulation=False,
             target_arch=None,
