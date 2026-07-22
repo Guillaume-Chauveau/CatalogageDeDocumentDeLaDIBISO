@@ -11,7 +11,7 @@ from PySide6 import QtWidgets
 import Caracteristique as c
 import CaracteristiqueMultiple as cm
 from Parametre import getCodeConnexionAPI
-from Backend.document_processor import process_single_image
+from Backend.bridge import process_single_image, process_single_image_consensus
 
 
 def get_app_dir():
@@ -754,7 +754,14 @@ class Fiche:
         self.window.setEnabled(False)
         QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
         try:
-            process_single_image(image_path, api_key)
+            # Utilise le consensus avec deux modèles vision (Gemma + Qwen) + arbitrage
+            process_single_image_consensus(
+                image_path,
+                api_key,
+                model_a="gemma-4-31b",
+                model_b="qwen-3.6-35b-instruct",
+                text_model="gpt-oss-120b",
+            )
         except Exception as exc:
             QtWidgets.QApplication.restoreOverrideCursor()
             self.window.setEnabled(True)
