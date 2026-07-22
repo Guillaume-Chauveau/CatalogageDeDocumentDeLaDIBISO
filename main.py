@@ -84,8 +84,10 @@ def afficherUnFormulaire(w, page):
 
     formulairePath = os.path.join(BASE_DIR, "UI", "Formulaire.ui")
     formulaire = loader.load(formulairePath, None)
+    
     currentFiche = f.Fiche(page, formulaire, afficherLeFormulaireAuteur, afficherLeFormulaireChampsScientifique,afficherLeFormulaireCollection, chemainScan)
     activerRedimensionnementDynamique(currentFiche)
+    currentFiche.window.showMaximized()
     ajouterBoutonFormulaire(currentFiche)
 
     if w is not None:
@@ -211,10 +213,9 @@ def ajouterBoutonFormulaire(w):
     w.window.Reset.clicked.connect(lambda: w.lecture(w.chemainOrigine))
     w.window.Reset.clicked.connect(lambda: w.calculeDeLaBareCentrale())
     w.window.Reset.setToolTip("Charge les valeur initialle de cette fiche")
-    w.window.pushButton.clicked.connect(lambda: w.Regenerer())
-    w.window.pushButton.setToolTip("Relance l’analyse via l’API sur l’image courante")
-    w.window.BoutonTitre.clicked.connect(lambda: w.copieFileName())
     w.window.Recalculer.clicked.connect(lambda: w.Regenerer())
+    w.window.Recalculer.setToolTip("Relance l’analyse via l’API sur l’image courante")
+    w.window.BoutonTitre.clicked.connect(lambda: w.copieFileName())
 
     for i in range(0, w.window.gridLayout.rowCount()):
         if w.window.gridLayout.itemAtPosition(i, 2) is not None:
@@ -248,6 +249,17 @@ def afficherRenduFormulaire(fiche=None):
             except Exception:
                 return ""
 
+    def _fermer_rendu_et_executer(action):
+        try:
+            window_manager.close("rendu")
+            QtWidgets.QApplication.processEvents()
+        except Exception as exc:
+            print(f"[Rendu] Erreur lors de la fermeture de la fenêtre de rendu: {exc}")
+        try:
+            action()
+        except Exception as exc:
+            print(f"[Rendu] Erreur lors de l'exécution de l'action: {exc}")
+
     try:
         rendu_text = fiche.affichage() if fiche is not None and hasattr(fiche, "affichage") else ""
     except Exception as exc:
@@ -272,10 +284,14 @@ def afficherRenduFormulaire(fiche=None):
             page = getattr(fiche, "page", None)
 
         parametre.BoutonFormulaire.clicked.connect(
-            lambda: afficherUnFormulaire(getattr(fiche, "window", None), page)
+            lambda: _fermer_rendu_et_executer(
+                lambda: afficherUnFormulaire(getattr(fiche, "window", None), page)
+            )
         )
         parametre.BoutonHome.clicked.connect(
-            lambda: afficherLeCatalogue(getattr(fiche, "window", None), getattr(fiche, "chemainScan", "Scan"))
+            lambda: _fermer_rendu_et_executer(
+                lambda: afficherLeCatalogue(getattr(fiche, "window", None), getattr(fiche, "chemainScan", "Scan"))
+            )
         )
     else:
         parametre.BoutonFormulaire.clicked.connect(lambda: None)
@@ -289,10 +305,7 @@ def afficherRenduFormulaire(fiche=None):
 
     currentRenduFormulaire = parametre
 
-    # On ferme d'abord une éventuelle ancienne fenêtre de rendu
     window_manager.close("rendu")
-
-    # On l'affiche explicitement
     window_manager.show("rendu", parametre)
     parametre.show()
     parametre.raise_()
