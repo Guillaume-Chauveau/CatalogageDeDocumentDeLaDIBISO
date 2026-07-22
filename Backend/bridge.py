@@ -151,6 +151,12 @@ def process_single_image_consensus(
     if not path.is_file():
         raise FileNotFoundError(f"Image introuvable : {image_path}")
 
+    CONSENSUS_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    json_path = CONSENSUS_OUTPUT_DIR / f"{path.stem}.json"
+    if json_path.exists():
+        print(f"Fichier {path.name} déjà traité (consensus). Ignoré.")
+        return path.stem
+
     analyzer_a = get_analyzer(api_key, model=model_a, enrichment_model=text_model)
     analyzer_b = get_analyzer(api_key, model=model_b, enrichment_model=text_model)
     client = OpenAI(base_url=API_BASE_URL, api_key=(api_key or "").strip())
