@@ -522,14 +522,14 @@ class Fiche:
                 text += ("0#$a" + str(article_val) + " @" + str(titre_val))
             else:
                 text += ("1#$a@" + str(titre_val))
+            if complement_val != "":
+                text += ("$e" + str(complement_val))
             if auteur_val != "":
                 text += ("$f" + str(auteur_val))
                 if co_auteur_val != "":
                     text += ("," + str(co_auteur_val))
                 if auteur_secondaire_val != "":
                     text += ("," + str(auteur_secondaire_val))
-            if complement_val != "":
-                text += ("$e" + str(complement_val))
             if numero_volume_val != "":
                 text += ("$h" + str(numero_volume_val))
             if text != "200 ":
