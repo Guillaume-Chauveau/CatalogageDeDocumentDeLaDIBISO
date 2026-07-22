@@ -732,6 +732,64 @@ class Fiche:
                 return candidate
         return None
 
+    def lectureSelectiveParProba(self, page):
+        """
+        Charge les nouvelles valeurs mais ne met à jour un champ que si 
+        le degré de certitude (proba) est PLUS ÉLEVÉ que la valeur actuelle.
+        Préserve les éditions manuelles (edit="1").
+        """
+        print(f"Chargement sélectif (probas) de : {page}")
+        
+        # Sauvegarder les probas actuelles
+        old_probas = {}
+        for char in self.listeDesCaracteristiques:
+            old_probas[char.nom if hasattr(char, 'nom') else self.listeDesNomDeCaracteristiques[char.id]] = char.getProba()
+        
+        pageL = page + ".txt"
+        source_path = os.path.join(APP_DIR, "Doc", pageL)
+        if not os.path.exists(source_path):
+            source_path = os.path.join(APP_DIR, "LLMOutput", pageL)
+        
+        with open(source_path, "r", encoding="utf-8") as f:
+            for line in f:
+                labelText, fieldText, proba_str, edit = line.strip().split("$")
+                new_proba = self._parseProba(proba_str)
+                
+                for caracteristique in self.listeDesCaracteristiques:
+                    if caracteristique.isCaracteristique(labelText):
+                        old_proba = caracteristique.getProba()
+                        
+                        # Ne mettre à jour que si la nouvelle proba est PLUS ÉLEVÉE
+                        # et que le champ n'a pas été manuellement édité (edit != "1")
+                        edit_status = self.window.gridLayout.itemAtPosition(caracteristique.id, 4).widget().text() if self.window.gridLayout.itemAtPosition(caracteristique.id, 4) else "0"
+                        
+                        if new_proba > old_proba and edit_status != "1":
+                            # Mettre à jour uniquement si proba plus élevée
+                            caracteristique.setValeur(fieldText)
+                            caracteristique.setProba(new_proba)
+                            
+                            fieldItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 2)
+                            barItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 3)
+                            
+                            if fieldItem is not None:
+                                widget = fieldItem.widget()
+                                if isinstance(widget, QtWidgets.QPushButton):
+                                    widget.setText(caracteristique.getValeur())
+                                else:
+                                    widget.setText(fieldText)
+                            if barItem is not None:
+                                bar = barItem.widget()
+                                if isinstance(bar, QtWidgets.QLabel):
+                                    self._setDotColor(bar, new_proba)
+                        
+                        # Préserver le statut d'édition manuelle
+                        editItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 4)
+                        if editItem is not None:
+                            editItem.widget().setText(edit)
+                        break
+        
+        f.close()
+    
     def Regenerer(self):
         api_key = (getCodeConnexionAPI() or "").strip()
         if not api_key:
@@ -776,7 +834,8 @@ class Fiche:
                 self.window.setEnabled(True)
                 QtWidgets.QApplication.restoreOverrideCursor()
 
-        self.lecture(self.chemain)
+        # Charger les nouvelles valeurs uniquement si la proba est plus élevée
+        self.lectureSelectiveParProba(self.chemain)
         self.calculeDeLaBareCentrale()
         self.setImage()
         self.ajoutTitreDeLaFenetre()
@@ -784,7 +843,7 @@ class Fiche:
         QtWidgets.QMessageBox.information(
             self.window,
             "Régénération terminée",
-            "Le modèle a été relancé sur l’image courante et les champs ont été mis à jour.",
+            "Le modèle a été relancé. Seuls les champs avec une certitude plus élevée ont été mis à jour.",
         )
     
 def getCaracéristiquesARomanisée():
