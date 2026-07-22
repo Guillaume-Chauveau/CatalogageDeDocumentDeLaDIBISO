@@ -115,8 +115,45 @@ def text_similarity(a: str, b: str) -> float:
     return difflib.SequenceMatcher(None, normalize_text(a), normalize_text(b)).ratio()
 
 
-def scalar_fields_agree(value_a: str, value_b: str) -> bool:
-    a, b = (value_a or "").strip(), (value_b or "").strip()
+CONTAINMENT_FIELDS = {"title", "title_complement"}
+CONTAINMENT_MIN_RATIO = 0.6  # le plus court doit couvrir au moins 60% du plus long
+
+
+def is_containment(value_a: str, value_b: str) -> bool:
+    """
+    True si l'une des deux valeurs est un préfixe/sous-chaîne quasi complète
+    de l'autre. Cas typique : un modèle vision tronque le titre ou le
+    sous-titre (page dense, texte petit) alors que l'autre le lit en entier.
+    Ce n'est PAS un vrai désaccord de contenu, juste un problème de
+    complétude — inutile (et risqué) de le confier à l'arbitrage texte, qui
+    n'a pas accès à l'image et pourrait préférer la version tronquée.
+    """
+    na, nb = normalize_text(value_a), normalize_text(value_b)
+    if not na or not nb or na == nb:
+        return False
+    shorter, longer = (na, nb) if len(na) <= len(nb) else (nb, na)
+    if shorter not in longer:
+        return False
+    return len(shorter) / len(longer) >= CONTAINMENT_MIN_RATIO
+
+
+def _as_text(value: Any) -> str:
+    """
+    Coercion défensive : un champ censé être scalaire (ex: "authors") peut
+    arriver ici sous forme de liste si un run plus ancien (avant correctif
+    dans pipeline.py) a été rejoué, ou si un modèle a renvoyé un type
+    inattendu. On ramène toujours à une chaîne "; "-séparée plutôt que de
+    planter sur .strip()/.lower().
+    """
+    if isinstance(value, list):
+        return " ; ".join(str(v).strip() for v in value if str(v).strip())
+    if isinstance(value, dict):
+        return json.dumps(value, ensure_ascii=False)
+    return value or ""
+
+
+def scalar_fields_agree(value_a: Any, value_b: Any) -> bool:
+    a, b = _as_text(value_a).strip(), _as_text(value_b).strip()
     if a == "" and b == "":
         return True
     if a == "" or b == "":
@@ -161,7 +198,20 @@ def arbitrate_field(
         "EXCLUSIVEMENT entre le candidat A et le candidat B, sans jamais "
         "proposer ou halluciner une troisième valeur, même si aucun des deux "
         "ne te semble pleinement satisfaisant.\n\n"
-        f"Contexte (autres champs déjà confirmés par les deux systèmes) :\n"
+        + (
+            "RÈGLE SPÉCIFIQUE AUX TITRES/SOUS-TITRES : si les deux candidats se "
+            "ressemblent mais qu'un des deux semble plus DÉVELOPPÉ, plus LONG ou "
+            "plus DÉTAILLÉ que l'autre (l'un contient une clause, une énumération "
+            "ou une fin de phrase absente de l'autre), privilégie SYSTÉMATIQUEMENT "
+            "le candidat le plus complet : un titre extrait par un système de "
+            "lecture automatique est presque toujours tronqué par manque de "
+            "lisibilité, jamais rallongé par invention. Un candidat plus court "
+            "n'est préférable que s'il corrige une erreur de lecture manifeste "
+            "(mot clairement mal reconnu), pas simplement parce qu'il paraît plus "
+            "sobre ou mieux formé stylistiquement.\n\n"
+            if field_name in ("title", "title_complement") else ""
+        )
+        + f"Contexte (autres champs déjà confirmés par les deux systèmes) :\n"
         f"{json.dumps(context, ensure_ascii=False)}\n\n"
         f"Candidat A ({model_a_name}) pour \"{field_name}\" : {json.dumps(value_a, ensure_ascii=False)}\n"
         f"Candidat B ({model_b_name}) pour \"{field_name}\" : {json.dumps(value_b, ensure_ascii=False)}\n\n"
@@ -217,7 +267,7 @@ def merge_results(
     pending_conflicts: List[str] = []
 
     def process_scalar(field: str, agree_fn) -> None:
-        val_a, val_b = meta_a.get(field, ""), meta_b.get(field, "")
+        val_a, val_b = _as_text(meta_a.get(field, "")), _as_text(meta_b.get(field, ""))
         if agree_fn(val_a, val_b):
             chosen_value = val_a if val_a else val_b
             c_a, c_b = get_field_confidence(conf_a, field), get_field_confidence(conf_b, field)
@@ -229,6 +279,24 @@ def merge_results(
                 f"value_{model_b_name}": val_b,
                 "chosen_value": chosen_value,
                 "confidence": max(candidates) if candidates else None,
+            }
+            agreed_context[field] = chosen_value
+        elif field in CONTAINMENT_FIELDS and is_containment(val_a, val_b):
+            # Désaccord apparent mais probable troncature d'un des deux
+            # modèles : on garde la version la plus longue/complète plutôt
+            # que de risquer un arbitrage aveugle qui choisirait la version
+            # tronquée.
+            chosen_value = val_a if len(val_a) >= len(val_b) else val_b
+            c_a, c_b = get_field_confidence(conf_a, field), get_field_confidence(conf_b, field)
+            candidates = [c for c in (c_a, c_b) if c is not None]
+            merged_metadata[field] = chosen_value
+            consensus_detail[field] = {
+                "agreement": True,
+                "resolution": "containment_heuristic_kept_longer",
+                f"value_{model_a_name}": val_a,
+                f"value_{model_b_name}": val_b,
+                "chosen_value": chosen_value,
+                "confidence": min(candidates) if candidates else None,
             }
             agreed_context[field] = chosen_value
         else:
