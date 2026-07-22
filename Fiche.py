@@ -447,9 +447,11 @@ class Fiche:
             if i < len(co_auteur_morceaux):
                 if co_auteur_morceaux[i] != "":
                     text += ("#1$3" + str(co_auteur_morceaux[i]))
-            if i < len(fonction_morceaux): 
-                if fonction_morceaux[i] != "":
-                    text += ("$4" + str(fonction_morceaux[i]))
+            #todo: solution tmp pour que la fonction du co-auteur 
+            #if i < len(fonction_morceaux): 
+            #    if fonction_morceaux[i] != "":
+            #        text += ("$4" + str(fonction_morceaux[i]))
+                    text += ("$4" + "070")
             if text != "701 ":
                 resultats.append(text)
         return "\n".join(resultats)+"\n"
@@ -463,9 +465,11 @@ class Fiche:
             if i < len(premier_auteur_morceaux) :
                 if premier_auteur_morceaux[i]!="":
                     text += ("#1$3" + str(premier_auteur_morceaux[i]))
-            if i < len(fonction_morceaux): 
-                if fonction_morceaux[i]!="":
-                    text += ("$4" + str(fonction_morceaux[i]))
+            #todo: solution tmp pour que la fonction de l'auteur
+            #if i < len(fonction_morceaux): 
+            #    if fonction_morceaux[i]!="":
+            #        text += ("$4" + str(fonction_morceaux[i]))
+                    text += ("$4" + "070")
             if text != "700 ":
                 resultats.append(text)
         return "\n".join(resultats)+"\n"
@@ -568,21 +572,57 @@ class Fiche:
 
 
     def ecriture(self):
-        #self.sauvgarde()
+        self.sauvgarde()
         self.exportation()
 
     def sauvgarde(self):
-        chemaintmp=self.chemain+".txt"
+        chemaintmp = self.chemain + ".txt"
         os.makedirs(os.path.dirname(chemaintmp), exist_ok=True)
+
+        lignes_existantes = []
+        labels_existants = set()
+
+        if os.path.exists(chemaintmp):
+            with open(chemaintmp, "r", encoding="utf-8") as f:
+                for ligne in f:
+                    ligne = ligne.rstrip("\n")
+                    if not ligne:
+                        continue
+                    label = ligne.split("$", 1)[0]
+                    lignes_existantes.append(ligne)
+                    labels_existants.add(label)
+
+        labels_a_mettre_a_jour = set()
+        lignes_a_ecrire = []
+        for i in self.listeDesCaracteristiques:
+            label_item = self.window.gridLayout.itemAtPosition(i.id, 1)
+            if label_item is None or label_item.widget() is None:
+                continue
+
+            label = label_item.widget().text()
+            texte = i.getValeur()
+            proba = i.getProba()
+            edit = self.window.gridLayout.itemAtPosition(i.id, 4).widget().text()
+            labels_a_mettre_a_jour.add(label)
+            lignes_a_ecrire.append((label, f"{label}${texte}${proba}${edit}"))
+
         with open(chemaintmp, "w", encoding="utf-8") as f:
-            for i in self.listeDesCaracteristiques:
-                texte = i.getValeur()
-                tmp = f.split("$")
-                print("Test Sauvgarde")
-                print(tmp[0])
-                print(self.window.gridLayout.itemAtPosition(i.id,1).widget().text())
-                if tmp[0]==self.window.gridLayout.itemAtPosition(i.id,1).widget().text():
-                    f.write(f"{self.window.gridLayout.itemAtPosition(i.id,1).widget().text()}${texte}${i.getProba()}${self.window.gridLayout.itemAtPosition(i.id,4).widget().text()}\n")
+            lignes_deja_remplacees = set()
+
+            for ligne in lignes_existantes:
+                label = ligne.split("$", 1)[0]
+                if label in labels_a_mettre_a_jour:
+                    for label_courant, nouvelle_ligne in lignes_a_ecrire:
+                        if label_courant == label:
+                            f.write(nouvelle_ligne + "\n")
+                            lignes_deja_remplacees.add(label)
+                            break
+                else:
+                    f.write(ligne + "\n")
+
+            for label, nouvelle_ligne in lignes_a_ecrire:
+                if label not in lignes_deja_remplacees:
+                    f.write(nouvelle_ligne + "\n")
 
     def exportation(self):
         chemain=os.path.join(APP_DIR, "Sortie", str(self.nomDuFichier))
