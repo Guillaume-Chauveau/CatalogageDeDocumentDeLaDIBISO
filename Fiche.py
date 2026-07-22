@@ -277,18 +277,31 @@ class Fiche:
         text = ""
         self.nettoyerCaracteristiques()
 
-        article = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Article")))
-        titre = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Titre")))
+        articleR = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Article")))
+        article = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier("Article"))
+        titreR = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Titre")))
+        titre = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier("Titre"))
        
-        auteur = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Auteur")))
-        complementTitre = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Complement du titre")))
+        auteurR = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Auteur")))
+        auteur = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier("Auteur"))
+        complementTitreR = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Complement du titre")))
+        complementTitre = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier("Complement du titre"))
+        
         numeroVolume = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Numero du volume")))
-        ville = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Ville")))
-        editeur = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Editeur")))
-        annee = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Annee")))
-        volume = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Volume")))
-        illustration = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Illustration")))
-        dimension = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Dimension")))
+        villeR = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Ville")))
+        ville = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier("Ville"))
+
+        editeurR = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Editeur")))
+        editeur = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier("Editeur"))
+        annee = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier("Annee"))
+        volumeR = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Volume")))
+        illustrationR = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Illustration")))
+        dimensionR = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Dimension")))
+
+        volume = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier("Volume"))
+        illustration = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier("Illustration"))
+        dimension = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier("Dimension"))
+
         indexationRameau =self.getCaracteristiqueParNom("Indexation Rameau")
         # Accès défensif aux caractéristiques par indice (évite IndexError en build distrib)
         def _get_valeur_safe(idx):
@@ -305,9 +318,16 @@ class Fiche:
         fonctionCoauteur = _get_valeur_safe(self.INDICEROLECOAUTEUR)
         auteurSecondaire = _get_valeur_safe(self.INDICEAUTEURSECONDAIRE)
         fonctionAuteurSecondaire = _get_valeur_safe(self.INDICEROLEAUTEURSECONDAIRE)
-        collectivite = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Nom de la Collectivite")))
-        fonctionCollectivite = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Fonction de la Collectivite")))
-        mentionEdition = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Mention d'edition")))
+        collectiviteR = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Nom de la Collectivite")))
+        fonctionCollectiviteR = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Fonction de la Collectivite")))
+        
+        collectivite = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier("Nom de la Collectivite"))
+        fonctionCollectivite = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier("Fonction de la Collectivite"))
+        
+
+
+        mentionEditionR = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Mention d'edition")))
+        mentionEdition = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier("Mention d'edition"))
 
         valeursCollection = self.getValeursFormulaireCollection()
         articleFormulaireCollection, collection, section, reference = self._extraireValeursCollection(valeursCollection)
@@ -321,16 +341,26 @@ class Fiche:
 
         if article != "" or titre != "" or auteur != "" or complementTitre != "":
             text +=self._champs200(article, titre, auteur, complementTitre, numeroVolume, coAuteur, auteurSecondaire)
+        if (articleR != "" and articleR != article) or (titreR != "" and titreR != titre) or (auteurR != "" and auteurR != auteur) or (complementTitreR != "" and complementTitreR != complementTitre):
+            text +=self._champs200(articleR, titreR, auteurR, complementTitreR, numeroVolume, coAuteur, auteurSecondaire)
 
         if mentionEdition != "":
             text += "205 ##" + mentionEdition + "\n"
+        if mentionEditionR != "" and mentionEditionR != mentionEdition:
+            text += "205 ##" + mentionEditionR + "\n"
 
         if ville != "" or editeur != "" or annee != "":
             text += self._formatagePourVilleEditeurAnnee(ville, editeur, annee)
             text += "\n"
+        if (villeR != "" and villeR != ville) or (editeurR != "" and editeurR != editeur):
+            text += self._formatagePourVilleEditeurAnnee(villeR, editeurR, annee)
+            text += "\n"
 
         if volume != "" or illustration != "" or dimension != "":
             text += self._champs215(volume, illustration, dimension)
+        
+        if (volumeR != "" and volumeR != volume) or (illustrationR != "" and illustrationR != illustration) or (dimensionR != "" and dimensionR != dimension):
+            text += self._champs215(volumeR, illustrationR, dimensionR)
 
         if collection or section:
             text += self._champs225(collection, section)
@@ -350,6 +380,8 @@ class Fiche:
 
         if collectivite != "" or fonctionCollectivite != "":
             text += self._champs712(collectivite, fonctionCollectivite)
+        if (collectiviteR != "" and collectiviteR != collectivite) or (fonctionCollectiviteR != "" and fonctionCollectiviteR != fonctionCollectivite):
+            text += self._champs712(collectiviteR, fonctionCollectiviteR)
         #text = self._retirerLeDernierPointVigule(text)
         print(text)
         return text
@@ -415,9 +447,11 @@ class Fiche:
             if i < len(co_auteur_morceaux):
                 if co_auteur_morceaux[i] != "":
                     text += ("#1$3" + str(co_auteur_morceaux[i]))
-            if i < len(fonction_morceaux): 
-                if fonction_morceaux[i] != "":
-                    text += ("$4" + str(fonction_morceaux[i]))
+            #todo: solution tmp pour que la fonction du co-auteur 
+            #if i < len(fonction_morceaux): 
+            #    if fonction_morceaux[i] != "":
+            #        text += ("$4" + str(fonction_morceaux[i]))
+                    text += ("$4" + "070")
             if text != "701 ":
                 resultats.append(text)
         return "\n".join(resultats)+"\n"
@@ -431,9 +465,11 @@ class Fiche:
             if i < len(premier_auteur_morceaux) :
                 if premier_auteur_morceaux[i]!="":
                     text += ("#1$3" + str(premier_auteur_morceaux[i]))
-            if i < len(fonction_morceaux): 
-                if fonction_morceaux[i]!="":
-                    text += ("$4" + str(fonction_morceaux[i]))
+            #todo: solution tmp pour que la fonction de l'auteur
+            #if i < len(fonction_morceaux): 
+            #    if fonction_morceaux[i]!="":
+            #        text += ("$4" + str(fonction_morceaux[i]))
+                    text += ("$4" + "070")
             if text != "700 ":
                 resultats.append(text)
         return "\n".join(resultats)+"\n"
@@ -536,21 +572,57 @@ class Fiche:
 
 
     def ecriture(self):
-        #self.sauvgarde()
+        self.sauvgarde()
         self.exportation()
 
     def sauvgarde(self):
-        chemaintmp=self.chemain+".txt"
+        chemaintmp = self.chemain + ".txt"
         os.makedirs(os.path.dirname(chemaintmp), exist_ok=True)
+
+        lignes_existantes = []
+        labels_existants = set()
+
+        if os.path.exists(chemaintmp):
+            with open(chemaintmp, "r", encoding="utf-8") as f:
+                for ligne in f:
+                    ligne = ligne.rstrip("\n")
+                    if not ligne:
+                        continue
+                    label = ligne.split("$", 1)[0]
+                    lignes_existantes.append(ligne)
+                    labels_existants.add(label)
+
+        labels_a_mettre_a_jour = set()
+        lignes_a_ecrire = []
+        for i in self.listeDesCaracteristiques:
+            label_item = self.window.gridLayout.itemAtPosition(i.id, 1)
+            if label_item is None or label_item.widget() is None:
+                continue
+
+            label = label_item.widget().text()
+            texte = i.getValeur()
+            proba = i.getProba()
+            edit = self.window.gridLayout.itemAtPosition(i.id, 4).widget().text()
+            labels_a_mettre_a_jour.add(label)
+            lignes_a_ecrire.append((label, f"{label}${texte}${proba}${edit}"))
+
         with open(chemaintmp, "w", encoding="utf-8") as f:
-            for i in self.listeDesCaracteristiques:
-                texte = i.getValeur()
-                tmp = f.split("$")
-                print("Test Sauvgarde")
-                print(tmp[0])
-                print(self.window.gridLayout.itemAtPosition(i.id,1).widget().text())
-                if tmp[0]==self.window.gridLayout.itemAtPosition(i.id,1).widget().text():
-                    f.write(f"{self.window.gridLayout.itemAtPosition(i.id,1).widget().text()}${texte}${i.getProba()}${self.window.gridLayout.itemAtPosition(i.id,4).widget().text()}\n")
+            lignes_deja_remplacees = set()
+
+            for ligne in lignes_existantes:
+                label = ligne.split("$", 1)[0]
+                if label in labels_a_mettre_a_jour:
+                    for label_courant, nouvelle_ligne in lignes_a_ecrire:
+                        if label_courant == label:
+                            f.write(nouvelle_ligne + "\n")
+                            lignes_deja_remplacees.add(label)
+                            break
+                else:
+                    f.write(ligne + "\n")
+
+            for label, nouvelle_ligne in lignes_a_ecrire:
+                if label not in lignes_deja_remplacees:
+                    f.write(nouvelle_ligne + "\n")
 
     def exportation(self):
         chemain=os.path.join(APP_DIR, "Sortie", str(self.nomDuFichier))
@@ -666,6 +738,8 @@ class Fiche:
         parts = nomSansExtention.split('#')
         if len(parts) == 2: # Normalement inutile, mais on le laisse en cas d'érreur lors de la saisie du nom du fichier
             dimension = parts[1]
+            #ajout des espace entre le nombre de cm et "cm"
+            dimension=dimension[:len(dimension)-2]+" "+dimension[len(dimension)-2:]
             self.getCaracteristiqueParNom("Dimension").setValeur(dimension)
             # Mettre à jour les widgets correspondants
             DimensionWidget = self.window.gridLayout.itemAtPosition(self.getCaracteristiqueParNom("Dimension").id, 2).widget()

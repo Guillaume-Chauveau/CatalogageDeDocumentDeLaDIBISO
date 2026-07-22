@@ -1,6 +1,7 @@
 import sys
 import os
 from PySide6 import QtCore, QtGui, QtWidgets
+from PySide6.QtWidgets import QFileDialog,QMessageBox
 from PySide6.QtUiTools import QUiLoader
 import ListeAFinir as Catalogue
 import Fiche as f
@@ -21,6 +22,21 @@ def get_base_dir():
 
 BASE_DIR = get_base_dir()
 loader = QUiLoader()
+
+
+def enregistrerUnimarc(fenetre, obtenir_texte):
+    """Enregistre le texte affiché dans le rendu au format .txt."""
+    fichier, _ = QFileDialog.getSaveFileName(fenetre, "Enregistrer", "", "Texte (*.txt)")
+
+    if not fichier:
+        return
+
+    try:
+        with open(fichier, 'w', encoding='utf-8') as fichier_sortie:
+            fichier_sortie.write(obtenir_texte())
+        QMessageBox.information(fenetre, "Succès", "Fichier enregistré.")
+    except Exception as exc:
+        QMessageBox.critical(fenetre, "Erreur", str(exc))
 
 
 class WindowManager:
@@ -84,8 +100,10 @@ def afficherUnFormulaire(w, page):
 
     formulairePath = os.path.join(BASE_DIR, "UI", "Formulaire.ui")
     formulaire = loader.load(formulairePath, None)
+    
     currentFiche = f.Fiche(page, formulaire, afficherLeFormulaireAuteur, afficherLeFormulaireChampsScientifique,afficherLeFormulaireCollection, chemainScan)
     activerRedimensionnementDynamique(currentFiche)
+    currentFiche.window.showMaximized()
     ajouterBoutonFormulaire(currentFiche)
 
     if w is not None:
@@ -211,9 +229,9 @@ def ajouterBoutonFormulaire(w):
     w.window.Reset.clicked.connect(lambda: w.lecture(w.chemainOrigine))
     w.window.Reset.clicked.connect(lambda: w.calculeDeLaBareCentrale())
     w.window.Reset.setToolTip("Charge les valeur initialle de cette fiche")
-
-    w.window.BoutonTitre.clicked.connect(lambda: w.copieFileName())
     w.window.Recalculer.clicked.connect(lambda: w.Regenerer())
+    w.window.Recalculer.setToolTip("Relance l’analyse via l’API sur l’image courante")
+    w.window.BoutonTitre.clicked.connect(lambda: w.copieFileName())
 
     for i in range(0, w.window.gridLayout.rowCount()):
         if w.window.gridLayout.itemAtPosition(i, 2) is not None:
@@ -225,27 +243,38 @@ def afficherRenduFormulaire(fiche=None):
     global currentRenduFormulaire
 
     parametrePath = os.path.join(BASE_DIR, "UI", "RenduFormulaire.ui")
-    parametre = loader.load(parametrePath, None)
+    rendu = loader.load(parametrePath, None)
 
-    if parametre is None:
+    if rendu is None:
         print("Erreur: impossible de charger RenduFormulaire.ui")
         return
 
-    if hasattr(parametre, "setWindowTitle"):
-        parametre.setWindowTitle("Rendu du formulaire")
-    if hasattr(parametre, "resize"):
-        parametre.resize(800, 600)
-    if hasattr(parametre, "setAttribute"):
-        parametre.setAttribute(QtCore.Qt.WA_DeleteOnClose, False)
+    if hasattr(rendu, "setWindowTitle"):
+        rendu.setWindowTitle("Rendu du formulaire")
+    if hasattr(rendu, "resize"):
+        rendu.resize(800, 600)
+    if hasattr(rendu, "setAttribute"):
+        rendu.setAttribute(QtCore.Qt.WA_DeleteOnClose, False)
 
     def _get_response_text():
         try:
-            return parametre.Reponce.toPlainText()
+            return rendu.Reponce.toPlainText()
         except Exception:
             try:
-                return parametre.Reponce.text()
+                return rendu.Reponce.text()
             except Exception:
                 return ""
+
+    def _fermer_rendu_et_executer(action):
+        try:
+            window_manager.close("rendu")
+            QtWidgets.QApplication.processEvents()
+        except Exception as exc:
+            print(f"[Rendu] Erreur lors de la fermeture de la fenêtre de rendu: {exc}")
+        try:
+            action()
+        except Exception as exc:
+            print(f"[Rendu] Erreur lors de l'exécution de l'action: {exc}")
 
     try:
         rendu_text = fiche.affichage() if fiche is not None and hasattr(fiche, "affichage") else ""
@@ -254,14 +283,14 @@ def afficherRenduFormulaire(fiche=None):
         rendu_text = ""
 
     try:
-        parametre.Reponce.setText(rendu_text)
+        rendu.Reponce.setText(rendu_text)
     except Exception:
         try:
-            parametre.Reponce.setPlainText(rendu_text)
+            rendu.Reponce.setPlainText(rendu_text)
         except Exception as exc:
             print(f"[Rendu] Impossible d'écrire dans Reponce: {exc}")
 
-    parametre.BoutonCopier.clicked.connect(
+    rendu.BoutonCopier.clicked.connect(
         lambda: QtWidgets.QApplication.clipboard().setText(_get_response_text())
     )
 
@@ -270,32 +299,36 @@ def afficherRenduFormulaire(fiche=None):
         if page is None:
             page = getattr(fiche, "page", None)
 
-        parametre.BoutonFormulaire.clicked.connect(
-            lambda: afficherUnFormulaire(getattr(fiche, "window", None), page)
+        rendu.BoutonFormulaire.clicked.connect(
+            lambda: _fermer_rendu_et_executer(
+                lambda: afficherUnFormulaire(getattr(fiche, "window", None), page)
+            )
         )
-        parametre.BoutonHome.clicked.connect(
-            lambda: afficherLeCatalogue(getattr(fiche, "window", None), getattr(fiche, "chemainScan", "Scan"))
+        rendu.BoutonHome.clicked.connect(
+            lambda: _fermer_rendu_et_executer(
+                lambda: afficherLeCatalogue(getattr(fiche, "window", None), getattr(fiche, "chemainScan", "Scan"))
+            )
         )
     else:
-        parametre.BoutonFormulaire.clicked.connect(lambda: None)
-        parametre.BoutonHome.clicked.connect(lambda: None)
+        rendu.BoutonFormulaire.clicked.connect(lambda: None)
+        rendu.BoutonHome.clicked.connect(lambda: None)
 
+    rendu.BoutonExporter.clicked.connect(
+        lambda: enregistrerUnimarc(rendu, _get_response_text)
+    )
     try:
         if fiche is not None and hasattr(fiche, "window") and fiche.window is not None:
             fiche.window.close()
     except Exception as exc:
         print(f"[Rendu] Erreur lors de la fermeture de la fiche: {exc}")
 
-    currentRenduFormulaire = parametre
+    currentRenduFormulaire = rendu
 
-    # On ferme d'abord une éventuelle ancienne fenêtre de rendu
     window_manager.close("rendu")
-
-    # On l'affiche explicitement
-    window_manager.show("rendu", parametre)
-    parametre.show()
-    parametre.raise_()
-    parametre.activateWindow()
+    window_manager.show("rendu", rendu)
+    rendu.show()
+    rendu.raise_()
+    rendu.activateWindow()
     QtWidgets.QApplication.processEvents()
 
 def afficherLeCatalogue(w=None, repertoire="Scan"):
@@ -318,7 +351,8 @@ def afficherLeCatalogue(w=None, repertoire="Scan"):
     currentCatalogue.window.VoirFini.checkStateChanged.connect(lambda: currentCatalogue.creerCatalogue())
     currentCatalogue.window.Parametre.clicked.connect(lambda: afficherLesParametres())
     currentCatalogue.window.AjouterUnFichier.clicked.connect(lambda: currentCatalogue.openFileDialog())
-    currentCatalogue.window.Statistique.clicked.connect(lambda: afficherLesStatistiques())
+    currentCatalogue.window.Statistique.hide()
+    #currentCatalogue.window.Statistique.clicked.connect(lambda: afficherLesStatistiques())
     currentCatalogue.window.ChoisirUnNouveauDossierDeBase.clicked.connect(lambda: currentCatalogue.choisirRepertoireDeScan(mettreAJourChemainScan))
 
     activerRedimensionnementDynamique(currentCatalogue)
@@ -395,6 +429,8 @@ def afficherLesStatistiques():
     statistiques.resize(1500, 950)
     currentStatistiques = statistiques
     window_manager.show("statistiques", statistiques)
+
+    
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
