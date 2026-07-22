@@ -11,7 +11,7 @@ from Parametre import getCodeConnexionAPI
 
 base_dir = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(base_dir))
-from Backend.document_processor import process_single_image, process_image_batch
+from Backend.bridge import process_single_image, process_single_image_consensus, process_image_batch, process_image_batch_consensus
 
 
 class OcrWorker(QThread):
@@ -28,12 +28,26 @@ class OcrWorker(QThread):
     def run(self):
         try:
             if self.mode == "batch":
-                stems = process_image_batch(self.scan_dir, self.api_key)
+                # Utilise le consensus pour le traitement par lot
+                stems = process_image_batch_consensus(
+                    self.scan_dir,
+                    self.api_key,
+                    model_a="gemma-4-31b",
+                    model_b="qwen-3.6-35b-instruct",
+                    text_model="gpt-oss-120b",
+                )
             else:
                 stems = []
                 for filename in self.filenames:
                     image_path = os.path.join(self.scan_dir, filename)
-                    stems.append(process_single_image(image_path, self.api_key))
+                    # Utilise le consensus avec deux modèles vision (Gemma + Qwen) + arbitrage
+                    stems.append(process_single_image_consensus(
+                        image_path,
+                        self.api_key,
+                        model_a="gemma-4-31b",
+                        model_b="qwen-3.6-35b-instruct",
+                        text_model="gpt-oss-120b",
+                    ))
             self.finished_ok.emit(stems)
         except Exception as exc:
             self.failed.emit(str(exc))
