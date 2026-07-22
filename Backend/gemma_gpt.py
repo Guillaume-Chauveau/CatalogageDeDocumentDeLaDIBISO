@@ -79,8 +79,10 @@ class AristoteDocumentAnalyzer:
 
     Le pipeline comporte deux passes :
       - Passe 1 (vision, modèle `model`) : extraction brute des métadonnées
-        depuis l'image, y compris "translators" (traducteur(s) explicite(s),
-        distincts des auteurs).
+        depuis l'image, y compris "translators", "illustrators", "prefaciers"
+        et "editors" (traducteur(s), illustrateur(s), préfacier(s),
+        directeur(s) éditorial/scientifique explicites, tous distincts des
+        auteurs).
       - Passe 2 (texte seul, modèle `enrichment_model`, typiquement un
         modèle de raisonnement type gpt-oss) : ENRICHISSEMENT systématique
         — décomposition prénom/nom de chaque auteur ("authors_parsed") et
@@ -143,6 +145,32 @@ class AristoteDocumentAnalyzer:
             "titres/civilités (même règle que pour \"authors\"). Si plusieurs traducteurs, "
             "séparer par ' ; ', dans l'ordre d'apparition. Laisser vide si aucun traducteur "
             "n'est mentionné.\n"
+            "4quater. \"illustrators\": Le ou les ILLUSTRATEURS de l'ouvrage, uniquement s'ils "
+            "sont explicitement mentionnés comme tels (ex: 'illustré par', 'illustrations de', "
+            "'dessins de', 'gravures de', 'illustrated by'). Ne jamais confondre avec les auteurs "
+            "ni les traducteurs. Recopier le(s) nom(s) exactement tel(s) qu'ils apparaissent, SANS "
+            "les titres/civilités (même règle que pour \"authors\"). Si plusieurs illustrateurs, "
+            "séparer par ' ; ', dans l'ordre d'apparition. Laisser vide si aucun illustrateur "
+            "n'est mentionné.\n"
+            "4quinquies. \"prefaciers\": Le ou les auteurs de la PRÉFACE ou de l'avant-propos, "
+            "uniquement s'ils sont explicitement mentionnés comme tels (ex: 'préface de', "
+            "'avant-propos de', 'introduction de', 'foreword by', 'preface by'). Ne jamais "
+            "confondre avec les auteurs, traducteurs ou illustrateurs. Recopier le(s) nom(s) "
+            "exactement tel(s) qu'ils apparaissent, SANS les titres/civilités (même règle que pour "
+            "\"authors\"). Si plusieurs préfaciers, séparer par ' ; ', dans l'ordre d'apparition. "
+            "Laisser vide si aucun préfacier n'est mentionné.\n"
+            "4sexies. \"editors\": Le ou les responsables éditoriaux/scientifiques de l'ouvrage "
+            "(directeur de publication, éditeur scientifique), uniquement s'ils sont "
+            "explicitement mentionnés comme tels via une formule dédiée (ex: 'Herausgegeben von', "
+            "'hrsg. von', 'édité par', 'sous la direction de', 'publié par [Nom]', 'edited by', "
+            "'ed. by'). Ne jamais confondre avec les auteurs (qui ont écrit le texte), ni avec les "
+            "\"publishers\" (qui désigne la maison d'édition ou la collectivité éditrice, pas une "
+            "personne). Un nom ne va dans \"editors\" QUE si le texte indique explicitement ce "
+            "rôle de direction éditoriale/scientifique. Recopier le(s) nom(s) exactement tel(s) "
+            "qu'ils apparaissent, SANS les titres/civilités (même règle que pour \"authors\" — les "
+            "civilités retirées ici ne vont PAS dans \"author_titles\", qui concerne uniquement les "
+            "auteurs). Si plusieurs responsables éditoriaux, séparer par ' ; ', dans l'ordre "
+            "d'apparition. Laisser vide si aucun éditeur scientifique n'est mentionné.\n"
             "5. \"edition\": La mention d'édition telle qu'elle apparaît sur l'image "
             "(ex: '2e éd.', 'Nouvelle édition revue et augmentée', '3rd edition'). "
             "Laisser vide si aucune mention d'édition n'est visible.\n"
@@ -183,6 +211,9 @@ class AristoteDocumentAnalyzer:
             "  \"authors\": \"\",\n"
             "  \"author_titles\": \"\",\n"
             "  \"translators\": \"\",\n"
+            "  \"illustrators\": \"\",\n"
+            "  \"prefaciers\": \"\",\n"
+            "  \"editors\": \"\",\n"
             "  \"edition\": \"\",\n"
             "  \"publishers\": [{\"publisher\": \"\", \"place\": \"\"}],\n"
             "  \"collection\": \"\",\n"
@@ -200,6 +231,9 @@ class AristoteDocumentAnalyzer:
             "authors": "",
             "author_titles": "",
             "translators": "",
+            "illustrators": "",
+            "prefaciers": "",
+            "editors": "",
             "edition": "",
             "publishers": [],
             "collection": "",
@@ -216,6 +250,9 @@ class AristoteDocumentAnalyzer:
                 "volume_number": "",
                 "authors": "",
                 "translators": "",
+                "illustrators": "",
+                "prefaciers": "",
+                "editors": "",
                 "edition": "",
                 "publishers": [],
                 "collection": "",
@@ -289,7 +326,7 @@ class AristoteDocumentAnalyzer:
 
         rom_scalar_keys = [
             "title", "title_complement", "volume_number", "authors", "translators",
-            "edition", "collection", "illustrations",
+            "illustrators", "prefaciers", "editors", "edition", "collection", "illustrations",
         ]
 
         has_exploitable_content = bool(final_metadata.get("title")) or bool(final_metadata.get("authors"))
@@ -307,6 +344,9 @@ class AristoteDocumentAnalyzer:
                     "volume_number": final_metadata.get("volume_number", ""),
                     "authors": final_metadata.get("authors", ""),
                     "translators": final_metadata.get("translators", ""),
+                    "illustrators": final_metadata.get("illustrators", ""),
+                    "prefaciers": final_metadata.get("prefaciers", ""),
+                    "editors": final_metadata.get("editors", ""),
                     "edition": final_metadata.get("edition", ""),
                     "publishers": final_metadata.get("publishers", []),
                     "collection": final_metadata.get("collection", ""),
@@ -485,6 +525,9 @@ class AristoteDocumentAnalyzer:
                 "    \"volume_number\": \"\",\n"
                 "    \"authors\": \"\",\n"
                 "    \"translators\": \"\",\n"
+                "    \"illustrators\": \"\",\n"
+                "    \"prefaciers\": \"\",\n"
+                "    \"editors\": \"\",\n"
                 "    \"edition\": \"\",\n"
                 "    \"publishers\": [{\"publisher\": \"\", \"place\": \"\"}],\n"
                 "    \"collection\": \"\",\n"
@@ -1057,7 +1100,8 @@ class AristoteDocumentAnalyzer:
 
         # --- Champs texte simples ---
         for key in ("title", "title_complement", "volume_number", "edition", "collection",
-                    "illustrations", "date", "author_titles", "translators"):
+                    "illustrations", "date", "author_titles", "translators",
+                    "illustrators", "prefaciers", "editors"):
             m = re.search(r'"' + key + r'"\s*:\s*"([^"]*)"', response)
             extracted[key] = m.group(1) if m else ""
 
