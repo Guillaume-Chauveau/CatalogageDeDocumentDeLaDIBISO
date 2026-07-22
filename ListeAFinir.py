@@ -1,7 +1,7 @@
 import sys
 from PySide6 import QtWidgets
 from PySide6 import QtGui, QtWidgets
-from PySide6.QtCore import QThread, Signal
+from PySide6.QtCore import QThread, Signal, Qt
 from PySide6.QtWidgets import QFileDialog
 from pathlib import Path
 import shutil
@@ -17,6 +17,7 @@ from Backend.bridge import process_single_image, process_single_image_consensus,
 class OcrWorker(QThread):
     finished_ok = Signal(list)
     failed = Signal(str)
+    progress = Signal(int, int, str)  # (current, total, current_file)
 
     def __init__(self, mode, scan_dir, filenames, api_key):
         super().__init__()
@@ -24,21 +25,67 @@ class OcrWorker(QThread):
         self.scan_dir = scan_dir
         self.filenames = filenames or []
         self.api_key = api_key
+        self._is_cancelled = False
+
+    def cancel(self):
+        """Arrête le traitement."""
+        self._is_cancelled = True
 
     def run(self):
         try:
+            stems = []
+            
             if self.mode == "batch":
-                # Utilise le consensus pour le traitement par lot
-                stems = process_image_batch_consensus(
-                    self.scan_dir,
-                    self.api_key,
-                    model_a="gemma-4-31b",
-                    model_b="qwen-3.6-35b-instruct",
-                    text_model="gpt-oss-120b",
-                )
+                # Implémentation du batch avec progression et annulation
+                from pathlib import Path
+                input_path = Path(self.scan_dir)
+                image_extensions = {".jpg", ".jpeg", ".png", ".bmp", ".tiff"}
+                
+                # Récupérer les dossiers de sortie
+                app_dir = Path(self.scan_dir).parent
+                llm_output_dir = app_dir / "LLMOutput"
+                doc_dir = app_dir / "Doc"
+                
+                # Filtrer les images : ignorer celles déjà traitées
+                image_files = []
+                for f in sorted(input_path.iterdir()):
+                    if f.suffix.lower() in image_extensions:
+                        # Vérifier si le fichier a déjà un résultat
+                        result_llm = llm_output_dir / f"{f.stem}.txt"
+                        result_doc = doc_dir / f"{f.stem}.txt"
+                        if not (result_llm.exists() or result_doc.exists()):
+                            image_files.append(f)
+                
+                total = len(image_files)
+                for idx, image_file in enumerate(image_files, 1):
+                    # Vérifier si annulation demandée
+                    if self._is_cancelled:
+                        break
+                    
+                    self.progress.emit(idx, total, image_file.name)
+                    
+                    try:
+                        stem = process_single_image_consensus(
+                            str(image_file),
+                            self.api_key,
+                            model_a="gemma-4-31b",
+                            model_b="qwen-3.6-35b-instruct",
+                            text_model="gpt-oss-120b",
+                        )
+                        stems.append(stem)
+                    except Exception as exc:
+                        print(f"Erreur lors du traitement de {image_file.name} : {exc}")
+                        continue
             else:
+                # Mode image : traitement des fichiers spécifiés
                 stems = []
-                for filename in self.filenames:
+                total = len(self.filenames)
+                for idx, filename in enumerate(self.filenames, 1):
+                    # Vérifier si annulation demandée
+                    if self._is_cancelled:
+                        break
+                    
+                    self.progress.emit(idx, total, filename)
                     image_path = os.path.join(self.scan_dir, filename)
                     # Utilise le consensus avec deux modèles vision (Gemma + Qwen) + arbitrage
                     stems.append(process_single_image_consensus(
@@ -48,6 +95,7 @@ class OcrWorker(QThread):
                         model_b="qwen-3.6-35b-instruct",
                         text_model="gpt-oss-120b",
                     ))
+            
             self.finished_ok.emit(stems)
         except Exception as exc:
             self.failed.emit(str(exc))
@@ -63,11 +111,13 @@ class ListeAFinir:
     window=None
     repertoirDesScan =""
     _worker = None
+    _progress_dialog = None
 
     def __init__(self,w,repertoire):
         self.repertoirDesScan=repertoire
         self.window=w
         self.window.setWindowTitle("Catalogue de documents")
+        self._progress_dialog = None
         self.ajouterFicheAuto()
         self.ajouterFicheNonFinie()
         self.creerCatalogueNonFini()
@@ -189,6 +239,38 @@ class ListeAFinir:
         self._worker = OcrWorker(mode, self._get_scan_dir(), filenames, api_key)
         self._worker.finished_ok.connect(self._apresTraitement)
         self._worker.failed.connect(self._enCasErreur)
+        self._worker.progress.connect(self._on_progress)
+        
+        # Calculer le nombre total d'images à traiter
+        if mode == "batch":
+            from pathlib import Path
+            input_path = Path(self._get_scan_dir())
+            app_dir = input_path.parent
+            llm_output_dir = app_dir / "LLMOutput"
+            doc_dir = app_dir / "Doc"
+            image_extensions = {".jpg", ".jpeg", ".png", ".bmp", ".tiff"}
+            
+            # Compter seulement les images non traitées
+            total_files = 0
+            for f in input_path.iterdir():
+                if f.suffix.lower() in image_extensions:
+                    result_llm = llm_output_dir / f"{f.stem}.txt"
+                    result_doc = doc_dir / f"{f.stem}.txt"
+                    if not (result_llm.exists() or result_doc.exists()):
+                        total_files += 1
+        else:
+            total_files = len(filenames) if filenames else 1
+        
+        # Créer la barre de progression
+        self._progress_dialog = QtWidgets.QProgressDialog(
+            "Analyse des images...", "Annuler", 0, total_files, self.window
+        )
+        self._progress_dialog.setWindowModality(Qt.WindowModality.WindowModal)
+        self._progress_dialog.setWindowTitle("Traitement en cours")
+        # Connecter le bouton "Annuler" pour arrêter le traitement
+        self._progress_dialog.canceled.connect(self._on_cancel_clicked)
+        self._progress_dialog.show()
+        
         self._worker.start()
 
     def _set_processing_ui(self, active: bool):
@@ -197,20 +279,54 @@ class ListeAFinir:
             if widget is not None:
                 widget.setEnabled(not active)
 
+    def _on_progress(self, current, total, filename):
+        """Met à jour la barre de progression lors du traitement de chaque image."""
+        if self._progress_dialog:
+            self._progress_dialog.setMaximum(total)
+            self._progress_dialog.setValue(current)
+            self._progress_dialog.setLabelText(f"Traitement : {filename}\n({current}/{total})")
+            # Forcer la mise à jour de l'interface
+            QtWidgets.QApplication.processEvents()
+
+    def _on_cancel_clicked(self):
+        """Gère le clic sur le bouton Annuler."""
+        if self._progress_dialog:
+            # Changer le message et désactiver le bouton
+            self._progress_dialog.setLabelText("⏹ Annulation en cours...\nAttente de la fin du fichier en cours...")
+            self._progress_dialog.setCancelButton(None)  # Désactiver le bouton Annuler
+        # Demander l'arrêt du worker
+        if self._worker:
+            self._worker.cancel()
+
     def _apresTraitement(self, stems):
+        if self._progress_dialog:
+            self._progress_dialog.close()
+            self._progress_dialog = None
         self._worker = None
         self._set_processing_ui(False)
         self.ajouterFicheAuto()
         self.ajouterFicheNonFinie()
         self.creerCatalogue()
+        
         if stems:
+            message = f"{len(stems)} document(s) analysé(s) et ajouté(s) au catalogue.\n\n"
+            message += "(Les documents déjà traités ont été ignorés.)"
             QtWidgets.QMessageBox.information(
                 self.window,
                 "Analyse terminée",
-                f"{len(stems)} document(s) analysé(s) et ajouté(s) au catalogue.",
+                message,
+            )
+        else:
+            QtWidgets.QMessageBox.information(
+                self.window,
+                "Analyse terminée",
+                "Aucun nouveau document à traiter.\n(Les documents déjà traités ont été ignorés.)",
             )
 
     def _enCasErreur(self, message):
+        if self._progress_dialog:
+            self._progress_dialog.close()
+            self._progress_dialog = None
         self._worker = None
         self._set_processing_ui(False)
         QtWidgets.QMessageBox.critical(self.window, "Erreur d'analyse", message)

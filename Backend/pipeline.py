@@ -12,7 +12,7 @@ from pathlib import Path
 from PIL import Image
 import io
 
-from openai import OpenAI
+from openai import OpenAI, APIStatusError
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -31,10 +31,88 @@ TOP_LOGPROBS  = 5               # nombre d'alternatives par token à conserver
 
 
 
-def encode_image_to_base64(image_path: str, max_pixels: int = 1024 * 1024) -> tuple[str, str]:
+# Plafond défensif sur la taille du payload base64 PAR IMAGE. La passerelle
+# nginx de l'API Aristote rejette (413 Request Entity Too Large) les requêtes
+# trop volumineuses ; comme deux images sont envoyées par appel (page entière
+# + zoom sur le titre, cf. _generate), une image encodée sans limite en JPEG
+# qualité 95 à ~6.7MP peut à elle seule dépasser des plafonds nginx courants
+# (souvent 1-10 Mo pour client_max_body_size). On vise donc un budget par
+# image nettement plus bas que ça, quitte à réduire la qualité puis la
+# résolution jusqu'à passer sous la barre.
+MAX_IMAGE_B64_BYTES = 1_000_000  # ~1.5 Mo de base64 par image, ~4 Mo pour les 2 vues + prompt
+
+
+def _encode_pil_with_size_cap(
+    image: "Image.Image", fmt: str, max_b64_bytes: int = MAX_IMAGE_B64_BYTES,
+) -> str:
     """
-    Opens an image, downscales it if it exceeds max_pixels, and returns
+    Encode une image PIL en base64, en réduisant d'abord la qualité JPEG puis,
+    si ça ne suffit pas, la résolution, jusqu'à repasser sous max_b64_bytes.
+    Ne s'applique qu'au JPEG (les autres formats sont encodés tels quels,
+    sans tentative de compression progressive).
+    """
+    if fmt != "JPEG":
+        buffer = io.BytesIO()
+        image.save(buffer, format=fmt)
+        return base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+    qualities = (95, 90, 82, 72, 62)
+    last_b64 = None
+    for quality in qualities:
+        buffer = io.BytesIO()
+        image.save(buffer, format="JPEG", quality=quality, optimize=True)
+        b64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+        last_b64 = b64
+        if len(b64) <= max_b64_bytes:
+            logger.debug(f"Image encodée à qualité={quality} ({len(b64)} octets base64)")
+            return b64
+
+    # La compression seule n'a pas suffi : on réduit aussi la résolution,
+    # par paliers, en repartant de la qualité la plus basse déjà tentée.
+    current = image
+    for _ in range(4):
+        w, h = current.size
+        current = current.resize((max(1, int(w * 0.75)), max(1, int(h * 0.75))), Image.LANCZOS)
+        buffer = io.BytesIO()
+        current.save(buffer, format="JPEG", quality=62, optimize=True)
+        b64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+        last_b64 = b64
+        if len(b64) <= max_b64_bytes:
+            logger.warning(
+                f"Image redimensionnée à {current.size} (en plus de la compression) "
+                f"pour respecter le plafond de {max_b64_bytes} octets base64."
+            )
+            return b64
+
+    logger.warning(
+        f"Impossible de faire descendre l'image sous {max_b64_bytes} octets base64 "
+        f"même après compression et redimensionnement agressifs ({len(last_b64)} octets). "
+        "Envoi de la meilleure tentative malgré tout."
+    )
+    return last_b64
+
+
+def encode_image_to_base64(
+    image_path: str, max_pixels: int = 2600 * 2600
+) -> tuple[str, str]:
+    """
+    Opens an image, downscales it ONLY if it exceeds max_pixels, and returns
     (base64_string, mime_type) ready to embed in an OpenAI-compatible message.
+
+    NOTE : l'ancien plafond (1024*1024 ~ 1 mégapixel) est beaucoup trop bas
+    pour une page de titre patrimoniale. Le sous-titre ("title_complement")
+    est presque toujours imprimé en corps plus petit que le titre principal,
+    parfois sur plusieurs lignes en petits caractères en bas de page : à 1MP,
+    ce texte devient illisible pour le modèle vision AVANT même d'atteindre
+    le prompt. On relève le plafond à ~6.7MP (2600x2600), ce qui couvre
+    largement les scans Gallica/IIIF usuels sans les redimensionner du tout
+    dans la plupart des cas — la ligne `if w * h > max_pixels` fait qu'on ne
+    dégrade JAMAIS une image qui est déjà sous ce seuil.
+
+    La qualité d'encodage est ensuite adaptée (cf. _encode_pil_with_size_cap)
+    pour que le payload base64 reste sous MAX_IMAGE_B64_BYTES, quel que soit
+    le plafond en pixels choisi ci-dessus — sans quoi la passerelle de l'API
+    peut rejeter la requête en 413 avant même que le modèle ne la voie.
     """
     image = Image.open(image_path).convert("RGB")
 
@@ -44,19 +122,48 @@ def encode_image_to_base64(image_path: str, max_pixels: int = 1024 * 1024) -> tu
         scale = (max_pixels / (w * h)) ** 0.5
         image = image.resize((int(w * scale), int(h * scale)), Image.LANCZOS)
         logger.debug(f"Image resized to {image.size} to stay within {max_pixels} pixels")
+    else:
+        logger.debug(f"Image conservée à sa résolution native {image.size} (sous le plafond)")
 
     suffix = Path(image_path).suffix.lower()
     mime_map = {".jpg": "image/jpeg", ".jpeg": "image/jpeg",
                 ".png": "image/png",  ".bmp": "image/bmp",
                 ".tiff": "image/tiff", ".webp": "image/webp"}
     mime_type = mime_map.get(suffix, "image/jpeg")
-
-    buffer = io.BytesIO()
     fmt = "JPEG" if mime_type == "image/jpeg" else suffix.lstrip(".").upper()
-    image.save(buffer, format=fmt)
-    b64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+    b64 = _encode_pil_with_size_cap(image, fmt)
 
     return b64, mime_type
+
+
+def crop_title_zone(image_path: str, top_fraction: float = 0.55) -> Image.Image:
+    """
+    Découpe la portion supérieure de la page de titre (titre + sous-titre se
+    trouvent presque toujours dans le tiers/moitié supérieur, l'imprimeur et
+    la date en bas). Envoyer ce recadrage EN PLUS de l'image entière permet
+    au modèle de voir le texte du titre occuper une bien plus grande
+    proportion du cadre, donc plus de pixels utiles par caractère — sans
+    avoir besoin d'un fichier source différent.
+    """
+    image = Image.open(image_path).convert("RGB")
+    w, h = image.size
+    crop = image.crop((0, 0, w, int(h * top_fraction)))
+    return crop
+
+
+def pil_image_to_data_url(image: "Image.Image", max_b64_bytes: int = MAX_IMAGE_B64_BYTES) -> str:
+    """
+    NOTE : repasse par _encode_pil_with_size_cap (comme encode_image_to_base64)
+    pour rester sous MAX_IMAGE_B64_BYTES. Avant ce correctif, cette fonction
+    encodait le crop titre à qualité JPEG fixe 95 sans aucun plafond : pour
+    une image source à très haute résolution, ce recadrage (55% de la hauteur,
+    pleine largeur) pouvait à lui seul dépasser le client_max_body_size nginx
+    de l'API Aristote, provoquant un 413 Request Entity Too Large dès la
+    passe 1 — silencieusement différent du plafond appliqué à l'image entière.
+    """
+    b64 = _encode_pil_with_size_cap(image, "JPEG", max_b64_bytes)
+    return f"data:image/jpeg;base64,{b64}"
 
 
 class AristoteDocumentAnalyzer:
@@ -111,6 +218,24 @@ class AristoteDocumentAnalyzer:
     # Public interface (identical signature to the original class)
 
 
+    @staticmethod
+    def _coerce_text_field(value: Any) -> Any:
+        """
+        Certains modèles renvoient un champ censé être une chaîne (ex:
+        "authors") sous forme de liste JSON malgré la consigne du prompt
+        (ex: ["Dupont, Jean", "Martin, Paul"] au lieu de
+        "Dupont, Jean ; Martin, Paul"). On normalise systématiquement ce
+        genre de valeur en chaîne "; "-séparée pour que tout le reste du
+        pipeline (scoring, consensus, enrichissement...) puisse compter sur
+        un type cohérent (str) plutôt que de planter plus loin sur un
+        .strip() ou un .lower() appelé sur une liste.
+        """
+        if isinstance(value, list):
+            return " ; ".join(str(v).strip() for v in value if str(v).strip())
+        if isinstance(value, dict):
+            return json.dumps(value, ensure_ascii=False)
+        return value
+
     def process_image(self, image_path: str) -> dict:
         """Exécute le pipeline complet (passe 1 vision + passe 2 enrichissement) et formate la sortie en JSON."""
         start_time = time.time()
@@ -121,9 +246,31 @@ class AristoteDocumentAnalyzer:
             "Analyse l'image de couverture ou de page de titre et extrais les métadonnées "
             "pour correspondre EXACTEMENT à la structure JSON fournie.\n\n"
             "Règles strictes pour l'extraction :\n"
-            "1. \"title\": Le titre principal de l'ouvrage uniquement (sans sous-titre).\n"
+            "1. \"title\": Le titre principal de l'ouvrage, TRANSCRIT EN INTÉGRALITÉ, "
+            "y compris s'il s'étend sur plusieurs lignes de la page (les titres "
+            "d'ouvrages scientifiques anciens sont souvent longs et occupent "
+            "3, 4 lignes ou plus). Lis et assemble TOUTES les lignes qui appartiennent "
+            "au titre avant de t'arrêter — ne t'arrête pas à la fin de la première "
+            "ligne visible. N'inclus PAS le sous-titre (voir point 2). Ne reformule "
+            "jamais, ne résume jamais, ne raccourcis jamais un titre long : recopie "
+            "l'intégralité du texte tel qu'il apparaît, y compris les mots de liaison, "
+            "les virgules internes et la ponctuation d'origine.\n"
             "2. \"title_complement\": Le sous-titre ou complément du titre s'il existe "
-            "(ce qui suit un ':' ou un '—' après le titre principal). Laisser vide sinon.\n"
+            "(ce qui suit un ':' ou un '—' après le titre principal, ou ce qui est "
+            "imprimé en corps plus petit juste en dessous du titre). ATTENTION : ce "
+            "sous-titre est très souvent imprimé en caractères plus petits que le "
+            "titre principal et s'étend lui aussi sur plusieurs lignes — lis-le avec "
+            "la même exigence d'exhaustivité que le titre, jusqu'à sa toute dernière "
+            "ligne, même si les caractères sont petits ou serrés. Ne t'arrête jamais "
+            "au milieu d'une phrase parce que la suite est en petit texte : continue "
+            "la lecture jusqu'à la fin logique du complément de titre (généralement "
+            "juste avant le nom de l'auteur ou la mention d'édition). Laisser vide "
+            "si aucun sous-titre n'est présent.\n"
+            "2bis. Avant de répondre, relis mentalement le bloc titre + sous-titre "
+            "en entier une seconde fois et vérifie qu'aucune ligne, aucune clause "
+            "introduite par une virgule ou 'ou', et aucune énumération finale n'a "
+            "été omise. Un titre ou sous-titre incomplet (coupé avant sa fin réelle) "
+            "est une erreur grave, au même titre qu'une information inventée.\n"
             "3. \"volume_number\": Le numéro de volume ou de tome si l'ouvrage fait partie "
             "d'une suite ou d'une série (ex: 'Tome 2', 'Vol. III', 'Part 1'). "
             "Extraire uniquement le numéro/label tel qu'il apparaît. Laisser vide sinon.\n"
@@ -282,6 +429,17 @@ class AristoteDocumentAnalyzer:
                 metadata = {}
 
             final_metadata = {**required_keys, **metadata}
+
+            # Normalisation défensive : certains modèles renvoient un champ
+            # texte (typiquement "authors") sous forme de liste JSON au lieu
+            # d'une chaîne "; "-séparée. On coerce ici, une fois pour toutes,
+            # plutôt que de laisser un type inattendu (list) se propager
+            # jusqu'au scoring de confiance ou au pipeline de consensus.
+            for _key in required_keys:
+                if _key in ("publishers", "authors_parsed", "romanization"):
+                    continue
+                final_metadata[_key] = self._coerce_text_field(final_metadata.get(_key))
+
             # "romanization" / "authors_parsed" / "scientific_field" sont produits
             # par la passe 2 : on les réinitialise à leur valeur par défaut ici,
             # même si le parsing tolérant de la passe 1 en aurait extrait des traces.
@@ -412,31 +570,84 @@ class AristoteDocumentAnalyzer:
     # Private helpers — generation
 
 
+    @staticmethod
+    def _is_payload_too_large_error(exc: Exception) -> bool:
+        """
+        Détecte un rejet '413 Request Entity Too Large' de la passerelle nginx.
+        Cette erreur arrive en HTML brut (pas un JSON d'erreur standard), donc
+        le SDK openai ne la reconnaît pas forcément comme APIStatusError avec
+        status_code=413 — on vérifie donc aussi le texte brut de l'exception.
+        """
+        if getattr(exc, "status_code", None) == 413:
+            return True
+        msg = str(exc)
+        return "413" in msg and "entity too large" in msg.lower()
+
     def _generate(
-        self, image_path: str, prompt: str, max_tokens: int = 1500
+        self, image_path: str, prompt: str, max_tokens: int = 2200
     ) -> tuple[str, Optional[List[Dict[str, Any]]], Optional[str]]:
         """
         Sends image + prompt to the remote API and returns:
         (raw_text, token_logprobs, logprobs_error)
+
+        On envoie DEUX vues de la même page au modèle :
+          1. la page entière (contexte global : mise en page, bas de page,
+             éditeur/date/lieu) ;
+          2. un recadrage zoomé de la zone supérieure (titre + sous-titre),
+             où le texte occupe une bien plus grande proportion du cadre.
+        Le titre et le sous-titre sont souvent la partie la plus dense en
+        texte fin de la page (surtout le sous-titre, en corps plus petit) ;
+        leur donner une vue agrandie dédiée réduit nettement les troncatures
+        ou les caractères mal lus, sans rien changer au fichier source.
         """
         b64_image, mime_type = encode_image_to_base64(image_path)
 
-        messages = [
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": f"data:{mime_type};base64,{b64_image}",
-                        },
-                    },
-                    {"type": "text", "text": prompt},
-                ],
-            }
-        ]
+        page_image_block = {
+            "type": "image_url",
+            "image_url": {"url": f"data:{mime_type};base64,{b64_image}"},
+        }
+        content = [page_image_block]
+        has_zoom = False
 
-        return self._call_api(messages, max_tokens=max_tokens)
+        try:
+            title_zone = crop_title_zone(image_path)
+            content.append(
+                {
+                    "type": "image_url",
+                    "image_url": {"url": pil_image_to_data_url(title_zone)},
+                }
+            )
+            has_zoom = True
+            zoom_note = (
+                "\n\nLa SECONDE image est un zoom sur la partie supérieure de la "
+                "même page (où se trouvent le titre et le sous-titre), fournie "
+                "uniquement pour t'aider à lire le texte fin ou les polices "
+                "décoratives. Utilise-la en complément de la première image, "
+                "jamais à sa place : la mise en page et les mentions de bas de "
+                "page (éditeur, date) ne figurent que sur la première image."
+            )
+        except Exception as e:
+            logger.warning(f"Recadrage de la zone de titre impossible ({e}), envoi de la page entière uniquement.")
+            zoom_note = ""
+
+        content.append({"type": "text", "text": prompt + zoom_note})
+
+        messages = [{"role": "user", "content": content}]
+
+        try:
+            return self._call_api(messages, max_tokens=max_tokens)
+        except Exception as e:
+            if not has_zoom or not self._is_payload_too_large_error(e):
+                raise
+            logger.warning(
+                f"413 Request Entity Too Large pour {image_path} malgré la "
+                "compression — nouvelle tentative SANS le zoom titre (page "
+                "entière uniquement)."
+            )
+            fallback_messages = [
+                {"role": "user", "content": [page_image_block, {"type": "text", "text": prompt}]}
+            ]
+            return self._call_api(fallback_messages, max_tokens=max_tokens)
 
     def _generate_enrichment(
         self, fields: Dict[str, Any], include_romanization: bool, max_tokens: int = 4500,
