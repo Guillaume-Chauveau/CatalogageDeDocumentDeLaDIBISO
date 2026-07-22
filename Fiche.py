@@ -367,7 +367,7 @@ class Fiche:
         if reference:
             text += f"410 ##$t@{reference}\n"
         if indexationRameau is not None and indexationRameau.getValeur() !="":
-            text += ("606 ##$a" + str(indexationRameau.getValeurIndexationRameau()) + "\n")
+            text += str(indexationRameau.getValeurIndexationRameau())
 
         if premierAuteur !="" or fonctionAuteur !="":
             text +=self._champs700(premierAuteur, fonctionAuteur)
