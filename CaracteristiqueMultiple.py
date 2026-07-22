@@ -33,7 +33,10 @@ class CaracteristiqueMultiple(Caracteristique):
             return "{{"+" | ".join(self.valeur)+"}}"
     
     def getValeurIndexationRameau(self):
-        texte="{{"+self.valeur[0]+"}} | rameau"
+        texte="606 ##$a"+self.formatage(self.valeur[0])+"$2rameau\n"
         for i in range(1,len(self.valeur)):
-            texte+=" | {{"+self.valeur[i]+"}} | rameau"
+            texte+="606 ##$a"+self.formatage(self.valeur[i])+"$2rameau\n"
         return texte
+    
+    def formatage(self,text):
+        return text[0].upper()+text[1:].lower()
