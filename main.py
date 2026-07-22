@@ -332,7 +332,8 @@ def afficherLeCatalogue(w=None, repertoire="Scan"):
     currentCatalogue.window.VoirFini.checkStateChanged.connect(lambda: currentCatalogue.creerCatalogue())
     currentCatalogue.window.Parametre.clicked.connect(lambda: afficherLesParametres())
     currentCatalogue.window.AjouterUnFichier.clicked.connect(lambda: currentCatalogue.openFileDialog())
-    currentCatalogue.window.Statistique.clicked.connect(lambda: afficherLesStatistiques())
+    currentCatalogue.window.Statistique.hide()
+    #currentCatalogue.window.Statistique.clicked.connect(lambda: afficherLesStatistiques())
     currentCatalogue.window.ChoisirUnNouveauDossierDeBase.clicked.connect(lambda: currentCatalogue.choisirRepertoireDeScan(mettreAJourChemainScan))
 
     activerRedimensionnementDynamique(currentCatalogue)
