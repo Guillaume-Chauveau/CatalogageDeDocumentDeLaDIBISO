@@ -423,52 +423,58 @@ class Fiche:
         return "\n".join(resultats)+"\n"
 
     def _champs702(self, auteurSecondaire, fonctionAuteurSecondaire):
-        auteur_secondaire_morceaux, fonction_morceaux = self._decouperMorceaux(auteurSecondaire, fonctionAuteurSecondaire)
+        auteurSecondaireMorceaux, fonctionMorceaux = self._decouperMorceaux(auteurSecondaire, fonctionAuteurSecondaire)
         resultats = []
-        max_len = max([len(auteur_secondaire_morceaux), len(fonction_morceaux), 0])
+        max_len = max([len(auteurSecondaireMorceaux), len(fonctionMorceaux), 0])
         for i in range(max_len):
             text = "702 "
-            if i < len(auteur_secondaire_morceaux):
-                if auteur_secondaire_morceaux[i] != "":
-                    text += ("#1$3" + str(auteur_secondaire_morceaux[i]))
-            if i < len(fonction_morceaux) :
-                if fonction_morceaux[i] != "":
-                    text += ("$4" + str(fonction_morceaux[i]))
+            if i < len(auteurSecondaireMorceaux):
+                if auteurSecondaireMorceaux[i] != "":
+                    nomAuteurSecondaireMorceaux=auteurSecondaireMorceaux[i].split(" ")
+                    text += ("#1$a" + str(nomAuteurSecondaireMorceaux[0]))
+                    text += ("$b" + " ".join(nomAuteurSecondaireMorceaux[1:]))
+            if i < len(fonctionMorceaux) :
+                if fonctionMorceaux[i] != "":
+                    text += ("$4" + str(fonctionMorceaux[i]))
             if text != "702 ":
                 resultats.append(text)
         return "\n".join(resultats)+"\n"
     
     def _champs701(self, coAuteur, fonctionCoauteur):
-        co_auteur_morceaux, fonction_morceaux = self._decouperMorceaux(coAuteur, fonctionCoauteur)
+        coAuteurMorceaux, fonctionMorceaux = self._decouperMorceaux(coAuteur, fonctionCoauteur)
         resultats = []
-        max_len = max([len(co_auteur_morceaux), len(fonction_morceaux), 0])
+        max_len = max([len(coAuteurMorceaux), len(fonctionMorceaux), 0])
         for i in range(max_len):
             text = "701 "
-            if i < len(co_auteur_morceaux):
-                if co_auteur_morceaux[i] != "":
-                    text += ("#1$3" + str(co_auteur_morceaux[i]))
+            if i < len(coAuteurMorceaux):
+                if coAuteurMorceaux[i] != "":
+                    nomCoAuteurMorceaux=coAuteurMorceaux[i].split(" ")
+                    text += ("#1$a" + str(nomCoAuteurMorceaux[0]))
+                    text += ("$b" + " ".join(nomCoAuteurMorceaux[1:]))
             #todo: solution tmp pour que la fonction du co-auteur 
-            #if i < len(fonction_morceaux): 
-            #    if fonction_morceaux[i] != "":
-            #        text += ("$4" + str(fonction_morceaux[i]))
+            #if i < len(fonctionMorceaux): 
+            #    if fonctionMorceaux[i] != "":
+            #        text += ("$4" + str(fonctionMorceaux[i]))
                     text += ("$4" + "070")
             if text != "701 ":
                 resultats.append(text)
         return "\n".join(resultats)+"\n"
 
     def _champs700(self, premierAuteur, fonctionAuteur):
-        premier_auteur_morceaux, fonction_morceaux = self._decouperMorceaux(premierAuteur, fonctionAuteur)
+        premierAuteurMorceaux, fonctionMorceaux = self._decouperMorceaux(premierAuteur, fonctionAuteur)
         resultats = []
-        max_len = max([len(premier_auteur_morceaux), len(fonction_morceaux), 0])
+        max_len = max([len(premierAuteurMorceaux), len(fonctionMorceaux), 0])
         for i in range(max_len):
             text = "700 "
-            if i < len(premier_auteur_morceaux) :
-                if premier_auteur_morceaux[i]!="":
-                    text += ("#1$3" + str(premier_auteur_morceaux[i]))
+            if i < len(premierAuteurMorceaux) :
+                if premierAuteurMorceaux[i]!="":
+                    nomPremierAuteurMorceaux= premierAuteurMorceaux[i].split(" ")
+                    text += ("#1$a" + str(nomPremierAuteurMorceaux[0]))
+                    text += ("$b" + " ".join(nomPremierAuteurMorceaux[1:]))
             #todo: solution tmp pour que la fonction de l'auteur
-            #if i < len(fonction_morceaux): 
-            #    if fonction_morceaux[i]!="":
-            #        text += ("$4" + str(fonction_morceaux[i]))
+            #if i < len(fonctionMorceaux): 
+            #    if fonctionMorceaux[i]!="":
+            #        text += ("$4" + str(fonctionMorceaux[i]))
                     text += ("$4" + "070")
             if text != "700 ":
                 resultats.append(text)
