@@ -698,6 +698,8 @@ class Fiche:
         parts = nomSansExtention.split('#')
         if len(parts) == 2: # Normalement inutile, mais on le laisse en cas d'érreur lors de la saisie du nom du fichier
             dimension = parts[1]
+            #ajout des espace entre le nombre de cm et "cm"
+            dimension=dimension[:len(dimension)-2]+" "+dimension[len(dimension)-2:]
             self.getCaracteristiqueParNom("Dimension").setValeur(dimension)
             # Mettre à jour les widgets correspondants
             DimensionWidget = self.window.gridLayout.itemAtPosition(self.getCaracteristiqueParNom("Dimension").id, 2).widget()
