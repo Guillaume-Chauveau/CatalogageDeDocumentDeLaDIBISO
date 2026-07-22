@@ -365,9 +365,9 @@ class Fiche:
         if collection or section:
             text += self._champs225(collection, section)
         if reference:
-            text += f"410 ##$0@{reference}\n"
+            text += f"410 ##$t@{reference}\n"
         if indexationRameau is not None and indexationRameau.getValeur() !="":
-            text += ("606 ##$" + str(indexationRameau.getValeurIndexationRameau()) + "\n")
+            text += ("606 ##$a" + str(indexationRameau.getValeurIndexationRameau()) + "\n")
 
         if premierAuteur !="" or fonctionAuteur !="":
             text +=self._champs700(premierAuteur, fonctionAuteur)
@@ -539,10 +539,10 @@ class Fiche:
         if isinstance(text, list):
             for i in range(len(text)):
                 if text[i]:
-                    text[i] = text[i][0].upper() + text[i][1:]
+                    text[i] = text[i][0].upper() + text[i][1:].lower()
         else:
             if text:
-                text = text[0].upper() + text[1:]
+                text = text[0].upper() + text[1:].lower()
         return text
 
     def _retirerLeDernierPointVigule(self,text):
