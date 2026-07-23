@@ -330,12 +330,17 @@ class Fiche:
         mentionEdition = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier("Mention d'edition"))
 
         valeursCollection = self.getValeursFormulaireCollection()
-        articleFormulaireCollection, collection, section, reference = self._extraireValeursCollection(valeursCollection)
-        articleFormulaireCollection = self._majusculeEnDebutDeCaracteristique(articleFormulaireCollection)
-        collection = self._majusculeEnDebutDeCaracteristique(collection)
-        section = self._majusculeEnDebutDeCaracteristique(section)
-        reference = self._majusculeEnDebutDeCaracteristique(reference)
-        
+        if valeursCollection !="":
+            articleFormulaireCollection, collection, section, reference = self._extraireValeursCollection(valeursCollection)
+            articleFormulaireCollection = self._majusculeEnDebutDeCaracteristique(articleFormulaireCollection)
+            collection = self._majusculeEnDebutDeCaracteristique(collection)
+            section = self._majusculeEnDebutDeCaracteristique(section)
+            reference = self._majusculeEnDebutDeCaracteristique(reference)
+        else :
+            articleFormulaireCollection=""
+            collection =self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier("Collection"))
+            section = ""
+            reference=""
 
         text="008 $aAax3\n104 ##$ak$bzy$cy$dba$ffre\n106 ##$ar\n181 ##$P01$ctxt\n182 ##$P01$cn\n183 ##$P01$anga\n"
 
