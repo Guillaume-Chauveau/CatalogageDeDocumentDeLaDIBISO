@@ -87,21 +87,22 @@ currentFiche = None
 currentParametre = None
 currentStatistiques = None
 currentRenduFormulaire = None
-chemainScan = "Scan"  # Répertoire par défaut pour les scans
+chemainRepetoireDeTravail = "Scan"  # Répertoire par défaut pour les scans
+chemainScan = "Scan"
 
 def mettreAJourChemainScan(repertoire):
-    global chemainScan
-    chemainScan = repertoire
+    global chemainRepetoireDeTravail
+    chemainRepetoireDeTravail = repertoire
 
 def afficherUnFormulaire(w, page):
-    global currentFiche, chemainScan
+    global currentFiche, chemainRepetoireDeTravail
     if currentCatalogue is not None:
-        chemainScan = currentCatalogue.repertoirDesScan
+        chemainRepetoireDeTravail = currentCatalogue.repertoirDesScan
 
     formulairePath = os.path.join(BASE_DIR, "UI", "Formulaire.ui")
     formulaire = loader.load(formulairePath, None)
     
-    currentFiche = f.Fiche(page, formulaire, afficherLeFormulaireAuteur, afficherLeFormulaireChampsScientifique,afficherLeFormulaireCollection, chemainScan)
+    currentFiche = f.Fiche(page, formulaire, afficherLeFormulaireAuteur, afficherLeFormulaireChampsScientifique,afficherLeFormulaireCollection, chemainRepetoireDeTravail)
     activerRedimensionnementDynamique(currentFiche)
     currentFiche.window.showMaximized()
     ajouterBoutonFormulaire(currentFiche)
@@ -110,7 +111,6 @@ def afficherUnFormulaire(w, page):
         w.close()
 
     window_manager.show("fiche", currentFiche)
-    print(currentFiche)
 
 def afficherLesParametres():
     global currentParametre
@@ -330,12 +330,11 @@ def afficherRenduFormulaire(fiche=None):
     QtWidgets.QApplication.processEvents()
 
 def afficherLeCatalogue(w=None, repertoire="Scan"):
-    global currentCatalogue, chemainScan
+    global currentCatalogue, chemainRepetoireDeTravail
     if currentCatalogue is not None and getattr(currentCatalogue, "repertoirDesScan", ""):
         repertoire = currentCatalogue.repertoirDesScan
 
     mettreAJourChemainScan(repertoire)
-    print(f"Répertoire de scan utilisé pour le catalogue: {repertoire}")
 
     if w is not None:
         w.close()
