@@ -435,8 +435,8 @@ class Fiche:
             if i < len(auteurSecondaireMorceaux):
                 if auteurSecondaireMorceaux[i] != "":
                     nomAuteurSecondaireMorceaux=auteurSecondaireMorceaux[i].split(" ")
-                    text += ("#1$a" + str(nomAuteurSecondaireMorceaux[0]))
-                    text += ("$b" + " ".join(nomAuteurSecondaireMorceaux[1:]))
+                    text += ("#1$a" + self._majusculeEnDebutDeCaracteristique(str(nomAuteurSecondaireMorceaux[0])))
+                    text += ("$b" + " ".join(self._majusculeEnDebutDeCaracteristique(nomAuteurSecondaireMorceaux[1:])))
             if i < len(fonctionMorceaux) :
                 if fonctionMorceaux[i] != "":
                     text += ("$4" + str(fonctionMorceaux[i]))
@@ -453,8 +453,8 @@ class Fiche:
             if i < len(coAuteurMorceaux):
                 if coAuteurMorceaux[i] != "":
                     nomCoAuteurMorceaux=coAuteurMorceaux[i].split(" ")
-                    text += ("#1$a" + str(nomCoAuteurMorceaux[0]))
-                    text += ("$b" + " ".join(nomCoAuteurMorceaux[1:]))
+                    text += ("#1$a" + self._majusculeEnDebutDeCaracteristique(str(nomCoAuteurMorceaux[0])))
+                    text += ("$b" + " ".join(self._majusculeEnDebutDeCaracteristique(nomCoAuteurMorceaux[1:])))
             #todo: solution tmp pour que la fonction du co-auteur 
             #if i < len(fonctionMorceaux): 
             #    if fonctionMorceaux[i] != "":
@@ -473,8 +473,8 @@ class Fiche:
             if i < len(premierAuteurMorceaux) :
                 if premierAuteurMorceaux[i]!="":
                     nomPremierAuteurMorceaux= premierAuteurMorceaux[i].split(" ")
-                    text += ("#1$a" + str(nomPremierAuteurMorceaux[0]))
-                    text += ("$b" + " ".join(nomPremierAuteurMorceaux[1:]))
+                    text += ("#1$a" + str(self._majusculeEnDebutDeCaracteristique(nomPremierAuteurMorceaux[0])))
+                    text += ("$b" + " ".join(self._majusculeEnDebutDeCaracteristique(nomPremierAuteurMorceaux[1:])))
             #todo: solution tmp pour que la fonction de l'auteur
             #if i < len(fonctionMorceaux): 
             #    if fonctionMorceaux[i]!="":
@@ -545,6 +545,8 @@ class Fiche:
             if text != "200 ":
                 resultats.append(text)
         return "\n".join(resultats)+"\n"
+    
+
     def _majusculeEnDebutDeCaracteristique(self, text):
         if isinstance(text, list):
             for i in range(len(text)):
