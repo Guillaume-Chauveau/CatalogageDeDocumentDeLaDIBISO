@@ -4,7 +4,8 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6 import QtGui, QtWidgets
 from PySide6 import QtCore
 import os
-from PySide6.QtWidgets import QGridLayout, QLabel, QCheckBox
+
+from PySide6 import QtWidgets
 
 import Caracteristique as c
 import CaracteristiqueMultiple as cm
@@ -959,30 +960,6 @@ class Fiche:
             "Régénération terminée",
             "Le modèle a été relancé. Seuls les champs avec une certitude plus élevée ont été mis à jour.",
         )
-    
-    def getCaracteristiqueARecalculer(self):
-        selected_items = []
-        # Le nombre total de lignes dans le grid layout
-        row_count = self.window.gridLayout.rowCount()
-        for row in range(row_count):
-            # Récupération des éléments aux positions (row, 1) et (row, 5)
-            label_item = self.window.gridLayout.itemAtPosition(row, 1)
-            checkbox_item = self.window.gridLayout.itemAtPosition(row, 5)
-
-            # On vérifie que les deux cellules contiennent bien un widget
-            if label_item is not None and checkbox_item is not None:
-                label_widget = label_item.widget()
-                checkbox_widget = checkbox_item.widget()
-
-                # On s'assure qu'il s'agit bien des bons types de widgets
-                if isinstance(label_widget, QLabel) and isinstance(
-                    checkbox_widget, QCheckBox
-                ):
-                    # Si la case est cochée (True), on récupère le texte
-                    if checkbox_widget.isChecked():
-                        selected_items.append(label_widget.text())
-
-        return selected_items
     
 def getCaracéristiquesARomanisée():
     return ["Titre","Complement du titre","Auteur","Numero du volume","Collection","Ville","Editeur","Mention d'edition","Illustration"]
