@@ -9,8 +9,29 @@ import os
 
 from Parametre import getCodeConnexionAPI
 
-base_dir = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.dirname(base_dir))
+def get_app_dir():
+    if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+        return os.path.abspath(sys._MEIPASS)
+    return os.path.dirname(os.path.abspath(__file__))
+
+
+def get_data_dir(name: str) -> str:
+    app_dir = get_app_dir()
+    candidate = os.path.join(app_dir, name)
+    if os.path.exists(candidate):
+        return candidate
+
+    if getattr(sys, 'frozen', False):
+        exe_dir = os.path.dirname(sys.executable)
+        fallback = os.path.join(exe_dir, name)
+        os.makedirs(fallback, exist_ok=True)
+        return fallback
+
+    return candidate
+
+
+BASE_DIR = get_app_dir()
+sys.path.insert(0, os.path.dirname(BASE_DIR))
 from Backend.bridge import process_single_image, process_single_image_consensus, process_image_batch, process_image_batch_consensus
 
 
@@ -179,13 +200,13 @@ class ListeAFinir:
         self.Fiches.append(fiche)
     
     def ajouterFicheAuto(self):
-        self.Fiches=os.listdir(os.path.join(BASE_DIR, "Doc"))
+        self.Fiches=os.listdir(get_data_dir("Doc"))
 
     def getFichesNonFinies(self):
         return self.FichesNonFinies
 
     def ajouterFicheNonFinie(self):
-        FichesFini= os.listdir(os.path.join(BASE_DIR, "Sortie"))
+        FichesFini= os.listdir(get_data_dir("Sortie"))
         self.FichesNonFinies.clear()
         for i in self.Fiches:
             if i not in FichesFini:
