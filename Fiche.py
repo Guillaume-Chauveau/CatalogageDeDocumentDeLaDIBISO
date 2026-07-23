@@ -186,26 +186,50 @@ class Fiche:
                 labelText, fieldText, proba, edit = line.strip().split("$")
                 for caracteristique in self.listeDesCaracteristiques:
                     if caracteristique.isCaracteristique(labelText):
-                        caracteristique.setValeur(fieldText)
-                        caracteristique.setProba(self._parseProba(proba))
-                        fieldItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 2)
-                        barItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 3)
-                        editItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 4)
+                        if caracteristique not in ["Role Auteur","Role CoAuteur","Role Auteur Secondaire"]:
+                            caracteristique.setValeur(fieldText)
+                            caracteristique.setProba(self._parseProba(proba))
+                            fieldItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 2)
+                            barItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 3)
+                            editItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 4)
 
-                        if fieldItem is not None:
-                            widget = fieldItem.widget()
-                            if isinstance(widget, QtWidgets.QPushButton):
-                                widget.setText(caracteristique.getValeur())
-                            else:
-                                widget.setText(fieldText)
-                        if barItem is not None:
-                            bar = barItem.widget()
-                            if isinstance(bar, QtWidgets.QLabel):
-                                self._setDotColor(bar, caracteristique.getProba())
-                        if editItem is not None:
-                            editItem.widget().setText(edit)
-                            if edit=="1":
-                                   self.changeEdit(caracteristique.id)
+                            if fieldItem is not None:
+                                widget = fieldItem.widget()
+                                if isinstance(widget, QtWidgets.QPushButton):
+                                    widget.setText(caracteristique.getValeur())
+                                else:
+                                    widget.setText(fieldText)
+                            if barItem is not None:
+                                bar = barItem.widget()
+                                if isinstance(bar, QtWidgets.QLabel):
+                                    self._setDotColor(bar, caracteristique.getProba())
+                            if editItem is not None:
+                                editItem.widget().setText(edit)
+                                if edit=="1":
+                                    self.changeEdit(caracteristique.id)
+                        else:
+                            # gestion des role des auteur, co-auteur et auteur secondaire
+                            #a modifier quand le problème de code sera bon 
+                            caracteristique.setValeur("070")
+                            caracteristique.setProba(self._parseProba(0))
+                            fieldItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 2)
+                            barItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 3)
+                            editItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 4)
+
+                            if fieldItem is not None:
+                                widget = fieldItem.widget()
+                                if isinstance(widget, QtWidgets.QPushButton):
+                                    widget.setText("070")
+                                else:
+                                    widget.setText("070")
+                            if barItem is not None:
+                                bar = barItem.widget()
+                                if isinstance(bar, QtWidgets.QLabel):
+                                    self._setDotColor(bar, caracteristique.getProba())
+                            if editItem is not None:
+                                editItem.widget().setText(edit)
+                                if edit=="1":
+                                    self.changeEdit(caracteristique.id)
                 if labelText == "Traducteur":
                     # Défensive : s'assurer que les indices existent et que la valeur est une liste
                     try:
@@ -456,10 +480,9 @@ class Fiche:
                     text += ("#1$a" + self._majusculeEnDebutDeCaracteristique(str(nomCoAuteurMorceaux[0])))
                     text += ("$b" + " ".join(self._majusculeEnDebutDeCaracteristique(nomCoAuteurMorceaux[1:])))
             #todo: solution tmp pour que la fonction du co-auteur 
-            #if i < len(fonctionMorceaux): 
-            #    if fonctionMorceaux[i] != "":
-            #        text += ("$4" + str(fonctionMorceaux[i]))
-                    text += ("$4" + "070")
+            if i < len(fonctionMorceaux): 
+                if fonctionMorceaux[i] != "":
+                    text += ("$4" + str(fonctionMorceaux[i]))
             if text != "701 ":
                 resultats.append(text)
         return "\n".join(resultats)+"\n"
@@ -475,11 +498,9 @@ class Fiche:
                     nomPremierAuteurMorceaux= premierAuteurMorceaux[i].split(" ")
                     text += ("#1$a" + str(self._majusculeEnDebutDeCaracteristique(nomPremierAuteurMorceaux[0])))
                     text += ("$b" + " ".join(self._majusculeEnDebutDeCaracteristique(nomPremierAuteurMorceaux[1:])))
-            #todo: solution tmp pour que la fonction de l'auteur
-            #if i < len(fonctionMorceaux): 
-            #    if fonctionMorceaux[i]!="":
-            #        text += ("$4" + str(fonctionMorceaux[i]))
-                    text += ("$4" + "070")
+            if i < len(fonctionMorceaux): 
+                if fonctionMorceaux[i]!="":
+                    text += ("$4" + str(fonctionMorceaux[i]))
             if text != "700 ":
                 resultats.append(text)
         return "\n".join(resultats)+"\n"
