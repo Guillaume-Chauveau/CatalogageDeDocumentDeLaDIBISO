@@ -55,7 +55,6 @@ class FormulaireCollection:
         if index < len(line_edits):
             return line_edits[index]
 
-        print(f"[FormulaireCollection] widget introuvable pour {key}")
         return None
 
     def _set_text(self, key, value):
@@ -112,7 +111,6 @@ class FormulaireCollection:
 
     def sauvegarderFormulaire(self):
         valeurs = self.recupererValeursDepuisWidgets()
-        print("[FormulaireCollection] valeurs lues:", valeurs)
 
         self.article = valeurs["article"]
         self.collection = valeurs["collection"]

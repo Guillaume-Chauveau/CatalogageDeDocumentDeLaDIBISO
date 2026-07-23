@@ -233,7 +233,6 @@ class ListeAFinir:
 
     def _lancerTraitement(self, mode="image", filenames=None):
         api_key = getCodeConnexionAPI()
-        print(api_key)
         if not api_key.strip():
             QtWidgets.QMessageBox.warning(
                 self.window,
@@ -372,6 +371,6 @@ class ListeAFinir:
     def _testImageExiste(self,filename):
         scan_dir = self._get_scan_dir()
         for extension in [".png", ".jpg", ".jpeg"]:
-            if os.path.exists(os.path.join(scan_dir, os.path.splitext(filename)[0] + extension)):
+            if os.path.exists(os.path.join(scan_dir, os.path.splitext(filename)[0] + extension)) or os.path.exists(os.path.join("Scan", os.path.splitext(filename)[0] + extension)):
                 return True
         return False

@@ -99,7 +99,7 @@ class Fiche:
     INDICEAUTEURSECONDAIRE=18
     INDICEROLEAUTEURSECONDAIRE=19
     INDICECOLLECTION=5
-    chemainScan=""
+    chemainDossierDeTravail=""
 
     def __init__(self, nomDuFichier, w, afficherAuteur, afficherChamps, afficherCollection, chemainScan):
         self.window = w
@@ -108,7 +108,7 @@ class Fiche:
         self.afficherCollection = afficherCollection
         self.chemain = os.path.join(APP_DIR, "Doc", str(nomDuFichier))
         self.chemainOrigine = os.path.join(APP_DIR, "LLMOutput", str(nomDuFichier))
-        self.chemainScan = os.path.join(APP_DIR, chemainScan, str(nomDuFichier))
+        self.chemainDossierDeTravail = os.path.join(APP_DIR, chemainScan, str(nomDuFichier))
         self.nomDuFichier = nomDuFichier
         self.formulaireCollection = None
         self.listeDesCaracteristiques = []
@@ -235,13 +235,10 @@ class Fiche:
             return form.getValeurs()
         return ""
     def getValeursDUneCaracteristiqueDansLeFichier(self,nom):
-        print(nom)
         with open(self.chemain+".txt", "r", encoding="utf-8") as f:
             for line in f:
-                print(line)
                 labelText, fieldText, proba, edit = line.strip().split("$")
                 if labelText == nom:
-                    print(fieldText)
                     return fieldText
         return ""
     @staticmethod
@@ -291,16 +288,13 @@ class Fiche:
                     widget.setText("0")
 
     def lecture(self,page):
-        print(self.chemainOrigine)
         self._resetFormValues()
         pageL= page+".txt"
-        #print(f"lecture de la page: {pageL}")
         source_path = os.path.join(APP_DIR, "Doc", pageL)
         if not os.path.exists(source_path):
             source_path = os.path.join(APP_DIR, "LLMOutput", pageL)
         with open(source_path, "r", encoding="utf-8") as f:
             for line in f:
-                #print(line)
                 labelText, fieldText, proba, edit = line.strip().split("$")
                 for caracteristique in self.listeDesCaracteristiques:
                     if caracteristique.isCaracteristique(labelText):
@@ -326,9 +320,14 @@ class Fiche:
                                 if edit=="1":
                                     self.changeEdit(caracteristique.id)
                         else:
-                            # gestion des role des auteur, co-auteur et auteur secondaire
-                            #a modifier quand le problème de code sera bon 
-                            caracteristique.setValeur("070")
+                            if fieldText=="Illustrateur":
+                                caracteristique.setValeur("440")
+                            elif fieldText=="Éditeur scientifique":
+                                caracteristique.setValeur("340")
+                            elif fieldText=="Préfacier":
+                                caracteristique.setValeur("080")
+                            else:
+                                caracteristique.setValeur("070")
                             caracteristique.setProba(self._parseProba(0))
                             fieldItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 2)
                             barItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 3)
@@ -337,9 +336,9 @@ class Fiche:
                             if fieldItem is not None:
                                 widget = fieldItem.widget()
                                 if isinstance(widget, QtWidgets.QPushButton):
-                                    widget.setText("070")
+                                    widget.setText(caracteristique.getValeur())
                                 else:
-                                    widget.setText("070")
+                                    widget.setText(caracteristique.getValeur())
                             if barItem is not None:
                                 bar = barItem.widget()
                                 if isinstance(bar, QtWidgets.QLabel):
@@ -373,7 +372,7 @@ class Fiche:
                         self.listeDesCaracteristiques[self.INDICEROLEAUTEURSECONDAIRE] = role_target
                     if not isinstance(role_target.valeur, list):
                         role_target.valeur = [str(role_target.valeur)] if role_target.valeur else []
-                    role_target.valeur.append("Traducteur")
+                    role_target.valeur.append("730")
                 if labelText == "Langue":
                     self.langue = fieldText
         f.close()                         
@@ -531,7 +530,6 @@ class Fiche:
         if (collectiviteR != "" and collectiviteR != collectivite) or (fonctionCollectiviteR != "" and fonctionCollectiviteR != fonctionCollectivite):
             text += self._champs712(collectiviteR, fonctionCollectiviteR)
         #text = self._retirerLeDernierPointVigule(text)
-        print(text)
         return text
 
     def _decouperMorceaux(self, *valeurs):
@@ -786,22 +784,29 @@ class Fiche:
     def exportation(self):
         chemain=os.path.join(APP_DIR, "Sortie", str(self.nomDuFichier))
         chemain+=".txt"
-        print (f"Exportation de la fiche:{chemain}")
         os.makedirs(os.path.dirname(chemain), exist_ok=True)
         with open(chemain,"w", encoding="utf-8") as f:
             f.write(self.affichage())
 
     def setImage(self):
-        chemain=self.chemainScan
-        chemainPNG=chemain+".png"
-        chemainJPG=chemain+".jpg"
-        chemainJPEG=chemain+".jpeg"
+        chemainPNG=self.chemainDossierDeTravail+".png"
+        chemainJPG=self.chemainDossierDeTravail+".jpg"
+        chemainJPEG=self.chemainDossierDeTravail+".jpeg"
+        ScanPNG="Scan/"+self.nomDuFichier+".png"
+        ScanJPG="Scan/"+self.nomDuFichier+".jpg"
+        ScanJPEG="Scan/"+self.nomDuFichier+".jpeg"
         if os.path.exists(chemainPNG):
             image = QtGui.QImage(chemainPNG)
         elif os.path.exists(chemainJPG):
             image = QtGui.QImage(chemainJPG)
         elif os.path.exists(chemainJPEG):
             image = QtGui.QImage(chemainJPEG)
+        elif os.path.exists(ScanPNG):
+            image = QtGui.QImage(ScanPNG)
+        elif os.path.exists(ScanJPG):
+            image = QtGui.QImage(ScanJPG)
+        elif os.path.exists(ScanJPEG):
+            image = QtGui.QImage(ScanJPEG)
         else:
             image= QtGui.QImage(os.path.join(APP_DIR, "Image", "PasDImage.png"))
         scene = QtWidgets.QGraphicsScene()
@@ -935,7 +940,6 @@ class Fiche:
     def copieFileName(self):
         clipboard = QtWidgets.QApplication.clipboard()
         clipboard.setText(self.nomDuFichier)
-        print(f"Nom du fichier copié dans le presse-papiers: {self.nomDuFichier}")
 
     def _caractéristiqueARomanisée(self, Caractéristique):
         if Caractéristique is None:
@@ -953,13 +957,12 @@ class Fiche:
         return self.langue in getlangueNonRomaine()
 
     def _besoinDeRomanisée(self,Caractéristique):
-        print (Caractéristique+" "+Caractéristique in getCaracéristiquesARomanisée())
         return Caractéristique in getCaracéristiquesARomanisée()
 
     def _resolveCurrentImagePath(self):
-        candidates = [self.chemainScan]
+        candidates = [self.chemainDossierDeTravail]
         for ext in (".png", ".jpg", ".jpeg", ".bmp", ".tiff"):
-            candidates.append(self.chemainScan + ext)
+            candidates.append(self.chemainDossierDeTravail + ext)
         for candidate in candidates:
             if os.path.exists(candidate):
                 return candidate
@@ -971,7 +974,6 @@ class Fiche:
         le degré de certitude (proba) est PLUS ÉLEVÉ que la valeur actuelle.
         Préserve les éditions manuelles (edit="1").
         """
-        print(f"Chargement sélectif (probas) de : {page}")
         
         # Sauvegarder les probas actuelles
         old_probas = {}
