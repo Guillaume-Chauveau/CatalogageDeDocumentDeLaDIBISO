@@ -78,17 +78,17 @@ def _encode_pil_with_size_cap(
         b64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
         last_b64 = b64
         if len(b64) <= max_b64_bytes:
-            logger.warning(
-                f"Image redimensionnée à {current.size} (en plus de la compression) "
-                f"pour respecter le plafond de {max_b64_bytes} octets base64."
-            )
+            #logger.warning(
+            #    f"Image redimensionnée à {current.size} (en plus de la compression) "
+            #    f"pour respecter le plafond de {max_b64_bytes} octets base64."
+            #)
             return b64
 
-    logger.warning(
-        f"Impossible de faire descendre l'image sous {max_b64_bytes} octets base64 "
-        f"même après compression et redimensionnement agressifs ({len(last_b64)} octets). "
-        "Envoi de la meilleure tentative malgré tout."
-    )
+    #logger.warning(
+    #    f"Impossible de faire descendre l'image sous {max_b64_bytes} octets base64 "
+    #    f"même après compression et redimensionnement agressifs ({len(last_b64)} octets). "
+    #    "Envoi de la meilleure tentative malgré tout."
+    #)
     return last_b64
 
 
@@ -425,7 +425,7 @@ class AristoteDocumentAnalyzer:
 
             metadata = self._parse_json_tolerant(raw_response)
             if metadata is None:
-                logger.warning("Impossible d'extraire les métadonnées, structure par défaut utilisée.")
+                #logger.warning("Impossible d'extraire les métadonnées, structure par défaut utilisée.")
                 metadata = {}
 
             final_metadata = {**required_keys, **metadata}
@@ -520,7 +520,7 @@ class AristoteDocumentAnalyzer:
 
                 enrich_metadata = self._parse_enrichment_response(enrich_raw, include_romanization=is_non_latin)
                 if enrich_metadata is None:
-                    logger.warning("Impossible d'extraire l'enrichissement, valeurs par défaut utilisées.")
+                    #logger.warning("Impossible d'extraire l'enrichissement, valeurs par défaut utilisées.")
                     enrich_metadata = {}
 
                 final_metadata["scientific_field"] = enrich_metadata.get("scientific_field", "")
@@ -627,7 +627,7 @@ class AristoteDocumentAnalyzer:
                 "page (éditeur, date) ne figurent que sur la première image."
             )
         except Exception as e:
-            logger.warning(f"Recadrage de la zone de titre impossible ({e}), envoi de la page entière uniquement.")
+            #logger.warning(f"Recadrage de la zone de titre impossible ({e}), envoi de la page entière uniquement.")
             zoom_note = ""
 
         content.append({"type": "text", "text": prompt + zoom_note})
@@ -639,11 +639,11 @@ class AristoteDocumentAnalyzer:
         except Exception as e:
             if not has_zoom or not self._is_payload_too_large_error(e):
                 raise
-            logger.warning(
-                f"413 Request Entity Too Large pour {image_path} malgré la "
-                "compression — nouvelle tentative SANS le zoom titre (page "
-                "entière uniquement)."
-            )
+            #logger.warning(
+            #    f"413 Request Entity Too Large pour {image_path} malgré la "
+            #    "compression — nouvelle tentative SANS le zoom titre (page "
+            #    "entière uniquement)."
+            #)
             fallback_messages = [
                 {"role": "user", "content": [page_image_block, {"type": "text", "text": prompt}]}
             ]
@@ -793,7 +793,7 @@ class AristoteDocumentAnalyzer:
             )
         except Exception as e:
             # Fallback : le endpoint ne supporte pas logprobs pour ce modèle/route
-            logger.warning(f"logprobs non supportés par l'API ({e}), nouvelle tentative sans logprobs.")
+            #logger.warning(f"logprobs non supportés par l'API ({e}), nouvelle tentative sans logprobs.")
             response = self.client.chat.completions.create(
                 model=model_name,
                 max_tokens=max_tokens,
@@ -810,12 +810,12 @@ class AristoteDocumentAnalyzer:
                 # contenu se trouve dans un champ séparé (ex: reasoning_content)
                 # selon l'implémentation du endpoint.
                 reasoning_content = getattr(message, "reasoning_content", None)
-                logger.warning(
-                    f"content est None pour le modèle {model_name} "
-                    f"(finish_reason={finish_reason!r}"
-                    f"{', reasoning_content présent' if reasoning_content else ''}). "
-                    "Réponse traitée comme vide."
-                )
+                #logger.warning(
+                #    f"content est None pour le modèle {model_name} "
+                #    f"(finish_reason={finish_reason!r}"
+                #    f"{', reasoning_content présent' if reasoning_content else ''}). "
+                #    "Réponse traitée comme vide."
+                #)
                 content = ""
 
             text = content.strip()
@@ -832,12 +832,12 @@ class AristoteDocumentAnalyzer:
             # contenu se trouve dans un champ séparé (ex: reasoning_content)
             # selon l'implémentation du endpoint.
             reasoning_content = getattr(message, "reasoning_content", None)
-            logger.warning(
-                f"content est None pour le modèle {model_name} "
-                f"(finish_reason={finish_reason!r}"
-                f"{', reasoning_content présent' if reasoning_content else ''}). "
-                "Réponse traitée comme vide."
-            )
+            #logger.warning(
+            #    f"content est None pour le modèle {model_name} "
+            #    f"(finish_reason={finish_reason!r}"
+            #    f"{', reasoning_content présent' if reasoning_content else ''}). "
+            #    "Réponse traitée comme vide."
+            #)
             content = ""
 
         text = content.strip()
@@ -860,7 +860,8 @@ class AristoteDocumentAnalyzer:
                     "top_logprobs": top_list,
                 })
         else:
-            logger.warning("Le champ logprobs est vide dans la réponse (modèle/serveur non compatible).")
+            #logger.warning("Le champ logprobs est vide dans la réponse (modèle/serveur non compatible).")
+            pass
 
         return text, token_logprobs, None
 
@@ -1269,12 +1270,12 @@ class AristoteDocumentAnalyzer:
 
         reconstructed = "".join(pieces)
         if reconstructed != raw_response:
-            logger.warning(
-                "Le texte reconstruit à partir des tokens ne correspond pas exactement "
-                "à la réponse brute (probable désynchro d'encodage) — les scores de "
-                "confiance par champ sont calculés sur le texte reconstruit par tokens, "
-                "utilisé ici comme référence pour rester cohérent avec les offsets."
-            )
+            #logger.warning(
+            #    "Le texte reconstruit à partir des tokens ne correspond pas exactement "
+            #    "à la réponse brute (probable désynchro d'encodage) — les scores de "
+            #    "confiance par champ sont calculés sur le texte reconstruit par tokens, "
+            #    "utilisé ici comme référence pour rester cohérent avec les offsets."
+            #)
             return spans, reconstructed
         return spans, raw_response
 
@@ -1306,7 +1307,7 @@ class AristoteDocumentAnalyzer:
             except json.JSONDecodeError:
                 pass
 
-        logger.warning("Impossible de parser le JSON, tentative d'extraction regex avancée")
+        #logger.warning("Impossible de parser le JSON, tentative d'extraction regex avancée")
         extracted: Dict[str, Any] = {}
 
         # --- Champs texte simples ---
@@ -1363,7 +1364,7 @@ class AristoteDocumentAnalyzer:
             except json.JSONDecodeError:
                 pass
 
-        logger.warning("Impossible de parser le JSON d'enrichissement, extraction regex de repli")
+        #logger.warning("Impossible de parser le JSON d'enrichissement, extraction regex de repli")
 
         extracted: Dict[str, Any] = {}
 
@@ -1444,7 +1445,7 @@ def process_batch(analyzer: AristoteDocumentAnalyzer, input_dir: Path, output_di
     )
 
     if not image_files:
-        logger.warning(f"No images found in {input_dir}")
+        #logger.warning(f"No images found in {input_dir}")
         return
 
     logger.info(f"Starting batch processing of {len(image_files)} images…")

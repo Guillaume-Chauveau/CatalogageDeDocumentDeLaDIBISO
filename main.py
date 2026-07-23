@@ -214,7 +214,8 @@ def ajouterBoutonFormulaire(w):
     w.window.Validation.clicked.connect(_on_validation)
     w.window.Validation.setToolTip("Exporte cette fiche au format Unimarc")
 
-    w.window.Quiter.clicked.connect(lambda: afficherLeCatalogue(w.window, w.chemainScan))
+    scan_dir = getattr(w, "chemainScan", None) or getattr(w, "chemainDossierDeTravail", None) or "Scan"
+    w.window.Quiter.clicked.connect(lambda: afficherLeCatalogue(w.window, scan_dir))
     w.window.Quiter.setToolTip("Quite la page et retourne au menu de sélection du fichier")
     w.window.Restart.clicked.connect(lambda: w.lecture(w.chemain))
     w.window.Restart.clicked.connect(lambda: w.calculeDeLaBareCentrale())
@@ -304,7 +305,10 @@ def afficherRenduFormulaire(fiche=None):
         )
         rendu.BoutonHome.clicked.connect(
             lambda: _fermer_rendu_et_executer(
-                lambda: afficherLeCatalogue(getattr(fiche, "window", None), getattr(fiche, "chemainScan", "Scan"))
+                lambda: afficherLeCatalogue(
+                    getattr(fiche, "window", None),
+                    getattr(fiche, "chemainScan", None) or getattr(fiche, "chemainDossierDeTravail", None) or "Scan",
+                )
             )
         )
     else:
