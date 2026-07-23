@@ -13,7 +13,7 @@ _BACKEND_DIR = Path(__file__).resolve().parent
 if str(_BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(_BACKEND_DIR))
 
-from gemma_gpt import AristoteDocumentAnalyzer, process_batch, API_BASE_URL
+from Backend.pipeline import AristoteDocumentAnalyzer, process_batch, API_BASE_URL
 from convert_json_to_txt4 import build_lines
 
 APP_ROOT = _BACKEND_DIR.parent

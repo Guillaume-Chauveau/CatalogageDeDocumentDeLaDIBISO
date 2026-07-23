@@ -269,13 +269,13 @@ def build_lines(result: Dict[str, Any]) -> List[str]:
     lines.append(f"Co-Auteur${author_raw(1)}${fmt_confidence(author_raw_conf(1))}$0")
 
     # --- Role Auteur / Role CoAuteur (author_titles, même ordre que les auteurs) ---
-    titles = split_multi(metadata.get("author_titles", ""))
-    titles_conf = get_confidence(conf_root, "author_titles")
-    role_auteur = titles[0] if len(titles) > 0 else ""
-    role_coauteur = titles[1] if len(titles) > 1 else ""
+    #titles = split_multi(metadata.get("author_titles", ""))
+    #titles_conf = get_confidence(conf_root, "author_titles")
+    #role_auteur = titles[0] if len(titles) > 0 else ""
+    #role_coauteur = titles[1] if len(titles) > 1 else ""
 
-    lines.append(f"Role Auteur${fmt_value(role_auteur)}${fmt_confidence(titles_conf if role_auteur else None)}$0")
-    lines.append(f"Role CoAuteur${fmt_value(role_coauteur)}${fmt_confidence(titles_conf if role_coauteur else None)}$0")
+    #lines.append(f"Role Auteur${fmt_value(role_auteur)}${fmt_confidence(titles_conf if role_auteur else None)}$0")
+    #lines.append(f"Role CoAuteur${fmt_value(role_coauteur)}${fmt_confidence(titles_conf if role_coauteur else None)}$0")
 
     # --- Auteur Secondaire (traducteurs, illustrateurs, préfaciers) / Role Auteur Secondaire ---
     # Chacun des trois champs est extrait en passe 1 exactement comme
