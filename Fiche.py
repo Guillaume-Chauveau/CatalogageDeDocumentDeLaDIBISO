@@ -117,13 +117,10 @@ class Fiche:
             return form.getValeurs()
         return ""
     def getValeursDUneCaracteristiqueDansLeFichier(self,nom):
-        print(nom)
         with open(self.chemain+".txt", "r", encoding="utf-8") as f:
             for line in f:
-                print(line)
                 labelText, fieldText, proba, edit = line.strip().split("$")
                 if labelText == nom:
-                    print(fieldText)
                     return fieldText
         return ""
     @staticmethod
@@ -173,16 +170,13 @@ class Fiche:
                     widget.setText("0")
 
     def lecture(self,page):
-        print(self.chemainOrigine)
         self._resetFormValues()
         pageL= page+".txt"
-        #print(f"lecture de la page: {pageL}")
         source_path = os.path.join(APP_DIR, "Doc", pageL)
         if not os.path.exists(source_path):
             source_path = os.path.join(APP_DIR, "LLMOutput", pageL)
         with open(source_path, "r", encoding="utf-8") as f:
             for line in f:
-                #print(line)
                 labelText, fieldText, proba, edit = line.strip().split("$")
                 for caracteristique in self.listeDesCaracteristiques:
                     if caracteristique.isCaracteristique(labelText):
@@ -413,7 +407,6 @@ class Fiche:
         if (collectiviteR != "" and collectiviteR != collectivite) or (fonctionCollectiviteR != "" and fonctionCollectiviteR != fonctionCollectivite):
             text += self._champs712(collectiviteR, fonctionCollectiviteR)
         #text = self._retirerLeDernierPointVigule(text)
-        print(text)
         return text
 
     def _decouperMorceaux(self, *valeurs):
@@ -668,7 +661,6 @@ class Fiche:
     def exportation(self):
         chemain=os.path.join(APP_DIR, "Sortie", str(self.nomDuFichier))
         chemain+=".txt"
-        print (f"Exportation de la fiche:{chemain}")
         os.makedirs(os.path.dirname(chemain), exist_ok=True)
         with open(chemain,"w", encoding="utf-8") as f:
             f.write(self.affichage())
@@ -817,7 +809,6 @@ class Fiche:
     def copieFileName(self):
         clipboard = QtWidgets.QApplication.clipboard()
         clipboard.setText(self.nomDuFichier)
-        print(f"Nom du fichier copié dans le presse-papiers: {self.nomDuFichier}")
 
     def _caractéristiqueARomanisée(self, Caractéristique):
         if Caractéristique is None:
@@ -835,7 +826,6 @@ class Fiche:
         return self.langue in getlangueNonRomaine()
 
     def _besoinDeRomanisée(self,Caractéristique):
-        print (Caractéristique+" "+Caractéristique in getCaracéristiquesARomanisée())
         return Caractéristique in getCaracéristiquesARomanisée()
 
     def _resolveCurrentImagePath(self):
@@ -853,7 +843,6 @@ class Fiche:
         le degré de certitude (proba) est PLUS ÉLEVÉ que la valeur actuelle.
         Préserve les éditions manuelles (edit="1").
         """
-        print(f"Chargement sélectif (probas) de : {page}")
         
         # Sauvegarder les probas actuelles
         old_probas = {}

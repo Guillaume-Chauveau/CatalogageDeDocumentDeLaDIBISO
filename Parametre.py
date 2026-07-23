@@ -34,7 +34,6 @@ class Parametre:
 
     def retour(self):
         self.sauvegarderCodeConnexionAPI()
-        print(self.getCodeConnexionAPI())
 
 def getCodeConnexionAPI():
     with open(".clef.txt", "r") as f:
