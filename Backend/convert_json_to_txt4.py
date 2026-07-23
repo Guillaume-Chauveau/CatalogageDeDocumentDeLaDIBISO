@@ -257,7 +257,7 @@ def build_lines(result: Dict[str, Any]) -> List[str]:
 
     def author_raw(idx: int) -> str:
         if idx < len(authors_parsed) and isinstance(authors_parsed[idx], dict):
-            return fmt_value(authors_parsed[idx].get("raw", ""))
+            return fmt_value(authors_parsed[idx].get("family_name", "")+" "+authors_parsed[idx].get("given_name", ""))
         return ""
 
     def author_raw_conf(idx: int) -> Optional[float]:
