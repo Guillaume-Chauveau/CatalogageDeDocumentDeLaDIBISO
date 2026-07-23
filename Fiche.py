@@ -278,6 +278,8 @@ class Fiche:
     def _setDotColor(self, widget, value):
         if value == 100:
             color = "cyan"
+        elif value==0:
+            color ="Transparent"
         elif value <= 30:
             color = "red"
         elif value <=50:
