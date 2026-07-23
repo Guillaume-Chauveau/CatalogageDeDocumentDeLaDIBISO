@@ -145,6 +145,7 @@ def process_single_image_consensus(
     model_a: str,
     model_b: str,
     text_model: str = "gpt-oss-120b",
+    force: bool = False,
 ) -> str:
     """Traite une image avec les deux modèles vision + arbitrage/enrichissement consensus."""
     path = Path(image_path)
@@ -153,7 +154,7 @@ def process_single_image_consensus(
 
     CONSENSUS_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     json_path = CONSENSUS_OUTPUT_DIR / f"{path.stem}.json"
-    if json_path.exists():
+    if json_path.exists() and not force:
         print(f"Fichier {path.name} déjà traité (consensus). Ignoré.")
         return path.stem
 

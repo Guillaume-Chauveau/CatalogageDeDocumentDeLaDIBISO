@@ -28,6 +28,68 @@ class Fiche:
     listeDesCaracteristiques=[]
     listeDesNomDeCaracteristiques=["Article","Titre","Complement du titre","Auteur","Numero du volume","Collection","Ville","Editeur","Mention d'edition","Annee","Volume","Illustration","Dimension","Indexation Rameau","Premier Auteur","Co-Auteur","Role Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire","Nom de la Collectivite","Role de la Collectivite"]
     listeDesNomDeCaracteristiquesMultiple=["Indexation Rameau","Premier Auteur","Role Auteur","Co-Auteur","Role CoAuteur","Auteur Secondaire","Role Auteur Secondaire","Collection"]
+    CHAMPS_TXT=[
+        "Article",
+        "Titre",
+        "Titre Romanisé",
+        "Complement du titre",
+        "Complement du titre Romanisée",
+        "Auteur",
+        "Auteur Romanisé",
+        "Numero du volume",
+        "Numero du volume Romanisé",
+        "Collection",
+        "Collection Romanisée",
+        "Ville",
+        "Ville Romanisée",
+        "Editeur",
+        "Editeur Romanisé",
+        "Mention d'edition",
+        "Mention d'edition Romanisée",
+        "Annee",
+        "Volume",
+        "Illustration",
+        "Illustration Romanisée",
+        "Dimension",
+        "Indexation Rameau",
+        "Premier Auteur",
+        "Co-Auteur",
+        "Role Auteur",
+        "Role CoAuteur",
+        "Auteur Secondaire",
+        "Role Auteur Secondaire",
+        "Nom de la Collectivite",
+        "Role de la Collectivite",
+        "Langue",
+    ]
+    UI_TO_PROMPT_FIELDS={
+        "Titre": ["title"],
+        "Complement du titre": ["title_complement"],
+        "Numero du volume": ["volume_number"],
+        "Auteur": ["authors"],
+        "Collection": ["collection"],
+        "Ville": ["publishers"],
+        "Editeur": ["publishers"],
+        "Mention d'edition": ["edition"],
+        "Annee": ["date"],
+        "Illustration": ["illustrations"],
+        "Indexation Rameau": ["scientific_field"],
+        "Premier Auteur": ["authors_parsed"],
+        "Co-Auteur": ["authors_parsed"],
+        "Role Auteur": ["author_titles"],
+        "Role CoAuteur": ["author_titles"],
+        "Auteur Secondaire": ["translators", "illustrators", "prefaciers", "editors"],
+        "Role Auteur Secondaire": ["translators", "illustrators", "prefaciers", "editors"],
+        "Langue": ["language"],
+        "Titre Romanisé": ["romanization.title"],
+        "Auteur Romanisé": ["romanization.authors"],
+        "Collection Romanisée": ["romanization.collection"],
+        "Ville Romanisée": ["romanization.publishers"],
+        "Editeur Romanisé": ["romanization.publishers"],
+        "Mention d'edition Romanisée": ["romanization.edition"],
+        "Illustration Romanisée": ["romanization.illustrations"],
+        "Numero du volume Romanisé": ["romanization.volume_number"],
+    }
     chemain=""
     nomDuFichier=""
     INDICECHAMPSCIENTIFIQUE=13
@@ -101,7 +163,63 @@ class Fiche:
             self.window.gridLayout.addWidget(dot, row, 3)
             self.window.gridLayout.addWidget(edit, row, 4)
 
-    def __str__(self):        return f"Fiche: {self.getValeurParNom('Titre')} de {self.getValeurParNom('Auteur')} ({self.getValeurParNom('Annee')})"
+    def __str__(self):
+        return f"Fiche: {self.getValeurParNom('Titre')} de {self.getValeurParNom('Auteur')} ({self.getValeurParNom('Annee')})"
+
+    def demanderChampsARecalculer(self):
+        dialog = QtWidgets.QDialog(self.window)
+        dialog.setWindowTitle("Choisir les champs à recalculer")
+        main_layout = QtWidgets.QVBoxLayout(dialog)
+
+        label = QtWidgets.QLabel("Cochez les champs à mettre à jour :")
+        main_layout.addWidget(label)
+
+        control_layout = QtWidgets.QHBoxLayout()
+        check_all_button = QtWidgets.QPushButton("Tout cocher", dialog)
+        uncheck_all_button = QtWidgets.QPushButton("Tout décocher", dialog)
+        control_layout.addWidget(check_all_button)
+        control_layout.addWidget(uncheck_all_button)
+        main_layout.addLayout(control_layout)
+
+        grid = QtWidgets.QGridLayout()
+        checkboxes = []
+        cols = 3
+        for index, champ in enumerate(self.CHAMPS_TXT):
+            checkbox = QtWidgets.QCheckBox(champ, dialog)
+            checkbox.setChecked(True)
+            row = index // cols
+            col = index % cols
+            grid.addWidget(checkbox, row, col)
+            checkboxes.append(checkbox)
+
+        def set_all(value: bool):
+            for checkbox in checkboxes:
+                checkbox.setChecked(value)
+
+        check_all_button.clicked.connect(lambda: set_all(True))
+        uncheck_all_button.clicked.connect(lambda: set_all(False))
+
+        main_layout.addLayout(grid)
+
+        button_box = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel,
+            parent=dialog,
+        )
+        button_box.accepted.connect(dialog.accept)
+        button_box.rejected.connect(dialog.reject)
+        main_layout.addWidget(button_box)
+
+        if dialog.exec() != QtWidgets.QDialog.Accepted:
+            return None
+
+        return {checkbox.text() for checkbox in checkboxes if checkbox.isChecked()}
+
+    def _prompt_fields_from_ui_labels(self, labels):
+        prompt_fields = set()
+        for label in labels:
+            for field in self.UI_TO_PROMPT_FIELDS.get(label, []):
+                prompt_fields.add(field)
+        return prompt_fields
 
     def getCaracteristiqueParNom(self, nom):
         for char in self.listeDesCaracteristiques:
@@ -806,7 +924,7 @@ class Fiche:
                 return candidate
         return None
 
-    def lectureSelectiveParProba(self, page):
+    def lectureSelectiveParProba(self, page, champs_a_recalculer=None):
         """
         Charge les nouvelles valeurs mais ne met à jour un champ que si 
         le degré de certitude (proba) est PLUS ÉLEVÉ que la valeur actuelle.
@@ -827,6 +945,8 @@ class Fiche:
         with open(source_path, "r", encoding="utf-8") as f:
             for line in f:
                 labelText, fieldText, proba_str, edit = line.strip().split("$")
+                if champs_a_recalculer is not None and labelText not in champs_a_recalculer:
+                    continue
                 new_proba = self._parseProba(proba_str)
                 
                 for caracteristique in self.listeDesCaracteristiques:
@@ -883,6 +1003,21 @@ class Fiche:
             )
             return
 
+        selected_labels = self.demanderChampsARecalculer()
+        if selected_labels is None:
+            return
+        if not selected_labels:
+            QtWidgets.QMessageBox.information(
+                self.window,
+                "Aucun champ sélectionné",
+                "Aucun champ n'a été coché. Opération annulée.",
+            )
+            return
+
+        prompt_fields = self._prompt_fields_from_ui_labels(selected_labels)
+        print(f"Champs sélectionnés pour le recalculage : {selected_labels}")
+        print(f"Champs API correspondants : {prompt_fields}")
+
         self.window.setEnabled(False)
         QtWidgets.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
         try:
@@ -893,6 +1028,7 @@ class Fiche:
                 model_a="gemma-4-31b",
                 model_b="qwen-3.6-35b-instruct",
                 text_model="gpt-oss-120b",
+                force=True,
             )
         except Exception as exc:
             QtWidgets.QApplication.restoreOverrideCursor()
@@ -909,7 +1045,7 @@ class Fiche:
                 QtWidgets.QApplication.restoreOverrideCursor()
 
         # Charger les nouvelles valeurs uniquement si la proba est plus élevée
-        self.lectureSelectiveParProba(self.chemain)
+        self.lectureSelectiveParProba(self.chemain, champs_a_recalculer=selected_labels)
         self.calculeDeLaBareCentrale()
         self.setImage()
         self.ajoutTitreDeLaFenetre()
