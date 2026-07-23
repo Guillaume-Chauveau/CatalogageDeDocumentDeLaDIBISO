@@ -4,7 +4,6 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6 import QtGui, QtWidgets
 from PySide6 import QtCore
 import os
-import unicodedata
 
 from PySide6 import QtWidgets
 
@@ -305,26 +304,50 @@ class Fiche:
                 labelText, fieldText, proba, edit = line.strip().split("$")
                 for caracteristique in self.listeDesCaracteristiques:
                     if caracteristique.isCaracteristique(labelText):
-                        caracteristique.setValeur(fieldText)
-                        caracteristique.setProba(self._parseProba(proba))
-                        fieldItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 2)
-                        barItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 3)
-                        editItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 4)
+                        if caracteristique not in ["Role Auteur","Role CoAuteur","Role Auteur Secondaire"]:
+                            caracteristique.setValeur(fieldText)
+                            caracteristique.setProba(self._parseProba(proba))
+                            fieldItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 2)
+                            barItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 3)
+                            editItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 4)
 
-                        if fieldItem is not None:
-                            widget = fieldItem.widget()
-                            if isinstance(widget, QtWidgets.QPushButton):
-                                widget.setText(caracteristique.getValeur())
-                            else:
-                                widget.setText(fieldText)
-                        if barItem is not None:
-                            bar = barItem.widget()
-                            if isinstance(bar, QtWidgets.QLabel):
-                                self._setDotColor(bar, caracteristique.getProba())
-                        if editItem is not None:
-                            editItem.widget().setText(edit)
-                            if edit=="1":
-                                   self.changeEdit(caracteristique.id)
+                            if fieldItem is not None:
+                                widget = fieldItem.widget()
+                                if isinstance(widget, QtWidgets.QPushButton):
+                                    widget.setText(caracteristique.getValeur())
+                                else:
+                                    widget.setText(fieldText)
+                            if barItem is not None:
+                                bar = barItem.widget()
+                                if isinstance(bar, QtWidgets.QLabel):
+                                    self._setDotColor(bar, caracteristique.getProba())
+                            if editItem is not None:
+                                editItem.widget().setText(edit)
+                                if edit=="1":
+                                    self.changeEdit(caracteristique.id)
+                        else:
+                            # gestion des role des auteur, co-auteur et auteur secondaire
+                            #a modifier quand le problème de code sera bon 
+                            caracteristique.setValeur("070")
+                            caracteristique.setProba(self._parseProba(0))
+                            fieldItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 2)
+                            barItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 3)
+                            editItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 4)
+
+                            if fieldItem is not None:
+                                widget = fieldItem.widget()
+                                if isinstance(widget, QtWidgets.QPushButton):
+                                    widget.setText("070")
+                                else:
+                                    widget.setText("070")
+                            if barItem is not None:
+                                bar = barItem.widget()
+                                if isinstance(bar, QtWidgets.QLabel):
+                                    self._setDotColor(bar, caracteristique.getProba())
+                            if editItem is not None:
+                                editItem.widget().setText(edit)
+                                if edit=="1":
+                                    self.changeEdit(caracteristique.id)
                 if labelText == "Traducteur":
                     # Défensive : s'assurer que les indices existent et que la valeur est une liste
                     try:
@@ -373,6 +396,8 @@ class Fiche:
     def _setDotColor(self, widget, value):
         if value == 100:
             color = "cyan"
+        elif value==0:
+            color ="Transparent"
         elif value <= 30:
             color = "red"
         elif value <=50:
@@ -448,12 +473,17 @@ class Fiche:
         mentionEdition = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier("Mention d'edition"))
 
         valeursCollection = self.getValeursFormulaireCollection()
-        articleFormulaireCollection, collection, section, reference = self._extraireValeursCollection(valeursCollection)
-        articleFormulaireCollection = self._majusculeEnDebutDeCaracteristique(articleFormulaireCollection)
-        collection = self._majusculeEnDebutDeCaracteristique(collection)
-        section = self._majusculeEnDebutDeCaracteristique(section)
-        reference = self._majusculeEnDebutDeCaracteristique(reference)
-        
+        if valeursCollection !="":
+            articleFormulaireCollection, collection, section, reference = self._extraireValeursCollection(valeursCollection)
+            articleFormulaireCollection = self._majusculeEnDebutDeCaracteristique(articleFormulaireCollection)
+            collection = self._majusculeEnDebutDeCaracteristique(collection)
+            section = self._majusculeEnDebutDeCaracteristique(section)
+            reference = self._majusculeEnDebutDeCaracteristique(reference)
+        else :
+            articleFormulaireCollection=""
+            collection =self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier("Collection"))
+            section = ""
+            reference=""
 
         text="008 $aAax3\n104 ##$ak$bzy$cy$dba$ffre\n106 ##$ar\n181 ##$P01$ctxt\n182 ##$P01$cn\n183 ##$P01$anga\n"
 
@@ -483,9 +513,9 @@ class Fiche:
         if collection or section:
             text += self._champs225(collection, section)
         if reference:
-            text += f"410 ##$0@{reference}\n"
+            text += f"410 ##$t@{reference}\n"
         if indexationRameau is not None and indexationRameau.getValeur() !="":
-            text += ("606 ##$" + str(indexationRameau.getValeurIndexationRameau()) + "\n")
+            text += str(indexationRameau.getValeurIndexationRameau())
 
         if premierAuteur !="" or fonctionAuteur !="":
             text +=self._champs700(premierAuteur, fonctionAuteur)
@@ -541,53 +571,62 @@ class Fiche:
         return "\n".join(resultats)+"\n"
 
     def _champs702(self, auteurSecondaire, fonctionAuteurSecondaire):
-        auteur_secondaire_morceaux, fonction_morceaux = self._decouperMorceaux(auteurSecondaire, fonctionAuteurSecondaire)
+        auteurSecondaireMorceaux, fonctionMorceaux = self._decouperMorceaux(auteurSecondaire, fonctionAuteurSecondaire)
         resultats = []
-        max_len = max([len(auteur_secondaire_morceaux), len(fonction_morceaux), 0])
+        max_len = max([len(auteurSecondaireMorceaux), len(fonctionMorceaux), 0])
         for i in range(max_len):
             text = "702 "
-            if i < len(auteur_secondaire_morceaux):
-                if auteur_secondaire_morceaux[i] != "":
-                    text += ("#1$3" + str(auteur_secondaire_morceaux[i]))
-            if i < len(fonction_morceaux) :
-                if fonction_morceaux[i] != "":
-                    text += ("$4" + str(fonction_morceaux[i]))
+            if i < len(auteurSecondaireMorceaux):
+                if auteurSecondaireMorceaux[i] != "":
+                    nomAuteurSecondaireMorceaux=auteurSecondaireMorceaux[i].split(" ")
+                    text += ("#1$a" + self._majusculeEnDebutDeCaracteristique(str(nomAuteurSecondaireMorceaux[0])))
+                    text += ("$b" + " ".join(self._majusculeEnDebutDeCaracteristique(nomAuteurSecondaireMorceaux[1:])))
+            if i < len(fonctionMorceaux) :
+                if fonctionMorceaux[i] != "":
+                    text += ("$4" + str(fonctionMorceaux[i]))
+            else:
+                text += ("$4070")
             if text != "702 ":
                 resultats.append(text)
         return "\n".join(resultats)+"\n"
     
     def _champs701(self, coAuteur, fonctionCoauteur):
-        co_auteur_morceaux, fonction_morceaux = self._decouperMorceaux(coAuteur, fonctionCoauteur)
+        coAuteurMorceaux, fonctionMorceaux = self._decouperMorceaux(coAuteur, fonctionCoauteur)
         resultats = []
-        max_len = max([len(co_auteur_morceaux), len(fonction_morceaux), 0])
+        max_len = max([len(coAuteurMorceaux), len(fonctionMorceaux), 0])
         for i in range(max_len):
             text = "701 "
-            if i < len(co_auteur_morceaux):
-                if co_auteur_morceaux[i] != "":
-                    text += ("#1$3" + str(co_auteur_morceaux[i]))
+            if i < len(coAuteurMorceaux):
+                if coAuteurMorceaux[i] != "":
+                    nomCoAuteurMorceaux=coAuteurMorceaux[i].split(" ")
+                    text += ("#1$a" + self._majusculeEnDebutDeCaracteristique(str(nomCoAuteurMorceaux[0])))
+                    text += ("$b" + " ".join(self._majusculeEnDebutDeCaracteristique(nomCoAuteurMorceaux[1:])))
             #todo: solution tmp pour que la fonction du co-auteur 
-            #if i < len(fonction_morceaux): 
-            #    if fonction_morceaux[i] != "":
-            #        text += ("$4" + str(fonction_morceaux[i]))
-                    text += ("$4" + "070")
+            if i < len(fonctionMorceaux): 
+                if fonctionMorceaux[i] != "":
+                    text += ("$4" + str(fonctionMorceaux[i]))
+            else:
+                text += ("$4070")
             if text != "701 ":
                 resultats.append(text)
         return "\n".join(resultats)+"\n"
 
     def _champs700(self, premierAuteur, fonctionAuteur):
-        premier_auteur_morceaux, fonction_morceaux = self._decouperMorceaux(premierAuteur, fonctionAuteur)
+        premierAuteurMorceaux, fonctionMorceaux = self._decouperMorceaux(premierAuteur, fonctionAuteur)
         resultats = []
-        max_len = max([len(premier_auteur_morceaux), len(fonction_morceaux), 0])
+        max_len = max([len(premierAuteurMorceaux), len(fonctionMorceaux), 0])
         for i in range(max_len):
             text = "700 "
-            if i < len(premier_auteur_morceaux) :
-                if premier_auteur_morceaux[i]!="":
-                    text += ("#1$3" + str(premier_auteur_morceaux[i]))
-            #todo: solution tmp pour que la fonction de l'auteur
-            #if i < len(fonction_morceaux): 
-            #    if fonction_morceaux[i]!="":
-            #        text += ("$4" + str(fonction_morceaux[i]))
-                    text += ("$4" + "070")
+            if i < len(premierAuteurMorceaux) :
+                if premierAuteurMorceaux[i]!="":
+                    nomPremierAuteurMorceaux= premierAuteurMorceaux[i].split(" ")
+                    text += ("#1$a" + str(self._majusculeEnDebutDeCaracteristique(nomPremierAuteurMorceaux[0])))
+                    text += ("$b" + " ".join(self._majusculeEnDebutDeCaracteristique(nomPremierAuteurMorceaux[1:])))
+            if i < len(fonctionMorceaux): 
+                if fonctionMorceaux[i]!="":
+                    text += ("$4" + str(fonctionMorceaux[i]))
+            else:
+                text += ("$4070")
             if text != "700 ":
                 resultats.append(text)
         return "\n".join(resultats)+"\n"
@@ -640,27 +679,29 @@ class Fiche:
                 text += ("0#$a" + str(article_val) + " @" + str(titre_val))
             else:
                 text += ("1#$a@" + str(titre_val))
+            if complement_val != "":
+                text += ("$e" + str(complement_val))
             if auteur_val != "":
                 text += ("$f" + str(auteur_val))
                 if co_auteur_val != "":
                     text += ("," + str(co_auteur_val))
                 if auteur_secondaire_val != "":
                     text += ("," + str(auteur_secondaire_val))
-            if complement_val != "":
-                text += ("$e" + str(complement_val))
             if numero_volume_val != "":
                 text += ("$h" + str(numero_volume_val))
             if text != "200 ":
                 resultats.append(text)
         return "\n".join(resultats)+"\n"
+    
+
     def _majusculeEnDebutDeCaracteristique(self, text):
         if isinstance(text, list):
             for i in range(len(text)):
                 if text[i]:
-                    text[i] = text[i][0].upper() + text[i][1:]
+                    text[i] = text[i][0].upper() + text[i][1:].lower()
         else:
             if text:
-                text = text[0].upper() + text[1:]
+                text = text[0].upper() + text[1:].lower()
         return text
 
     def _retirerLeDernierPointVigule(self,text):

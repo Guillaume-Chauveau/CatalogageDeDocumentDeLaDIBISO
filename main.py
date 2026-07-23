@@ -118,8 +118,6 @@ def afficherLesParametres():
     parametre = loader.load(parametrePath, None)
 
     currentParametre = p.Parametre(parametre)
-    currentParametre.window.ToutVrai.clicked.connect(lambda: currentParametre.clickVraiTout())
-    currentParametre.window.ToutFaux.clicked.connect(lambda: currentParametre.clickFauxTout())
     currentParametre.window.Valider.clicked.connect(lambda: currentParametre.retour())
     currentParametre.window.Valider.clicked.connect(lambda: currentParametre.window.close())
     currentParametre.window.Annuler.clicked.connect(lambda: currentParametre.window.close())

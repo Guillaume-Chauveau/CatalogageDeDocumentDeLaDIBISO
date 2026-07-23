@@ -35,26 +35,69 @@
        <x>0</x>
        <y>-1</y>
        <width>691</width>
-       <height>391</height>
+       <height>420</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <layout class="QGridLayout" name="ListeParametre"/>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QCheckBox" name="ToutVrai">
+       <layout class="QGridLayout" name="infoCouleur">
+        <item row="3" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
+         <widget class="QLabel" name="label_4">
           <property name="text">
-           <string>Tout Vrai</string>
+           <string>jaune : entre 50% et 75%</string>
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QCheckBox" name="ToutFaux">
+        <item row="5" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
+         <widget class="QLabel" name="label_6">
           <property name="text">
-           <string>Tout Faux</string>
+           <string>rouge :  entre 0% et 30%</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>orange : entre 30% et 50%</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>cyan : 100%</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>vert : entre 75% et 100%</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
+         <widget class="QLabel" name="label">
+          <property name="font">
+           <font>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>information sur les scores de confiance</string>
+          </property>
+          <property name="textFormat">
+           <enum>Qt::TextFormat::AutoText</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>si rien ne s'affiche: le score de confiance est a 0%</string>
           </property>
          </widget>
         </item>
@@ -63,10 +106,33 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Policy::Minimum</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>clef API :</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QLineEdit" name="CodeConnexionAPI"/>
         </item>
         <item>
-         <spacer name="horizontalSpacer">
+         <spacer name="horizontalSpacer_2">
           <property name="orientation">
            <enum>Qt::Orientation::Horizontal</enum>
           </property>
