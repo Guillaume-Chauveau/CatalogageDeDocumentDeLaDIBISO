@@ -202,9 +202,14 @@ class Fiche:
                                 if edit=="1":
                                     self.changeEdit(caracteristique.id)
                         else:
-                            # gestion des role des auteur, co-auteur et auteur secondaire
-                            #a modifier quand le problème de code sera bon 
-                            caracteristique.setValeur("070")
+                            if fieldText=="Illustrateur":
+                                caracteristique.setValeur("440")
+                            elif fieldText=="Éditeur scientifique":
+                                caracteristique.setValeur("340")
+                            elif fieldText=="Préfacier":
+                                caracteristique.setValeur("080")
+                            else:
+                                caracteristique.setValeur("070")
                             caracteristique.setProba(self._parseProba(0))
                             fieldItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 2)
                             barItem = self.window.gridLayout.itemAtPosition(caracteristique.id, 3)
@@ -213,9 +218,9 @@ class Fiche:
                             if fieldItem is not None:
                                 widget = fieldItem.widget()
                                 if isinstance(widget, QtWidgets.QPushButton):
-                                    widget.setText("070")
+                                    widget.setText(caracteristique.getValeur())
                                 else:
-                                    widget.setText("070")
+                                    widget.setText(caracteristique.getValeur())
                             if barItem is not None:
                                 bar = barItem.widget()
                                 if isinstance(bar, QtWidgets.QLabel):
@@ -249,7 +254,7 @@ class Fiche:
                         self.listeDesCaracteristiques[self.INDICEROLEAUTEURSECONDAIRE] = role_target
                     if not isinstance(role_target.valeur, list):
                         role_target.valeur = [str(role_target.valeur)] if role_target.valeur else []
-                    role_target.valeur.append("Traducteur")
+                    role_target.valeur.append("730")
                 if labelText == "Langue":
                     self.langue = fieldText
         f.close()                         
