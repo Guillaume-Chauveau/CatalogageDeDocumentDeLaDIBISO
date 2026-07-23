@@ -464,6 +464,8 @@ class Fiche:
             if i < len(fonctionMorceaux) :
                 if fonctionMorceaux[i] != "":
                     text += ("$4" + str(fonctionMorceaux[i]))
+            else:
+                text += ("$4070")
             if text != "702 ":
                 resultats.append(text)
         return "\n".join(resultats)+"\n"
@@ -483,6 +485,8 @@ class Fiche:
             if i < len(fonctionMorceaux): 
                 if fonctionMorceaux[i] != "":
                     text += ("$4" + str(fonctionMorceaux[i]))
+            else:
+                text += ("$4070")
             if text != "701 ":
                 resultats.append(text)
         return "\n".join(resultats)+"\n"
@@ -501,6 +505,8 @@ class Fiche:
             if i < len(fonctionMorceaux): 
                 if fonctionMorceaux[i]!="":
                     text += ("$4" + str(fonctionMorceaux[i]))
+            else:
+                text += ("$4070")
             if text != "700 ":
                 resultats.append(text)
         return "\n".join(resultats)+"\n"
