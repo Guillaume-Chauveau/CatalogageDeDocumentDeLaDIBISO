@@ -954,11 +954,12 @@ class Fiche:
                         old_proba = caracteristique.getProba()
                         
                         # Ne mettre à jour que si la nouvelle proba est PLUS ÉLEVÉE
-                        # et que le champ n'a pas été manuellement édité (edit != "1")
+                        # ou si le champ est explicitement sélectionné pour recalcul.
                         edit_status = self.window.gridLayout.itemAtPosition(caracteristique.id, 4).widget().text() if self.window.gridLayout.itemAtPosition(caracteristique.id, 4) else "0"
+                        should_override_edit = labelText in (champs_a_recalculer or [])
                         
-                        if new_proba > old_proba and edit_status != "1":
-                            # Mettre à jour uniquement si proba plus élevée
+                        if should_override_edit or (new_proba > old_proba and edit_status != "1"):
+                            # Mettre à jour le champ demandé, même si l'ancienne valeur a été marquée manuellement.
                             caracteristique.setValeur(fieldText)
                             caracteristique.setProba(new_proba)
                             
