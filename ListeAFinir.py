@@ -217,7 +217,6 @@ class ListeAFinir:
 
     def _lancerTraitement(self, mode="image", filenames=None):
         api_key = getCodeConnexionAPI()
-        print(api_key)
         if not api_key.strip():
             QtWidgets.QMessageBox.warning(
                 self.window,
