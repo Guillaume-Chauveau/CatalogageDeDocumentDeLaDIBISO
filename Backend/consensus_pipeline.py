@@ -233,7 +233,7 @@ def arbitrate_field(
             chosen = "A"
         return {"chosen": chosen, "note": parsed.get("note", "")}
     except Exception as e:
-        logger.warning(f"Échec de l'arbitrage pour le champ '{field_name}': {e}. Repli sur A par défaut.")
+        #logger.warning(f"Échec de l'arbitrage pour le champ '{field_name}': {e}. Repli sur A par défaut.")
         return {"chosen": "A", "note": f"arbitrage échoué ({e}), repli par défaut sur le candidat A"}
 
 
@@ -432,7 +432,8 @@ def enrich_consensus(
 
             consensus_detail.update(enrich_conf)
         elif enrich_logprobs_error:
-            logger.warning(f"Enrichissement consensus sans logprobs : {enrich_logprobs_error}")
+            #logger.warning(f"Enrichissement consensus sans logprobs : {enrich_logprobs_error}")
+            pass
 
     except Exception as e:
         logger.error(f"Erreur lors de l'enrichissement post-consensus: {e}", exc_info=True)
@@ -490,7 +491,7 @@ def process_single_image(
             json.dump(result_b, f, indent=2, ensure_ascii=False)
 
     if "error" in (result_a.get("metadata", {}) or {}) or "error" in (result_b.get("metadata", {}) or {}):
-        logger.warning(f"  {image_file.name} : erreur dans au moins un des deux runs, consensus ignoré.")
+        #logger.warning(f"  {image_file.name} : erreur dans au moins un des deux runs, consensus ignoré.")
         merged = {
             "image_filename": image_file.name,
             "error": "au moins un des deux modèles a échoué sur cette image",
