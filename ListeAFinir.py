@@ -211,6 +211,22 @@ class ListeAFinir:
                 for origin in filenames:
                     filename = os.path.basename(origin)
                     destination = os.path.join(scan_dir, str(filename))
+                    origin_abs = os.path.abspath(origin)
+                    destination_abs = os.path.abspath(destination)
+
+                    if origin_abs == destination_abs:
+                        # Le fichier est déjà dans le répertoire de scan : pas besoin de recopier.
+                        copied.append(str(filename))
+                        continue
+
+                    if os.path.exists(destination_abs):
+                        try:
+                            if os.path.samefile(origin_abs, destination_abs):
+                                copied.append(str(filename))
+                                continue
+                        except (OSError, FileNotFoundError):
+                            pass
+
                     shutil.copy(origin, destination)
                     copied.append(str(filename))
                 self._lancerTraitement(mode="image", filenames=copied)
