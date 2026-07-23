@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1238</width>
+    <width>985</width>
     <height>852</height>
    </rect>
   </property>
@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>-550</y>
+      <y>-460</y>
       <width>881</width>
       <height>1041</height>
      </rect>
@@ -47,6 +47,47 @@
             <layout class="QHBoxLayout" name="horizontalLayout">
              <item>
               <layout class="QGridLayout" name="gridLayout">
+               <item row="17" column="3">
+                <widget class="QProgressBar" name="progressBar_17">
+                 <property name="styleSheet">
+                  <string notr="true">QProgressBar {
+    border: 2px solid grey;
+    border-radius: 5px;
+}
+
+QProgressBar::chunk {
+    background-color: #05B8CC;
+    width: 20px;
+}</string>
+                 </property>
+                 <property name="value">
+                  <number>24</number>
+                 </property>
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                </widget>
+               </item>
+               <item row="10" column="4">
+                <widget class="QLabel" name="label_27">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="1">
+                <widget class="QLabel" name="label_5">
+                 <property name="text">
+                  <string>Numero du volume</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="2">
+                <widget class="QLineEdit" name="lineEdit"/>
+               </item>
+               <item row="14" column="2">
+                <widget class="QLineEdit" name="lineEdit_10"/>
+               </item>
                <item row="10" column="1">
                 <widget class="QLabel" name="label_14">
                  <property name="text">
@@ -54,22 +95,15 @@
                  </property>
                 </widget>
                </item>
-               <item row="13" column="4">
-                <widget class="QLabel" name="label_30">
+               <item row="14" column="4">
+                <widget class="QLabel" name="label_31">
                  <property name="text">
                   <string>0</string>
                  </property>
                 </widget>
                </item>
-               <item row="9" column="4">
-                <widget class="QLabel" name="label_26">
-                 <property name="text">
-                  <string>0</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="6" column="4">
-                <widget class="QLabel" name="label_10">
+               <item row="4" column="4">
+                <widget class="QLabel" name="label_40">
                  <property name="text">
                   <string>0</string>
                  </property>
@@ -78,15 +112,138 @@
                <item row="17" column="2">
                 <widget class="QLineEdit" name="lineEdit_13"/>
                </item>
-               <item row="12" column="1">
-                <widget class="QLabel" name="label_16">
-                 <property name="text">
-                  <string>Indexation Rameau</string>
+               <item row="7" column="3">
+                <widget class="QProgressBar" name="progressBar_8">
+                 <property name="styleSheet">
+                  <string notr="true">QProgressBar {
+    border: 2px solid grey;
+    border-radius: 5px;
+}
+
+QProgressBar::chunk {
+    background-color: #05B8CC;
+    width: 20px;
+}</string>
+                 </property>
+                 <property name="value">
+                  <number>24</number>
+                 </property>
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
                  </property>
                 </widget>
                </item>
-               <item row="19" column="3">
-                <widget class="QProgressBar" name="progressBar_18">
+               <item row="1" column="1">
+                <widget class="QLabel" name="label_2">
+                 <property name="text">
+                  <string>Titre</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="3">
+                <widget class="QProgressBar" name="progressBar_5">
+                 <property name="styleSheet">
+                  <string notr="true">QProgressBar {
+    border: 2px solid grey;
+    border-radius: 5px;
+}
+
+QProgressBar::chunk {
+    background-color: #05B8CC;
+    width: 20px;
+}</string>
+                 </property>
+                 <property name="value">
+                  <number>24</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="4">
+                <widget class="QLabel" name="label_8">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="20" column="1">
+                <widget class="QLabel" name="label_23">
+                 <property name="text">
+                  <string>Fonction de la Collectivite</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="18" column="4">
+                <widget class="QLabel" name="label_38">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="2">
+                <widget class="QLineEdit" name="lineEdit_3"/>
+               </item>
+               <item row="4" column="3">
+                <widget class="QProgressBar" name="progressBar_6">
+                 <property name="styleSheet">
+                  <string notr="true">QProgressBar {
+    border: 2px solid grey;
+    border-radius: 5px;
+}
+
+QProgressBar::chunk {
+    background-color: #05B8CC;
+    width: 20px;
+}</string>
+                 </property>
+                 <property name="value">
+                  <number>24</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="11" column="2">
+                <widget class="QLineEdit" name="lineEdit_7"/>
+               </item>
+               <item row="13" column="4">
+                <widget class="QLabel" name="label_30">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="3">
+                <widget class="QProgressBar" name="progressBar_2">
+                 <property name="styleSheet">
+                  <string notr="true">QProgressBar {
+    border: 2px solid grey;
+    border-radius: 5px;
+}
+
+QProgressBar::chunk {
+    background-color: #05B8CC;
+    width: 20px;
+}</string>
+                 </property>
+                 <property name="value">
+                  <number>24</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="9" column="1">
+                <widget class="QLabel" name="label_13">
+                 <property name="text">
+                  <string>Annee</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="19" column="4">
+                <widget class="QLabel" name="label_35">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="10" column="3">
+                <widget class="QProgressBar" name="progressBar_10">
                  <property name="styleSheet">
                   <string notr="true">QProgressBar {
     border: 2px solid grey;
@@ -127,77 +284,60 @@ QProgressBar::chunk {
                  </property>
                 </widget>
                </item>
-               <item row="13" column="1">
-                <widget class="QLabel" name="label_17">
-                 <property name="text">
-                  <string>Auteur Principal</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="16" column="4">
-                <widget class="QLabel" name="label_33">
+               <item row="1" column="4">
+                <widget class="QLabel" name="label_7">
                  <property name="text">
                   <string>0</string>
                  </property>
                 </widget>
                </item>
-               <item row="20" column="1">
-                <widget class="QLabel" name="label_23">
+               <item row="8" column="2">
+                <widget class="QLineEdit" name="lineEdit_21"/>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLabel" name="label_4">
                  <property name="text">
-                  <string>Fonction de la Collectivite</string>
+                  <string>Complement du titre</string>
                  </property>
                 </widget>
                </item>
-               <item row="19" column="1">
-                <widget class="QLabel" name="label_22">
+               <item row="18" column="1">
+                <widget class="QLabel" name="label_37">
                  <property name="text">
-                  <string>Nom de la Collectivite</string>
+                  <string>Fonction Auteur Secondaire</string>
                  </property>
                 </widget>
                </item>
-               <item row="9" column="2">
-                <widget class="QLineEdit" name="lineEdit_5"/>
-               </item>
-               <item row="16" column="1">
-                <widget class="QLabel" name="label_20">
+               <item row="14" column="1">
+                <widget class="QLabel" name="label_18">
                  <property name="text">
-                  <string>Fonction CoAuteur</string>
+                  <string>Co-Auteur</string>
                  </property>
                 </widget>
                </item>
-               <item row="16" column="3">
-                <widget class="QProgressBar" name="progressBar_16">
-                 <property name="styleSheet">
-                  <string notr="true">QProgressBar {
-    border: 2px solid grey;
-    border-radius: 5px;
-}
-
-QProgressBar::chunk {
-    background-color: #05B8CC;
-    width: 20px;
-}</string>
-                 </property>
-                 <property name="value">
-                  <number>24</number>
-                 </property>
-                 <property name="orientation">
-                  <enum>Qt::Orientation::Horizontal</enum>
+               <item row="6" column="1">
+                <widget class="QLabel" name="label_11">
+                 <property name="text">
+                  <string>Ville</string>
                  </property>
                 </widget>
                </item>
-               <item row="19" column="2">
-                <widget class="QLineEdit" name="lineEdit_14"/>
+               <item row="8" column="1">
+                <widget class="QLabel" name="label_42">
+                 <property name="text">
+                  <string>Mention d'éditition</string>
+                 </property>
+                </widget>
                </item>
-               <item row="10" column="2">
-                <widget class="QLineEdit" name="lineEdit_6"/>
-               </item>
-               <item row="12" column="4">
-                <widget class="QLabel" name="label_29">
+               <item row="17" column="4">
+                <widget class="QLabel" name="label_34">
                  <property name="text">
                   <string>0</string>
                  </property>
                 </widget>
+               </item>
+               <item row="18" column="2">
+                <widget class="QLineEdit" name="lineEdit_19"/>
                </item>
                <item row="18" column="3">
                 <widget class="QProgressBar" name="progressBar_20">
@@ -220,8 +360,47 @@ QProgressBar::chunk {
                  </property>
                 </widget>
                </item>
-               <item row="20" column="2">
-                <widget class="QLineEdit" name="lineEdit_15"/>
+               <item row="5" column="3">
+                <widget class="QProgressBar" name="progressBar_21">
+                 <property name="styleSheet">
+                  <string notr="true">QProgressBar {
+    border: 2px solid grey;
+    border-radius: 5px;
+}
+
+QProgressBar::chunk {
+    background-color: #05B8CC;
+    width: 20px;
+}</string>
+                 </property>
+                 <property name="value">
+                  <number>24</number>
+                 </property>
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                </widget>
+               </item>
+               <item row="8" column="3">
+                <widget class="QProgressBar" name="progressBar_22">
+                 <property name="styleSheet">
+                  <string notr="true">QProgressBar {
+    border: 2px solid grey;
+    border-radius: 5px;
+}
+
+QProgressBar::chunk {
+    background-color: #05B8CC;
+    width: 20px;
+}</string>
+                 </property>
+                 <property name="value">
+                  <number>24</number>
+                 </property>
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                </widget>
                </item>
                <item row="15" column="1">
                 <widget class="QLabel" name="label_19">
@@ -230,116 +409,42 @@ QProgressBar::chunk {
                  </property>
                 </widget>
                </item>
-               <item row="1" column="3">
-                <widget class="QProgressBar" name="progressBar_2">
-                 <property name="styleSheet">
-                  <string notr="true">QProgressBar {
-    border: 2px solid grey;
-    border-radius: 5px;
-}
-
-QProgressBar::chunk {
-    background-color: #05B8CC;
-    width: 20px;
-}</string>
-                 </property>
-                 <property name="value">
-                  <number>24</number>
-                 </property>
-                </widget>
+               <item row="19" column="2">
+                <widget class="QLineEdit" name="lineEdit_14"/>
                </item>
-               <item row="0" column="1">
-                <widget class="QLabel" name="label">
+               <item row="11" column="1">
+                <widget class="QLabel" name="label_15">
                  <property name="text">
-                  <string>Article</string>
+                  <string>Dimension</string>
                  </property>
                 </widget>
                </item>
-               <item row="11" column="3">
-                <widget class="QProgressBar" name="progressBar_11">
-                 <property name="styleSheet">
-                  <string notr="true">QProgressBar {
-    border: 2px solid grey;
-    border-radius: 5px;
-}
-
-QProgressBar::chunk {
-    background-color: #05B8CC;
-    width: 20px;
-}</string>
-                 </property>
-                 <property name="value">
-                  <number>24</number>
-                 </property>
-                 <property name="orientation">
-                  <enum>Qt::Orientation::Horizontal</enum>
+               <item row="2" column="2">
+                <widget class="QLineEdit" name="lineEdit_17"/>
+               </item>
+               <item row="13" column="1">
+                <widget class="QLabel" name="label_17">
+                 <property name="text">
+                  <string>Auteur Principal</string>
                  </property>
                 </widget>
                </item>
-               <item row="14" column="3">
-                <widget class="QProgressBar" name="progressBar_14">
-                 <property name="styleSheet">
-                  <string notr="true">QProgressBar {
-    border: 2px solid grey;
-    border-radius: 5px;
-}
-
-QProgressBar::chunk {
-    background-color: #05B8CC;
-    width: 20px;
-}</string>
-                 </property>
-                 <property name="value">
-                  <number>24</number>
-                 </property>
-                 <property name="orientation">
-                  <enum>Qt::Orientation::Horizontal</enum>
-                 </property>
-                </widget>
-               </item>
-               <item row="18" column="2">
-                <widget class="QLineEdit" name="lineEdit_19"/>
-               </item>
-               <item row="16" column="2">
-                <widget class="QLineEdit" name="lineEdit_12"/>
-               </item>
-               <item row="18" column="4">
-                <widget class="QLabel" name="label_38">
+               <item row="6" column="4">
+                <widget class="QLabel" name="label_10">
                  <property name="text">
                   <string>0</string>
                  </property>
                 </widget>
                </item>
-               <item row="9" column="3">
-                <widget class="QProgressBar" name="progressBar_9">
-                 <property name="styleSheet">
-                  <string notr="true">QProgressBar {
-    border: 2px solid grey;
-    border-radius: 5px;
-}
-
-QProgressBar::chunk {
-    background-color: #05B8CC;
-    width: 20px;
-}</string>
-                 </property>
-                 <property name="value">
-                  <number>24</number>
-                 </property>
-                 <property name="orientation">
-                  <enum>Qt::Orientation::Horizontal</enum>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="4">
-                <widget class="QLabel" name="label_8">
+               <item row="11" column="4">
+                <widget class="QLabel" name="label_28">
                  <property name="text">
                   <string>0</string>
                  </property>
                 </widget>
                </item>
-               <item row="5" column="4">
-                <widget class="QLabel" name="label_9">
+               <item row="7" column="4">
+                <widget class="QLabel" name="label_24">
                  <property name="text">
                   <string>0</string>
                  </property>
@@ -366,25 +471,29 @@ QProgressBar::chunk {
                  </property>
                 </widget>
                </item>
+               <item row="19" column="3">
+                <widget class="QProgressBar" name="progressBar_18">
+                 <property name="styleSheet">
+                  <string notr="true">QProgressBar {
+    border: 2px solid grey;
+    border-radius: 5px;
+}
+
+QProgressBar::chunk {
+    background-color: #05B8CC;
+    width: 20px;
+}</string>
+                 </property>
+                 <property name="value">
+                  <number>24</number>
+                 </property>
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
+                 </property>
+                </widget>
+               </item>
                <item row="15" column="4">
                 <widget class="QLabel" name="label_32">
-                 <property name="text">
-                  <string>0</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="19" column="4">
-                <widget class="QLabel" name="label_35">
-                 <property name="text">
-                  <string>0</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="2">
-                <widget class="QLineEdit" name="lineEdit_2"/>
-               </item>
-               <item row="7" column="4">
-                <widget class="QLabel" name="label_24">
                  <property name="text">
                   <string>0</string>
                  </property>
@@ -411,55 +520,43 @@ QProgressBar::chunk {
                  </property>
                 </widget>
                </item>
-               <item row="14" column="4">
-                <widget class="QLabel" name="label_31">
+               <item row="20" column="4">
+                <widget class="QLabel" name="label_36">
                  <property name="text">
                   <string>0</string>
                  </property>
                 </widget>
                </item>
-               <item row="0" column="4">
-                <widget class="QLabel" name="label_6">
+               <item row="0" column="1">
+                <widget class="QLabel" name="label">
+                 <property name="text">
+                  <string>Article</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="1">
+                <widget class="QLabel" name="label_41">
+                 <property name="text">
+                  <string>Collection</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="16" column="1">
+                <widget class="QLabel" name="label_20">
+                 <property name="text">
+                  <string>Fonction CoAuteur</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="4">
+                <widget class="QLabel" name="label_9">
                  <property name="text">
                   <string>0</string>
                  </property>
                 </widget>
                </item>
-               <item row="15" column="2">
-                <widget class="QLineEdit" name="lineEdit_11"/>
-               </item>
-               <item row="14" column="2">
-                <widget class="QLineEdit" name="lineEdit_10"/>
-               </item>
-               <item row="17" column="1">
-                <widget class="QLabel" name="label_21">
-                 <property name="text">
-                  <string>Auteur Secondaire</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="11" column="2">
-                <widget class="QLineEdit" name="lineEdit_7"/>
-               </item>
-               <item row="18" column="1">
-                <widget class="QLabel" name="label_37">
-                 <property name="text">
-                  <string>Fonction Auteur Secondaire</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="14" column="1">
-                <widget class="QLabel" name="label_18">
-                 <property name="text">
-                  <string>Co-Auteur</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="13" column="2">
-                <widget class="QLineEdit" name="lineEdit_9"/>
-               </item>
-               <item row="17" column="3">
-                <widget class="QProgressBar" name="progressBar_17">
+               <item row="0" column="3">
+                <widget class="QProgressBar" name="progressBar_3">
                  <property name="styleSheet">
                   <string notr="true">QProgressBar {
     border: 2px solid grey;
@@ -479,17 +576,13 @@ QProgressBar::chunk {
                  </property>
                 </widget>
                </item>
-               <item row="11" column="4">
-                <widget class="QLabel" name="label_28">
-                 <property name="text">
-                  <string>0</string>
-                 </property>
-                </widget>
+               <item row="9" column="2">
+                <widget class="QLineEdit" name="lineEdit_5"/>
                </item>
-               <item row="1" column="1">
-                <widget class="QLabel" name="label_2">
+               <item row="17" column="1">
+                <widget class="QLabel" name="label_21">
                  <property name="text">
-                  <string>Titre</string>
+                  <string>Auteur Secondaire</string>
                  </property>
                 </widget>
                </item>
@@ -500,22 +593,8 @@ QProgressBar::chunk {
                  </property>
                 </widget>
                </item>
-               <item row="11" column="1">
-                <widget class="QLabel" name="label_15">
-                 <property name="text">
-                  <string>Dimension</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="17" column="4">
-                <widget class="QLabel" name="label_34">
-                 <property name="text">
-                  <string>0</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="3">
-                <widget class="QProgressBar" name="progressBar_3">
+               <item row="16" column="3">
+                <widget class="QProgressBar" name="progressBar_16">
                  <property name="styleSheet">
                   <string notr="true">QProgressBar {
     border: 2px solid grey;
@@ -556,28 +635,29 @@ QProgressBar::chunk {
                  </property>
                 </widget>
                </item>
-               <item row="1" column="2">
-                <widget class="QLineEdit" name="lineEdit"/>
-               </item>
-               <item row="10" column="4">
-                <widget class="QLabel" name="label_27">
+               <item row="16" column="4">
+                <widget class="QLabel" name="label_33">
                  <property name="text">
                   <string>0</string>
                  </property>
                 </widget>
                </item>
-               <item row="20" column="4">
-                <widget class="QLabel" name="label_36">
+               <item row="12" column="4">
+                <widget class="QLabel" name="label_29">
                  <property name="text">
                   <string>0</string>
                  </property>
                 </widget>
                </item>
-               <item row="12" column="2">
-                <widget class="QLineEdit" name="lineEdit_8"/>
+               <item row="9" column="4">
+                <widget class="QLabel" name="label_26">
+                 <property name="text">
+                  <string>0</string>
+                 </property>
+                </widget>
                </item>
-               <item row="10" column="3">
-                <widget class="QProgressBar" name="progressBar_10">
+               <item row="9" column="3">
+                <widget class="QProgressBar" name="progressBar_9">
                  <property name="styleSheet">
                   <string notr="true">QProgressBar {
     border: 2px solid grey;
@@ -597,18 +677,20 @@ QProgressBar::chunk {
                  </property>
                 </widget>
                </item>
-               <item row="2" column="1">
-                <widget class="QLabel" name="label_4">
-                 <property name="text">
-                  <string>Complement du titre</string>
-                 </property>
-                </widget>
+               <item row="10" column="2">
+                <widget class="QLineEdit" name="lineEdit_6"/>
                </item>
-               <item row="2" column="2">
-                <widget class="QLineEdit" name="lineEdit_17"/>
+               <item row="20" column="2">
+                <widget class="QLineEdit" name="lineEdit_15"/>
                </item>
-               <item row="2" column="3">
-                <widget class="QProgressBar" name="progressBar_5">
+               <item row="5" column="2">
+                <widget class="QLineEdit" name="lineEdit_20"/>
+               </item>
+               <item row="15" column="2">
+                <widget class="QLineEdit" name="lineEdit_11"/>
+               </item>
+               <item row="11" column="3">
+                <widget class="QProgressBar" name="progressBar_11">
                  <property name="styleSheet">
                   <string notr="true">QProgressBar {
     border: 2px solid grey;
@@ -623,35 +705,10 @@ QProgressBar::chunk {
                  <property name="value">
                   <number>24</number>
                  </property>
-                </widget>
-               </item>
-               <item row="1" column="4">
-                <widget class="QLabel" name="label_7">
-                 <property name="text">
-                  <string>0</string>
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
                  </property>
                 </widget>
-               </item>
-               <item row="3" column="3">
-                <widget class="QProgressBar" name="progressBar_4">
-                 <property name="styleSheet">
-                  <string notr="true">QProgressBar {
-    border: 2px solid grey;
-    border-radius: 5px;
-}
-
-QProgressBar::chunk {
-    background-color: #05B8CC;
-    width: 20px;
-}</string>
-                 </property>
-                 <property name="value">
-                  <number>24</number>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="2">
-                <widget class="QLineEdit" name="lineEdit_16"/>
                </item>
                <item row="3" column="1">
                 <widget class="QLabel" name="label_3">
@@ -660,31 +717,43 @@ QProgressBar::chunk {
                  </property>
                 </widget>
                </item>
-               <item row="4" column="1">
-                <widget class="QLabel" name="label_5">
-                 <property name="text">
-                  <string>Numero du volume</string>
-                 </property>
-                </widget>
-               </item>
                <item row="4" column="2">
                 <widget class="QLineEdit" name="lineEdit_18"/>
                </item>
-               <item row="4" column="3">
-                <widget class="QProgressBar" name="progressBar_6">
-                 <property name="styleSheet">
-                  <string notr="true">QProgressBar {
-    border: 2px solid grey;
-    border-radius: 5px;
-}
-
-QProgressBar::chunk {
-    background-color: #05B8CC;
-    width: 20px;
-}</string>
+               <item row="0" column="4">
+                <widget class="QLabel" name="label_6">
+                 <property name="text">
+                  <string>0</string>
                  </property>
-                 <property name="value">
-                  <number>24</number>
+                </widget>
+               </item>
+               <item row="0" column="2">
+                <widget class="QLineEdit" name="lineEdit_2"/>
+               </item>
+               <item row="3" column="2">
+                <widget class="QLineEdit" name="lineEdit_16"/>
+               </item>
+               <item row="12" column="2">
+                <widget class="QLineEdit" name="lineEdit_8"/>
+               </item>
+               <item row="7" column="1">
+                <widget class="QLabel" name="label_12">
+                 <property name="text">
+                  <string>Editeur</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="19" column="1">
+                <widget class="QLabel" name="label_22">
+                 <property name="text">
+                  <string>Nom de la Collectivite</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="12" column="1">
+                <widget class="QLabel" name="label_16">
+                 <property name="text">
+                  <string>Indexation Rameau</string>
                  </property>
                 </widget>
                </item>
@@ -695,22 +764,29 @@ QProgressBar::chunk {
                  </property>
                 </widget>
                </item>
-               <item row="4" column="4">
-                <widget class="QLabel" name="label_40">
-                 <property name="text">
-                  <string>0</string>
+               <item row="16" column="2">
+                <widget class="QLineEdit" name="lineEdit_12"/>
+               </item>
+               <item row="14" column="3">
+                <widget class="QProgressBar" name="progressBar_14">
+                 <property name="styleSheet">
+                  <string notr="true">QProgressBar {
+    border: 2px solid grey;
+    border-radius: 5px;
+}
+
+QProgressBar::chunk {
+    background-color: #05B8CC;
+    width: 20px;
+}</string>
+                 </property>
+                 <property name="value">
+                  <number>24</number>
+                 </property>
+                 <property name="orientation">
+                  <enum>Qt::Orientation::Horizontal</enum>
                  </property>
                 </widget>
-               </item>
-               <item row="6" column="1">
-                <widget class="QLabel" name="label_11">
-                 <property name="text">
-                  <string>Ville</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="6" column="2">
-                <widget class="QLineEdit" name="lineEdit_3"/>
                </item>
                <item row="6" column="3">
                 <widget class="QProgressBar" name="progressBar_7">
@@ -733,18 +809,8 @@ QProgressBar::chunk {
                  </property>
                 </widget>
                </item>
-               <item row="5" column="1">
-                <widget class="QLabel" name="label_41">
-                 <property name="text">
-                  <string>Collection</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="5" column="2">
-                <widget class="QLineEdit" name="lineEdit_20"/>
-               </item>
-               <item row="5" column="3">
-                <widget class="QProgressBar" name="progressBar_21">
+               <item row="3" column="3">
+                <widget class="QProgressBar" name="progressBar_4">
                  <property name="styleSheet">
                   <string notr="true">QProgressBar {
     border: 2px solid grey;
@@ -758,78 +824,159 @@ QProgressBar::chunk {
                  </property>
                  <property name="value">
                   <number>24</number>
-                 </property>
-                 <property name="orientation">
-                  <enum>Qt::Orientation::Horizontal</enum>
-                 </property>
-                </widget>
-               </item>
-               <item row="7" column="1">
-                <widget class="QLabel" name="label_12">
-                 <property name="text">
-                  <string>Editeur</string>
                  </property>
                 </widget>
                </item>
                <item row="7" column="2">
                 <widget class="QLineEdit" name="lineEdit_4"/>
                </item>
-               <item row="7" column="3">
-                <widget class="QProgressBar" name="progressBar_8">
-                 <property name="styleSheet">
-                  <string notr="true">QProgressBar {
-    border: 2px solid grey;
-    border-radius: 5px;
-}
-
-QProgressBar::chunk {
-    background-color: #05B8CC;
-    width: 20px;
-}</string>
-                 </property>
-                 <property name="value">
-                  <number>24</number>
-                 </property>
-                 <property name="orientation">
-                  <enum>Qt::Orientation::Horizontal</enum>
-                 </property>
-                </widget>
+               <item row="13" column="2">
+                <widget class="QLineEdit" name="lineEdit_9"/>
                </item>
-               <item row="9" column="1">
-                <widget class="QLabel" name="label_13">
+               <item row="0" column="5">
+                <widget class="QCheckBox" name="checkBox">
                  <property name="text">
-                  <string>Annee</string>
+                  <string/>
                  </property>
                 </widget>
                </item>
-               <item row="8" column="1">
-                <widget class="QLabel" name="label_42">
+               <item row="1" column="5">
+                <widget class="QCheckBox" name="checkBox_2">
                  <property name="text">
-                  <string>Mention d'éditition</string>
+                  <string/>
                  </property>
                 </widget>
                </item>
-               <item row="8" column="2">
-                <widget class="QLineEdit" name="lineEdit_21"/>
+               <item row="2" column="5">
+                <widget class="QCheckBox" name="checkBox_3">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
                </item>
-               <item row="8" column="3">
-                <widget class="QProgressBar" name="progressBar_22">
-                 <property name="styleSheet">
-                  <string notr="true">QProgressBar {
-    border: 2px solid grey;
-    border-radius: 5px;
-}
-
-QProgressBar::chunk {
-    background-color: #05B8CC;
-    width: 20px;
-}</string>
+               <item row="3" column="5">
+                <widget class="QCheckBox" name="checkBox_4">
+                 <property name="text">
+                  <string/>
                  </property>
-                 <property name="value">
-                  <number>24</number>
+                </widget>
+               </item>
+               <item row="4" column="5">
+                <widget class="QCheckBox" name="checkBox_5">
+                 <property name="text">
+                  <string/>
                  </property>
-                 <property name="orientation">
-                  <enum>Qt::Orientation::Horizontal</enum>
+                </widget>
+               </item>
+               <item row="5" column="5">
+                <widget class="QCheckBox" name="checkBox_6">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="6" column="5">
+                <widget class="QCheckBox" name="checkBox_7">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="7" column="5">
+                <widget class="QCheckBox" name="checkBox_8">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="8" column="5">
+                <widget class="QCheckBox" name="checkBox_9">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="9" column="5">
+                <widget class="QCheckBox" name="checkBox_10">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="10" column="5">
+                <widget class="QCheckBox" name="checkBox_11">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="11" column="5">
+                <widget class="QCheckBox" name="checkBox_12">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="12" column="5">
+                <widget class="QCheckBox" name="checkBox_13">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="13" column="5">
+                <widget class="QCheckBox" name="checkBox_14">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="14" column="5">
+                <widget class="QCheckBox" name="checkBox_15">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="15" column="5">
+                <widget class="QCheckBox" name="checkBox_16">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="16" column="5">
+                <widget class="QCheckBox" name="checkBox_17">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="17" column="5">
+                <widget class="QCheckBox" name="checkBox_18">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="18" column="5">
+                <widget class="QCheckBox" name="checkBox_19">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="19" column="5">
+                <widget class="QCheckBox" name="checkBox_20">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="20" column="5">
+                <widget class="QCheckBox" name="checkBox_21">
+                 <property name="text">
+                  <string/>
                  </property>
                 </widget>
                </item>
@@ -1008,7 +1155,7 @@ QProgressBar::chunk {
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1238</width>
+     <width>985</width>
      <height>33</height>
     </rect>
    </property>
