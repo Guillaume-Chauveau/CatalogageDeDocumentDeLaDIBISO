@@ -51,7 +51,7 @@
         <item row="5" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
          <widget class="QLabel" name="label_6">
           <property name="text">
-           <string>rouge : moins de 30%</string>
+           <string>rouge :  entre 0% et 30%</string>
           </property>
          </widget>
         </item>
@@ -91,6 +91,13 @@
           </property>
           <property name="textFormat">
            <enum>Qt::TextFormat::AutoText</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0" alignment="Qt::AlignmentFlag::AlignHCenter">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>si rien ne s'affiche: le score de confiance est a 0%</string>
           </property>
          </widget>
         </item>
