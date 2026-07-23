@@ -19,23 +19,25 @@ L'application suit une architecture modulaire avec séparation des préoccupatio
 
 ```
 app/
-├── main.py                 # Point d'entrée principal
+├── main.py                # Gestion des intération entre les interface et le code
 ├── Fiche.py               # Classe principale pour gérer les fiches
 ├── Caracteristique.py     # Classe de base pour les caractéristiques
 ├── CaracteristiqueMultiple.py # Extension pour caractéristiques multiples
-├── ListeAFinir.py         # Gestion du catalogue
-├── Parametre.py           # Gestion des paramètres
+├── ListeAFinir.py         # Gestion du catalogue et du répertoire courant
+├── Parametre.py           # Interface d'information et lieu pour rentré la clef API
 ├── FormulaireAuteur.py    # Formulaire pour auteurs
 ├── FormulaireChampsScientifique.py # Formulaire pour champs scientifiques
-├── Hebdomadaire.py       # (Non fini)
-├── Statistique.py         # (Non fini)
-├── UI/                    # Interfaces Qt Designer
+├── Statistique.py         # Non intégré a la version final mais peut toujours etre utilisé avec par ligne de code
+├── UI/                   # Interfaces Qt Designer
 │   ├── *.ui              # Fichiers d'interface
 │   └── *_ui.py           # Code Python généré
-├── Doc/                   # Documents originaux traités
-├── LLMOutput/            # Sorties brutes du LLM
-├── Scan/                 # Images scannées
-├── Sortie/               # Exports finaux
+├── Doc/                  # Docier de travaile pour la création des fiches
+├── LLMOutput/            # Docier de sauvegarde de la vertion original des fiches
+├── Scan/                 # Docier qui regroupe les images scannées ajouté une par une
+├── Sortie/               # Exports finaux respectant le standart UniMARC
+├── Backend/              # Docier qui regroupe les codes relatifit a l'API
+│   ├── convert_json_to_txt.py #Fichier convertisant les JSON donné par le LLM en txt utilisé par l'interface graphique
+│   ├──
 └── Image/                # Ressources graphiques
 ```
 
