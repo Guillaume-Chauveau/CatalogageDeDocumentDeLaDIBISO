@@ -37,7 +37,7 @@ class Fiche:
     INDICEAUTEURSECONDAIRE=18
     INDICEROLEAUTEURSECONDAIRE=19
     INDICECOLLECTION=5
-    chemainScan=""
+    chemainDossierDeTravail=""
 
     def __init__(self, nomDuFichier, w, afficherAuteur, afficherChamps, afficherCollection, chemainScan):
         self.window = w
@@ -46,7 +46,7 @@ class Fiche:
         self.afficherCollection = afficherCollection
         self.chemain = os.path.join(APP_DIR, "Doc", str(nomDuFichier))
         self.chemainOrigine = os.path.join(APP_DIR, "LLMOutput", str(nomDuFichier))
-        self.chemainScan = os.path.join(APP_DIR, chemainScan, str(nomDuFichier))
+        self.chemainDossierDeTravail = os.path.join(APP_DIR, chemainScan, str(nomDuFichier))
         self.nomDuFichier = nomDuFichier
         self.formulaireCollection = None
         self.listeDesCaracteristiques = []
@@ -666,16 +666,24 @@ class Fiche:
             f.write(self.affichage())
 
     def setImage(self):
-        chemain=self.chemainScan
-        chemainPNG=chemain+".png"
-        chemainJPG=chemain+".jpg"
-        chemainJPEG=chemain+".jpeg"
+        chemainPNG=self.chemainDossierDeTravail+".png"
+        chemainJPG=self.chemainDossierDeTravail+".jpg"
+        chemainJPEG=self.chemainDossierDeTravail+".jpeg"
+        ScanPNG="Scan/"+self.nomDuFichier+".png"
+        ScanJPG="Scan/"+self.nomDuFichier+".jpg"
+        ScanJPEG="Scan/"+self.nomDuFichier+".jpeg"
         if os.path.exists(chemainPNG):
             image = QtGui.QImage(chemainPNG)
         elif os.path.exists(chemainJPG):
             image = QtGui.QImage(chemainJPG)
         elif os.path.exists(chemainJPEG):
             image = QtGui.QImage(chemainJPEG)
+        elif os.path.exists(ScanPNG):
+            image = QtGui.QImage(ScanPNG)
+        elif os.path.exists(ScanJPG):
+            image = QtGui.QImage(ScanJPG)
+        elif os.path.exists(ScanJPEG):
+            image = QtGui.QImage(ScanJPEG)
         else:
             image= QtGui.QImage(os.path.join(APP_DIR, "Image", "PasDImage.png"))
         scene = QtWidgets.QGraphicsScene()
@@ -829,9 +837,9 @@ class Fiche:
         return Caractéristique in getCaracéristiquesARomanisée()
 
     def _resolveCurrentImagePath(self):
-        candidates = [self.chemainScan]
+        candidates = [self.chemainDossierDeTravail]
         for ext in (".png", ".jpg", ".jpeg", ".bmp", ".tiff"):
-            candidates.append(self.chemainScan + ext)
+            candidates.append(self.chemainDossierDeTravail + ext)
         for candidate in candidates:
             if os.path.exists(candidate):
                 return candidate
