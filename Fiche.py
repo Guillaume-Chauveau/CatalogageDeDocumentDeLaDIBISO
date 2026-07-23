@@ -4,7 +4,6 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6 import QtGui, QtWidgets
 from PySide6 import QtCore
 import os
-import unicodedata
 
 from PySide6 import QtWidgets
 
