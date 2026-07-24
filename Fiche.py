@@ -11,7 +11,7 @@ import Caracteristique as c
 import CaracteristiqueMultiple as cm
 from Parametre import getCodeConnexionAPI, validate_api_key
 from Backend.bridge import process_single_image, process_single_image_consensus
-from app_paths import get_data_dir, get_resource_dir
+from app_paths import get_data_dir, get_resource_dir, get_scan_directories
 
 
 class Fiche:
@@ -100,7 +100,8 @@ class Fiche:
         self.afficherCollection = afficherCollection
         self.chemain = os.path.join(get_data_dir("Doc"), str(nomDuFichier))
         self.chemainOrigine = os.path.join(get_data_dir("LLMOutput"), str(nomDuFichier))
-        self.chemainDossierDeTravail = os.path.join(get_data_dir(chemainScan), str(nomDuFichier))
+        self.scan_directories = get_scan_directories(chemainScan)
+        self.chemainDossierDeTravail = os.path.join(self.scan_directories[-1], str(nomDuFichier))
         self.nomDuFichier = nomDuFichier
         self.formulaireCollection = None
         self.listeDesCaracteristiques = []
@@ -780,28 +781,20 @@ class Fiche:
         with open(chemain,"w", encoding="utf-8") as f:
             f.write(self.affichage())
 
+    def _resolve_image_path(self):
+        for scan_dir in self.scan_directories:
+            for extension in [".png", ".jpg", ".jpeg", ".bmp", ".tiff"]:
+                candidate = os.path.join(scan_dir, self.nomDuFichier + extension)
+                if os.path.exists(candidate):
+                    return candidate
+        return None
+
     def setImage(self):
-        chemainPNG=self.chemainDossierDeTravail+".png"
-        chemainJPG=self.chemainDossierDeTravail+".jpg"
-        chemainJPEG=self.chemainDossierDeTravail+".jpeg"
-        scan_dir = get_data_dir("Scan")
-        ScanPNG = os.path.join(scan_dir, self.nomDuFichier + ".png")
-        ScanJPG = os.path.join(scan_dir, self.nomDuFichier + ".jpg")
-        ScanJPEG = os.path.join(scan_dir, self.nomDuFichier + ".jpeg")
-        if os.path.exists(chemainPNG):
-            image = QtGui.QImage(chemainPNG)
-        elif os.path.exists(chemainJPG):
-            image = QtGui.QImage(chemainJPG)
-        elif os.path.exists(chemainJPEG):
-            image = QtGui.QImage(chemainJPEG)
-        elif os.path.exists(ScanPNG):
-            image = QtGui.QImage(ScanPNG)
-        elif os.path.exists(ScanJPG):
-            image = QtGui.QImage(ScanJPG)
-        elif os.path.exists(ScanJPEG):
-            image = QtGui.QImage(ScanJPEG)
+        image_path = self._resolve_image_path()
+        if image_path is not None:
+            image = QtGui.QImage(image_path)
         else:
-            image= QtGui.QImage(os.path.join(get_resource_dir(), "Image", "PasDImage.png"))
+            image = QtGui.QImage(os.path.join(get_resource_dir(), "Image", "PasDImage.png"))
         scene = QtWidgets.QGraphicsScene()
         image = image.scaled((image.size()/4), QtCore.Qt.IgnoreAspectRatio, QtCore.Qt.SmoothTransformation)
         pixmap = QtGui.QPixmap.fromImage(image)
@@ -953,13 +946,7 @@ class Fiche:
         return Caractéristique in getCaracéristiquesARomanisée()
 
     def _resolveCurrentImagePath(self):
-        candidates = [self.chemainDossierDeTravail]
-        for ext in (".png", ".jpg", ".jpeg", ".bmp", ".tiff"):
-            candidates.append(self.chemainDossierDeTravail + ext)
-        for candidate in candidates:
-            if os.path.exists(candidate):
-                return candidate
-        return None
+        return self._resolve_image_path()
 
     def lectureSelectiveParProba(self, page, champs_a_recalculer=None):
         """
