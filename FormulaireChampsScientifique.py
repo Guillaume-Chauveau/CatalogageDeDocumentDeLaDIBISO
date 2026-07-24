@@ -5,15 +5,10 @@ from pathlib import Path
 from PySide6 import QtWidgets
 from PySide6 import QtGui, QtWidgets
 
-
-def get_app_base_dir():
-    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
-        return Path(sys._MEIPASS)
-    return Path(__file__).resolve().parent
+from app_paths import get_resource_dir
 
 
-APP_BASE_DIR = get_app_base_dir()
-CHAMPS_SCIENTIFIQUES_FILE = APP_BASE_DIR / "champs_scientifiques.txt"
+CHAMPS_SCIENTIFIQUES_FILE = Path(get_resource_dir()) / "champs_scientifiques.txt"
 
 
 class FormulaireChampsScientifique:

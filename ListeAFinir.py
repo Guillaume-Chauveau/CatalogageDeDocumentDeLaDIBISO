@@ -7,31 +7,10 @@ from pathlib import Path
 import shutil
 import os
 
-from Parametre import getCodeConnexionAPI
+from Parametre import getCodeConnexionAPI, validate_api_key
+from app_paths import get_data_dir, get_resource_dir
 
-def get_app_dir():
-    if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-        return os.path.abspath(sys._MEIPASS)
-    return os.path.dirname(os.path.abspath(__file__))
-
-
-def get_data_dir(name: str) -> str:
-    app_dir = get_app_dir()
-    candidate = os.path.join(app_dir, name)
-    if os.path.exists(candidate):
-        return candidate
-
-    if getattr(sys, 'frozen', False):
-        exe_dir = os.path.dirname(sys.executable)
-        fallback = os.path.join(exe_dir, name)
-        os.makedirs(fallback, exist_ok=True)
-        return fallback
-
-    return candidate
-
-
-BASE_DIR = get_app_dir()
-sys.path.insert(0, os.path.dirname(BASE_DIR))
+sys.path.insert(0, get_resource_dir())
 from Backend.bridge import process_single_image, process_single_image_consensus, process_image_batch, process_image_batch_consensus
 
 
@@ -121,10 +100,6 @@ class OcrWorker(QThread):
         except Exception as exc:
             self.failed.emit(str(exc))
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-if hasattr(sys, '_MEIPASS'):
-    BASE_DIR = sys._MEIPASS
 
 class ListeAFinir:
     Fiches = []
@@ -215,7 +190,7 @@ class ListeAFinir:
     def _get_scan_dir(self):
         if os.path.isabs(self.repertoirDesScan):
             return self.repertoirDesScan
-        return os.path.join(os.path.dirname(__file__), self.repertoirDesScan)
+        return get_data_dir(self.repertoirDesScan)
 
     def openFileDialog(self):
         dialog = QFileDialog(self.window)
@@ -254,11 +229,12 @@ class ListeAFinir:
 
     def _lancerTraitement(self, mode="image", filenames=None):
         api_key = getCodeConnexionAPI()
-        if not api_key.strip():
+        ok, message = validate_api_key(api_key)
+        if not ok:
             QtWidgets.QMessageBox.warning(
                 self.window,
                 "Clé API manquante",
-                "Configurez votre clé API dans Paramètres avant d'analyser des documents.",
+                message,
             )
             return
 

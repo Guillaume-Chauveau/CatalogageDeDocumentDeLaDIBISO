@@ -4,13 +4,7 @@ import matplotlib.pyplot as plt
 import sys
 from matplotlib.figure import Figure
 
-def get_app_dir():
-    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
-        return os.path.abspath(sys._MEIPASS)
-    return os.path.dirname(os.path.abspath(__file__))
-
-
-APP_DIR = get_app_dir()
+from app_paths import get_data_dir
 
 
 ## classe pour la réalisation des statistique
@@ -18,9 +12,9 @@ APP_DIR = get_app_dir()
 class Statistique:
 
     def __init__(self):
-        self.Fiches=os.path.join(APP_DIR, "Doc")
-        self.FichesFini= os.path.join(APP_DIR, "Sortie")
-        self.FichesOriginale= os.path.join(APP_DIR, "LLMOutput")
+        self.Fiches=get_data_dir("Doc")
+        self.FichesFini= get_data_dir("Sortie")
+        self.FichesOriginale= get_data_dir("LLMOutput")
         self.totalCaractéristique=0
         self.totalHumain=0
         self.getRatioHumain()
