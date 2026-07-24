@@ -8,7 +8,7 @@ import shutil
 import os
 
 from Parametre import getCodeConnexionAPI, validate_api_key
-from app_paths import get_data_dir, get_resource_dir
+from app_paths import get_data_dir, get_resource_dir, get_scan_directories
 
 sys.path.insert(0, get_resource_dir())
 from Backend.bridge import process_single_image, process_single_image_consensus, process_image_batch, process_image_batch_consensus
@@ -23,6 +23,7 @@ class OcrWorker(QThread):
         super().__init__()
         self.mode = mode
         self.scan_dir = scan_dir
+        self.scan_dirs = [scan_dir] if isinstance(scan_dir, str) else list(scan_dir or [])
         self.filenames = filenames or []
         self.api_key = api_key
         self._is_cancelled = False
@@ -38,19 +39,19 @@ class OcrWorker(QThread):
             if self.mode == "batch":
                 # Implémentation du batch avec progression et annulation
                 from pathlib import Path
-                input_path = Path(self.scan_dir)
                 image_extensions = {".jpg", ".jpeg", ".png", ".bmp", ".tiff"}
                 
-                # Récupérer les dossiers de sortie
-                app_dir = Path(self.scan_dir).parent
-                llm_output_dir = app_dir / "LLMOutput"
-                doc_dir = app_dir / "Doc"
-                
-                # Filtrer les images : ignorer celles déjà traitées
                 image_files = []
-                for f in sorted(input_path.iterdir()):
-                    if f.suffix.lower() in image_extensions:
-                        # Vérifier si le fichier a déjà un résultat
+                for scan_dir in self.scan_dirs:
+                    input_path = Path(scan_dir)
+                    if not input_path.exists():
+                        continue
+                    app_dir = input_path.parent
+                    llm_output_dir = app_dir / "LLMOutput"
+                    doc_dir = app_dir / "Doc"
+                    for f in sorted(input_path.iterdir()):
+                        if f.suffix.lower() not in image_extensions:
+                            continue
                         result_llm = llm_output_dir / f"{f.stem}.txt"
                         result_doc = doc_dir / f"{f.stem}.txt"
                         if not (result_llm.exists() or result_doc.exists()):
@@ -86,7 +87,14 @@ class OcrWorker(QThread):
                         break
                     
                     self.progress.emit(idx, total, filename)
-                    image_path = os.path.join(self.scan_dir, filename)
+                    image_path = None
+                    for scan_dir in self.scan_dirs:
+                        candidate = os.path.join(scan_dir, filename)
+                        if os.path.exists(candidate):
+                            image_path = candidate
+                            break
+                    if image_path is None:
+                        raise FileNotFoundError(f"Image introuvable : {filename}")
                     # Utilise le consensus avec deux modèles vision (Gemma + Qwen) + arbitrage
                     stems.append(process_single_image_consensus(
                         image_path,
@@ -111,6 +119,7 @@ class ListeAFinir:
 
     def __init__(self,w,repertoire):
         self.repertoirDesScan=repertoire
+        self.scan_directories = get_scan_directories(repertoire)
         self.window=w
         self.window.setWindowTitle("Catalogue de documents")
         self._progress_dialog = None
@@ -188,9 +197,14 @@ class ListeAFinir:
                 self.FichesNonFinies.append(i)
     
     def _get_scan_dir(self):
-        if os.path.isabs(self.repertoirDesScan):
-            return self.repertoirDesScan
-        return get_data_dir(self.repertoirDesScan)
+        if self.repertoirDesScan:
+            if os.path.isabs(self.repertoirDesScan):
+                return self.repertoirDesScan
+            return get_data_dir(self.repertoirDesScan)
+        return get_data_dir("Scan")
+
+    def _get_scan_dirs(self):
+        return get_scan_directories(self._get_scan_dir())
 
     def openFileDialog(self):
         dialog = QFileDialog(self.window)
@@ -248,7 +262,7 @@ class ListeAFinir:
 
         self._set_processing_ui(True)
         
-        self._worker = OcrWorker(mode, self._get_scan_dir(), filenames, api_key)
+        self._worker = OcrWorker(mode, self._get_scan_dirs(), filenames, api_key)
         self._worker.finished_ok.connect(self._apresTraitement)
         self._worker.failed.connect(self._enCasErreur)
         self._worker.progress.connect(self._on_progress)
@@ -256,20 +270,21 @@ class ListeAFinir:
         # Calculer le nombre total d'images à traiter
         if mode == "batch":
             from pathlib import Path
-            input_path = Path(self._get_scan_dir())
-            app_dir = input_path.parent
-            llm_output_dir = app_dir / "LLMOutput"
-            doc_dir = app_dir / "Doc"
             image_extensions = {".jpg", ".jpeg", ".png", ".bmp", ".tiff"}
-            
-            # Compter seulement les images non traitées
             total_files = 0
-            for f in input_path.iterdir():
-                if f.suffix.lower() in image_extensions:
-                    result_llm = llm_output_dir / f"{f.stem}.txt"
-                    result_doc = doc_dir / f"{f.stem}.txt"
-                    if not (result_llm.exists() or result_doc.exists()):
-                        total_files += 1
+            for scan_dir in self._get_scan_dirs():
+                input_path = Path(scan_dir)
+                if not input_path.exists():
+                    continue
+                app_dir = input_path.parent
+                llm_output_dir = app_dir / "LLMOutput"
+                doc_dir = app_dir / "Doc"
+                for f in input_path.iterdir():
+                    if f.suffix.lower() in image_extensions:
+                        result_llm = llm_output_dir / f"{f.stem}.txt"
+                        result_doc = doc_dir / f"{f.stem}.txt"
+                        if not (result_llm.exists() or result_doc.exists()):
+                            total_files += 1
         else:
             total_files = len(filenames) if filenames else 1
         
@@ -345,6 +360,7 @@ class ListeAFinir:
     
     def changerDeRepertoireDeScan(self,repertoire):
         self.repertoirDesScan=repertoire
+        self.scan_directories = get_scan_directories(repertoire)
     
     def choisirRepertoireDeScan(self, callback=None):
         dialog = QFileDialog(self.window)
@@ -366,8 +382,9 @@ class ListeAFinir:
         self.window.AfficheDossier.setText(valeur)
 
     def _testImageExiste(self,filename):
-        scan_dir = self._get_scan_dir()
-        for extension in [".png", ".jpg", ".jpeg"]:
-            if os.path.exists(os.path.join(scan_dir, os.path.splitext(filename)[0] + extension)) or os.path.exists(os.path.join("Scan", os.path.splitext(filename)[0] + extension)):
-                return True
+        stem = os.path.splitext(filename)[0]
+        for scan_dir in self._get_scan_dirs():
+            for extension in [".png", ".jpg", ".jpeg"]:
+                if os.path.exists(os.path.join(scan_dir, stem + extension)):
+                    return True
         return False
