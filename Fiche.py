@@ -9,17 +9,9 @@ from PySide6 import QtWidgets
 
 import Caracteristique as c
 import CaracteristiqueMultiple as cm
-from Parametre import getCodeConnexionAPI
+from Parametre import getCodeConnexionAPI, validate_api_key
 from Backend.bridge import process_single_image, process_single_image_consensus
-
-
-def get_app_dir():
-    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
-        return os.path.abspath(sys._MEIPASS)
-    return os.path.dirname(os.path.abspath(__file__))
-
-
-APP_DIR = get_app_dir()
+from app_paths import get_data_dir, get_resource_dir
 
 
 class Fiche:
@@ -106,9 +98,9 @@ class Fiche:
         self.afficherAuteur = afficherAuteur
         self.afficherChamps = afficherChamps
         self.afficherCollection = afficherCollection
-        self.chemain = os.path.join(APP_DIR, "Doc", str(nomDuFichier))
-        self.chemainOrigine = os.path.join(APP_DIR, "LLMOutput", str(nomDuFichier))
-        self.chemainDossierDeTravail = os.path.join(APP_DIR, chemainScan, str(nomDuFichier))
+        self.chemain = os.path.join(get_data_dir("Doc"), str(nomDuFichier))
+        self.chemainOrigine = os.path.join(get_data_dir("LLMOutput"), str(nomDuFichier))
+        self.chemainDossierDeTravail = os.path.join(get_data_dir(chemainScan), str(nomDuFichier))
         self.nomDuFichier = nomDuFichier
         self.formulaireCollection = None
         self.listeDesCaracteristiques = []
@@ -290,9 +282,9 @@ class Fiche:
     def lecture(self,page):
         self._resetFormValues()
         pageL= page+".txt"
-        source_path = os.path.join(APP_DIR, "Doc", pageL)
+        source_path = os.path.join(get_data_dir("Doc"), pageL)
         if not os.path.exists(source_path):
-            source_path = os.path.join(APP_DIR, "LLMOutput", pageL)
+            source_path = os.path.join(get_data_dir("LLMOutput"), pageL)
         with open(source_path, "r", encoding="utf-8") as f:
             for line in f:
                 labelText, fieldText, proba, edit = line.strip().split("$")
@@ -782,7 +774,7 @@ class Fiche:
                     f.write(nouvelle_ligne + "\n")
 
     def exportation(self):
-        chemain=os.path.join(APP_DIR, "Sortie", str(self.nomDuFichier))
+        chemain=os.path.join(get_data_dir("Sortie"), str(self.nomDuFichier))
         chemain+=".txt"
         os.makedirs(os.path.dirname(chemain), exist_ok=True)
         with open(chemain,"w", encoding="utf-8") as f:
@@ -792,9 +784,10 @@ class Fiche:
         chemainPNG=self.chemainDossierDeTravail+".png"
         chemainJPG=self.chemainDossierDeTravail+".jpg"
         chemainJPEG=self.chemainDossierDeTravail+".jpeg"
-        ScanPNG="Scan/"+self.nomDuFichier+".png"
-        ScanJPG="Scan/"+self.nomDuFichier+".jpg"
-        ScanJPEG="Scan/"+self.nomDuFichier+".jpeg"
+        scan_dir = get_data_dir("Scan")
+        ScanPNG = os.path.join(scan_dir, self.nomDuFichier + ".png")
+        ScanJPG = os.path.join(scan_dir, self.nomDuFichier + ".jpg")
+        ScanJPEG = os.path.join(scan_dir, self.nomDuFichier + ".jpeg")
         if os.path.exists(chemainPNG):
             image = QtGui.QImage(chemainPNG)
         elif os.path.exists(chemainJPG):
@@ -808,7 +801,7 @@ class Fiche:
         elif os.path.exists(ScanJPEG):
             image = QtGui.QImage(ScanJPEG)
         else:
-            image= QtGui.QImage(os.path.join(APP_DIR, "Image", "PasDImage.png"))
+            image= QtGui.QImage(os.path.join(get_resource_dir(), "Image", "PasDImage.png"))
         scene = QtWidgets.QGraphicsScene()
         image = image.scaled((image.size()/4), QtCore.Qt.IgnoreAspectRatio, QtCore.Qt.SmoothTransformation)
         pixmap = QtGui.QPixmap.fromImage(image)
@@ -981,9 +974,9 @@ class Fiche:
             old_probas[char.nom if hasattr(char, 'nom') else self.listeDesNomDeCaracteristiques[char.id]] = char.getProba()
         
         pageL = page + ".txt"
-        source_path = os.path.join(APP_DIR, "Doc", pageL)
+        source_path = os.path.join(get_data_dir("Doc"), pageL)
         if not os.path.exists(source_path):
-            source_path = os.path.join(APP_DIR, "LLMOutput", pageL)
+            source_path = os.path.join(get_data_dir("LLMOutput"), pageL)
         
         with open(source_path, "r", encoding="utf-8") as f:
             for line in f:
@@ -1029,12 +1022,13 @@ class Fiche:
         f.close()
     
     def Regenerer(self):
-        api_key = (getCodeConnexionAPI() or "").strip()
-        if not api_key:
+        api_key = getCodeConnexionAPI()
+        ok, message = validate_api_key(api_key)
+        if not ok:
             QtWidgets.QMessageBox.critical(
                 self.window,
                 "Clé API manquante",
-                "Veuillez renseigner la clé API dans Paramètres avant de régénérer cette fiche.",
+                message,
             )
             return
 

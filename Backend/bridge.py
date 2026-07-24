@@ -19,7 +19,10 @@ from convert_json_to_txt4 import build_lines
 from consensus_pipeline import merge_results, enrich_consensus
 from openai import OpenAI
 
-APP_ROOT = _BACKEND_DIR.parent
+from app_paths import get_exe_dir
+
+
+APP_ROOT = Path(get_exe_dir())
 JSON_OUTPUT_DIR = APP_ROOT / "outputs" / "aristote_results"
 CONSENSUS_OUTPUT_DIR = APP_ROOT / "outputs" / "consensus_results"
 LLM_OUTPUT_DIR = APP_ROOT / "LLMOutput"

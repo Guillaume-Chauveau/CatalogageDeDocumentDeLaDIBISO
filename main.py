@@ -1,5 +1,16 @@
 import sys
 import os
+
+# PyInstaller: le bundle n'inclut pas toujours le magasin CA SSL utilisé par httpx/openai.
+if getattr(sys, "frozen", False):
+    try:
+        import certifi
+
+        os.environ.setdefault("SSL_CERT_FILE", certifi.where())
+        os.environ.setdefault("REQUESTS_CA_BUNDLE", certifi.where())
+    except ImportError:
+        pass
+
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtWidgets import QFileDialog,QMessageBox
 from PySide6.QtUiTools import QUiLoader
@@ -14,13 +25,10 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 
 
-def get_base_dir():
-    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
-        return sys._MEIPASS
-    return os.path.dirname(os.path.abspath(__file__))
+from app_paths import get_resource_dir
 
 
-BASE_DIR = get_base_dir()
+BASE_DIR = get_resource_dir()
 loader = QUiLoader()
 
 
@@ -118,8 +126,12 @@ def afficherLesParametres():
     parametre = loader.load(parametrePath, None)
 
     currentParametre = p.Parametre(parametre)
-    currentParametre.window.Valider.clicked.connect(lambda: currentParametre.retour())
-    currentParametre.window.Valider.clicked.connect(lambda: currentParametre.window.close())
+
+    def _valider_parametres():
+        if currentParametre.retour():
+            currentParametre.window.close()
+
+    currentParametre.window.Valider.clicked.connect(_valider_parametres)
     currentParametre.window.Annuler.clicked.connect(lambda: currentParametre.window.close())
 
     activerRedimensionnementDynamique(currentParametre)
@@ -348,7 +360,13 @@ def afficherLeCatalogue(w=None, repertoire="Scan"):
 
     currentCatalogue = Catalogue.ListeAFinir(catalogue, repertoire)
     currentCatalogue.window.Reactualiser.clicked.connect(lambda: afficherLeCatalogue(currentCatalogue.window, repertoire))
-    currentCatalogue.window.listWidget.currentItemChanged.connect(lambda: afficherUnFormulaire(currentCatalogue.window, currentCatalogue.window.listWidget.currentItem().text()))
+    def _ouvrir_fiche_selectionnee():
+        item = currentCatalogue.window.listWidget.currentItem()
+        if item is None:
+            return
+        afficherUnFormulaire(currentCatalogue.window, item.text())
+
+    currentCatalogue.window.listWidget.currentItemChanged.connect(lambda _cur, _prev: _ouvrir_fiche_selectionnee())
     currentCatalogue.window.VoirFini.checkStateChanged.connect(lambda: currentCatalogue.creerCatalogue())
     currentCatalogue.window.Parametre.clicked.connect(lambda: afficherLesParametres())
     currentCatalogue.window.AjouterUnFichier.clicked.connect(lambda: currentCatalogue.openFileDialog())
@@ -436,4 +454,7 @@ def afficherLesStatistiques():
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     afficherLeCatalogue()
+    if not p.has_api_key():
+        p.avertir_si_clef_api_manquante()
+        afficherLesParametres()
     app.exec()
