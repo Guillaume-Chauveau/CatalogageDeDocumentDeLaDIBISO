@@ -25,11 +25,12 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 
 
-from app_paths import get_resource_dir
+from app_paths import get_resource_dir, add_scan_directory, bootstrap_scan_directories
 
 
 BASE_DIR = get_resource_dir()
 loader = QUiLoader()
+bootstrap_scan_directories()
 
 
 def enregistrerUnimarc(fenetre, obtenir_texte):
@@ -101,6 +102,8 @@ chemainScan = "Scan"
 def mettreAJourChemainScan(repertoire):
     global chemainRepetoireDeTravail
     chemainRepetoireDeTravail = repertoire
+    if repertoire:
+        add_scan_directory(repertoire)
 
 def afficherUnFormulaire(w, page):
     global currentFiche, chemainRepetoireDeTravail

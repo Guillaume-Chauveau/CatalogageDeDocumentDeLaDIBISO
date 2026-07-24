@@ -12,3 +12,5 @@ Backend/__pycache__
 Doc/briefe_von_justus_liebig.txt
 champs_scientifiques.txt
 .clef.txt
+tests/*
+scan_directories_v1.json
