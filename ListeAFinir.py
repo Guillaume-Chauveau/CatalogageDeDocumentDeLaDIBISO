@@ -8,7 +8,7 @@ import shutil
 import os
 
 from Parametre import getCodeConnexionAPI, validate_api_key
-from app_paths import get_data_dir, get_resource_dir, get_scan_directories
+from app_paths import get_data_dir, get_resource_dir, get_scan_directories, add_scan_directory
 
 sys.path.insert(0, get_resource_dir())
 from Backend.bridge import process_single_image, process_single_image_consensus, process_image_batch, process_image_batch_consensus
@@ -197,14 +197,10 @@ class ListeAFinir:
                 self.FichesNonFinies.append(i)
     
     def _get_scan_dir(self):
-        if self.repertoirDesScan:
-            if os.path.isabs(self.repertoirDesScan):
-                return self.repertoirDesScan
-            return get_data_dir(self.repertoirDesScan)
         return get_data_dir("Scan")
 
     def _get_scan_dirs(self):
-        return get_scan_directories(self._get_scan_dir())
+        return get_scan_directories(self.repertoirDesScan)
 
     def openFileDialog(self):
         dialog = QFileDialog(self.window)
@@ -261,6 +257,7 @@ class ListeAFinir:
             return
 
         self._set_processing_ui(True)
+        self.window.setCursor(QtGui.QCursor(Qt.CursorShape.WaitCursor))
         
         self._worker = OcrWorker(mode, self._get_scan_dirs(), filenames, api_key)
         self._worker.finished_ok.connect(self._apresTraitement)
@@ -306,6 +303,19 @@ class ListeAFinir:
             if widget is not None:
                 widget.setEnabled(not active)
 
+        if hasattr(self.window, "setEnabled"):
+            self.window.setEnabled(not active)
+
+        if hasattr(self.window, "listWidget"):
+            list_widget = self.window.listWidget
+            if hasattr(list_widget, "setEnabled"):
+                list_widget.setEnabled(not active)
+            elif hasattr(list_widget, "setDisabled"):
+                if active:
+                    list_widget.setDisabled(True)
+                else:
+                    list_widget.setDisabled(False)
+
     def _on_progress(self, current, total, filename):
         """Met à jour la barre de progression lors du traitement de chaque image."""
         if self._progress_dialog:
@@ -331,6 +341,7 @@ class ListeAFinir:
             self._progress_dialog = None
         self._worker = None
         self._set_processing_ui(False)
+        self.window.setCursor(QtGui.QCursor(Qt.CursorShape.ArrowCursor))
         self.ajouterFicheAuto()
         self.ajouterFicheNonFinie()
         self.creerCatalogue()
@@ -356,10 +367,12 @@ class ListeAFinir:
             self._progress_dialog = None
         self._worker = None
         self._set_processing_ui(False)
+        self.window.setCursor(QtGui.QCursor(Qt.CursorShape.ArrowCursor))
         QtWidgets.QMessageBox.critical(self.window, "Erreur d'analyse", message)
     
     def changerDeRepertoireDeScan(self,repertoire):
         self.repertoirDesScan=repertoire
+        add_scan_directory(repertoire)
         self.scan_directories = get_scan_directories(repertoire)
     
     def choisirRepertoireDeScan(self, callback=None):
