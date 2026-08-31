@@ -1,3 +1,4 @@
+import re
 import sys
 from PySide6 import QtWidgets
 from PySide6.QtUiTools import QUiLoader
@@ -368,7 +369,42 @@ class Fiche:
                     role_target.valeur.append("730")
                 if labelText == "Langue":
                     self.langue = fieldText
-        f.close()                         
+        f.close()
+        self._appliquerSeparationArticleTitre()
+
+    def _appliquerSeparationArticleTitre(self):
+        """
+        Si le champ Article est vide et que le Titre commence par un article
+        ("A dictionnary...", "Le voyage...", etc.), sépare l'article du reste
+        du titre et met à jour à la fois le modèle et les champs affichés
+        à l'écran (le split fait dans affichage() ne mettait à jour que le
+        modèle, pas les QLineEdit visibles, donc rien ne changeait à l'écran).
+        """
+        articleChar = self.getCaracteristiqueParNom("Article")
+        titreChar = self.getCaracteristiqueParNom("Titre")
+        if articleChar is None or titreChar is None:
+            return
+        if articleChar.getValeur() != "" or titreChar.getValeur() == "":
+            return
+
+        article_detecte, titre_sans_article = self._split_article_debut_titre(titreChar.getValeur())
+        if not article_detecte:
+            return
+
+        articleChar.setValeur(article_detecte)
+        titreChar.setValeur(titre_sans_article)
+
+        articleItem = self.window.gridLayout.itemAtPosition(articleChar.id, 2)
+        if articleItem is not None:
+            widget = articleItem.widget()
+            if isinstance(widget, QtWidgets.QLineEdit):
+                widget.setText(articleChar.getValeur())
+
+        titreItem = self.window.gridLayout.itemAtPosition(titreChar.id, 2)
+        if titreItem is not None:
+            widget = titreItem.widget()
+            if isinstance(widget, QtWidgets.QLineEdit):
+                widget.setText(titreChar.getValeur())
 
     def changeColor(self,bar):
         value = bar.value()
@@ -416,7 +452,19 @@ class Fiche:
         article = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier("Article"))
         titreR = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Titre")))
         titre = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier("Titre"))
-       
+
+        if article == "" and titre != "":
+            article_detecte, titre_sans_article = self._split_article_debut_titre(titre)
+            if article_detecte:
+                article = article_detecte
+                titre = titre_sans_article
+                articleChar = self.getCaracteristiqueParNom("Article")
+                titreChar = self.getCaracteristiqueParNom("Titre")
+                if articleChar is not None:
+                    articleChar.setValeur(article)
+                if titreChar is not None:
+                    titreChar.setValeur(titre)
+            
         auteurR = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Auteur")))
         auteur = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier("Auteur"))
         complementTitreR = self._majusculeEnDebutDeCaracteristique(self.getValeursDUneCaracteristiqueDansLeFichier(self._caractéristiqueARomanisée("Complement du titre")))
@@ -504,6 +552,10 @@ class Fiche:
 
         if collection or section:
             text += self._champs225(collection, section)
+            if collection:
+                text += f"410 ##$t@{self._normaliser_casse(collection)}\n"
+        if reference and reference != collection:
+            text += f"410 ##$t@{self._normaliser_casse(reference)}\n"
         if reference:
             text += f"410 ##$t@{reference}\n"
         if indexationRameau is not None and indexationRameau.getValeur() !="":
@@ -622,6 +674,37 @@ class Fiche:
                 resultats.append(text)
         return "\n".join(resultats)+"\n"
     
+    def _normaliser_casse(self, text):
+        if text is None:
+            return ""
+        if isinstance(text, (list, tuple)):
+            return [self._normaliser_casse(v) for v in text]
+        text = str(text).strip()
+        if not text:
+            return ""
+        lettres = [c for c in text if c.isalpha()]
+        if lettres and all(c.isupper() for c in lettres):
+            text = text.lower()
+        return text[0].upper() + text[1:]
+
+    def _split_article_debut_titre(self, titre):
+        if titre is None:
+            return "", ""
+        titre = str(titre).strip()
+        if not titre:
+            return "", ""
+
+        motif = r"^(L['’]|Les|Le|La|The|Une|Un|Della|Delle|Dell|Degli|Dei|Des|Der|Die|Das|Einer|Einem|Einen|Eine|Ein|Del|Du|De|Los|Las|El|Gli|Lo|Il|All|Al|A|An|I)\b\s*"
+        match = re.match(motif, titre, flags=re.IGNORECASE)
+        if not match:
+            return "", self._normaliser_casse(titre)
+
+        article = self._normaliser_casse(match.group(0).strip())
+        reste = titre[match.end():].strip()
+        if not reste:
+            return article, ""
+        return article, self._normaliser_casse(reste)
+
     def _champs225(self, collection, section):
         collection_morceaux, section_morceaux = self._decouperMorceaux(collection, section)
         resultats = []
@@ -629,9 +712,9 @@ class Fiche:
         for i in range(max_len):
             text = "225 2#"
             if i < len(collection_morceaux) and collection_morceaux[i] != "":
-                text += f"$a@{collection_morceaux[i]}"
+                text += f"$a@{self._normaliser_casse(collection_morceaux[i])}"
             if i < len(section_morceaux) and section_morceaux[i] != "":
-                text += f"$i{section_morceaux[i]}"
+                text += f"$i{self._normaliser_casse(section_morceaux[i])}"
             if text != "225 2#":
                 resultats.append(text)
         return "\n".join(resultats)+"\n"
@@ -665,6 +748,20 @@ class Fiche:
             co_auteur_val = co_auteur_morceaux[i] if i < len(co_auteur_morceaux) else ""
             auteur_secondaire_val = auteur_secondaire_morceaux[i] if i < len(auteur_secondaire_morceaux) else ""
 
+            article_extrait, titre_sans_article = self._split_article_debut_titre(titre_val)
+            if article_val == "" and article_extrait:
+                article_val = article_extrait
+            if titre_sans_article:
+                titre_val = titre_sans_article
+
+            article_val = self._normaliser_casse(article_val)
+            titre_val = self._normaliser_casse(titre_val)
+            auteur_val = self._normaliser_casse(auteur_val)
+            complement_val = self._normaliser_casse(complement_val)
+            numero_volume_val = self._normaliser_casse(numero_volume_val)
+            co_auteur_val = self._normaliser_casse(co_auteur_val)
+            auteur_secondaire_val = self._normaliser_casse(auteur_secondaire_val)
+
             text = "200 "
             if article_val != "":
                 text += ("0#$a" + str(article_val) + " @" + str(titre_val))
@@ -674,10 +771,12 @@ class Fiche:
                 text += ("$e" + str(complement_val))
             if auteur_val != "":
                 text += ("$f" + str(auteur_val))
-                if co_auteur_val != "":
-                    text += ("," + str(co_auteur_val))
-                if auteur_secondaire_val != "":
-                    text += ("," + str(auteur_secondaire_val))
+                for cv in co_auteur_morceaux:
+                    if cv:
+                        text += ("$g" + str(self._normaliser_casse(cv)))
+                for sv in auteur_secondaire_morceaux:
+                    if sv:
+                        text += ("$g" + str(self._normaliser_casse(sv)))
             if numero_volume_val != "":
                 text += ("$h" + str(numero_volume_val))
             if text != "200 ":
@@ -686,14 +785,20 @@ class Fiche:
     
 
     def _majusculeEnDebutDeCaracteristique(self, text):
+        if text is None:
+            return ""
         if isinstance(text, list):
-            for i in range(len(text)):
-                if text[i]:
-                    text[i] = text[i][0].upper() + text[i][1:].lower()
-        else:
-            if text:
-                text = text[0].upper() + text[1:].lower()
-        return text
+            return [self._majusculeEnDebutDeCaracteristique(v) for v in text]
+        if isinstance(text, tuple):
+            return tuple(self._majusculeEnDebutDeCaracteristique(v) for v in text)
+        text = str(text).strip()
+        if not text:
+            return ""
+        lettres = [c for c in text if c.isalpha()]
+        if lettres and all(c.isupper() for c in lettres):
+            text = text.lower()
+        return text[0].upper() + text[1:]
+
 
     def _retirerLeDernierPointVigule(self,text):
         while text.endswith("\n") or text.endswith(" "):

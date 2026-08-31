@@ -39,4 +39,14 @@ class CaracteristiqueMultiple(Caracteristique):
         return texte
     
     def formatage(self,text):
-        return text[0].upper()+text[1:].lower()
+        if text is None:
+            return ""
+        if isinstance(text, (list, tuple)):
+            return [self._normaliser_casse(v) for v in text]
+        text = str(text).strip()
+        if not text:
+            return ""
+        lettres = [c for c in text if c.isalpha()]
+        if lettres and all(c.isupper() for c in lettres):
+            text = text.lower()
+        return text[0].upper() + text[1:]

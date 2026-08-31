@@ -1,16 +1,57 @@
-/__pycache__
+# Python cache and bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.pyre/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Project generated data / runtime outputs
 Doc/
 Scan/
 LLMOutput/
 Sortie/
+outputs/
 build/
 dist/
-.venv/
-tests/__pycache__
-outputs/
-Backend/__pycache__
-Doc/briefe_von_justus_liebig.txt
-champs_scientifiques.txt
+*.egg-info/
+
+# Local config and working files
 .clef.txt
-tests/*
+champs_scientifiques.txt
 scan_directories_v1.json
+*_v1.json
+*.log
+*.tmp
+*.bak
+
+# IDE / editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# PyInstaller / Qt / packaging
+*.spec.user
+*.rcc
+*.qm
+*.ui.autosave
+*.pro.user
+*.user
+
+# Git / generated repo files
+_*
+.gitkeep
+
+# Test artifacts
+/tests/__pycache__/
+.pytest_cache/*
+
+Biblinum-v1.2.0.zip
