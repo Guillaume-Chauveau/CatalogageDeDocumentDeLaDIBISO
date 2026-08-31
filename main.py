@@ -1,6 +1,19 @@
 import sys
 import os
+import traceback  # en haut du fichier, avec les autres imports
 
+def _lancerStatistiquesAvecDiagnostic():
+    try:
+        print("clic reçu1")
+        afficherLesStatistiques()
+        print("clic reçu")
+    except Exception as exc:
+        traceback.print_exc()
+        QMessageBox.critical(
+            currentCatalogue.window,
+            "Erreur Statistiques",
+            f"{type(exc).__name__}: {exc}",
+        )
 # PyInstaller: le bundle n'inclut pas toujours le magasin CA SSL utilisé par httpx/openai.
 if getattr(sys, "frozen", False):
     try:
@@ -53,6 +66,23 @@ class WindowManager:
     def __init__(self):
         self._windows = {}
 
+    @staticmethod
+    def _cible(obj):
+        """obj peut être soit la fenêtre Qt elle-même, soit un wrapper
+        (ex. currentCatalogue) exposant la fenêtre via .window.
+        ATTENTION: tout QWidget possède nativement une méthode .window()
+        (héritée de Qt) qui renvoie le widget de plus haut niveau. Donc
+        getattr(obj, "window", obj) sur un QMainWindow "nu" (ex. la fenêtre
+        Statistiques, chargée directement par loader.load) retombe sur cette
+        méthode bound au lieu du obj par défaut -> hasattr(target, "show")
+        est alors False et .show() n'est jamais appelé, silencieusement.
+        On ne suit .window que si c'est vraiment un widget Qt (le cas des
+        wrappers comme currentCatalogue.window), jamais une méthode."""
+        interieur = getattr(obj, "window", None)
+        if isinstance(interieur, QtWidgets.QWidget):
+            return interieur
+        return obj
+
     def register(self, name, obj):
         self._windows[name] = obj
         return obj
@@ -65,7 +95,7 @@ class WindowManager:
         if obj is None:
             return None
 
-        target = getattr(obj, "window", obj)
+        target = self._cible(obj)
         if hasattr(target, "close"):
             try:
                 target.close()
@@ -80,7 +110,7 @@ class WindowManager:
         self.close(name)
         self._windows[name] = obj
 
-        target = getattr(obj, "window", obj)
+        target = self._cible(obj)
         if hasattr(target, "setAttribute"):
             target.setAttribute(QtCore.Qt.WA_DeleteOnClose, False)
         if hasattr(target, "show"):
@@ -373,8 +403,9 @@ def afficherLeCatalogue(w=None, repertoire="Scan"):
     currentCatalogue.window.VoirFini.checkStateChanged.connect(lambda: currentCatalogue.creerCatalogue())
     currentCatalogue.window.Parametre.clicked.connect(lambda: afficherLesParametres())
     currentCatalogue.window.AjouterUnFichier.clicked.connect(lambda: currentCatalogue.openFileDialog())
-    currentCatalogue.window.Statistique.hide()
-    #currentCatalogue.window.Statistique.clicked.connect(lambda: afficherLesStatistiques())
+    currentCatalogue.window.Statistique.show()
+    currentCatalogue.window.Statistique.setEnabled(True)
+    currentCatalogue.window.Statistique.clicked.connect(lambda: _lancerStatistiquesAvecDiagnostic())
     currentCatalogue.window.ChoisirUnNouveauDossierDeBase.clicked.connect(lambda: currentCatalogue.choisirRepertoireDeScan(mettreAJourChemainScan))
 
     activerRedimensionnementDynamique(currentCatalogue)
@@ -409,49 +440,105 @@ def afficherLesStatistiques():
     global currentStatistiques
     statistiquesPath = os.path.join(BASE_DIR, "UI", "Statistiques.ui")
     statistiques = loader.load(statistiquesPath, None)
-
     statistiques.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-
     statistiques.Retour.clicked.connect(lambda: statistiques.close())
     statistiques.Retour.clicked.connect(lambda: afficherLeCatalogue(currentCatalogue.window, currentCatalogue.repertoirDesScan))
 
+    # Une seule instance -> une seule passe de cache pour toute la fenêtre
+    stat = s.Statistique()
+
     centralWidget = QtWidgets.QWidget()
+    layoutPrincipal = QtWidgets.QVBoxLayout(centralWidget)
+    layoutPrincipal.setContentsMargins(10, 10, 10, 40)
+    layoutPrincipal.setSpacing(15)
+
+    scrollArea = QtWidgets.QScrollArea()
+    scrollArea.setWidgetResizable(True)
+    scrollArea.setWidget(centralWidget)
+    statistiques.setCentralWidget(scrollArea)
+
     gridL = QtWidgets.QGridLayout()
-    centralWidget.setLayout(gridL)
-    statistiques.setCentralWidget(centralWidget)
-    gridL.setContentsMargins(5, 5, 64, 64)
+    layoutPrincipal.addLayout(gridL)
     gridL.setSpacing(10)
-    gridL.setColumnStretch(0, 1)
-    gridL.setColumnStretch(1, 1)
-    gridL.setRowStretch(0, 1)
-    gridL.setRowStretch(1, 1)
+    for col in (0, 1):
+        gridL.setColumnStretch(col, 1)
+    for row in (0, 1):
+        gridL.setRowStretch(row, 1)
 
-    #activerRedimensionnementDynamique(formulaireChampsScientifiqueWindow)
-    #window_manager.show("formulaire_champs", formulaireChampsScientifiqueWindow)
-
-    def _ajouterCanvas(figure):
+    def _ajouterCanvas(figure, hauteur_min=280):
         canvas = FigureCanvas(figure)
         canvas.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        canvas.setMinimumSize(300, 280)
+        canvas.setMinimumSize(300, hauteur_min)
+        canvas.draw()
         return canvas
 
-    canvasRatioRéalisationHumaine = _ajouterCanvas(s.Statistique().desinnerRatioHumain())
-    canvasPourcentageFait = _ajouterCanvas(s.Statistique().desinnerPourcentageFait())
-    canvasNombreErreursParCatacteristique = _ajouterCanvas(s.Statistique().dessinerNombreDErreurParCaracteristique())
-    canvasNombreErreursParFichier = _ajouterCanvas(s.Statistique().dessinerNombreDeCaracteristiqueCorrigeParFichier())
+    gridL.addWidget(_ajouterCanvas(stat.dessinerRepartitionLangues()), 0, 0)
+    gridL.addWidget(_ajouterCanvas(stat.dessinerRepartitionAnnees()), 0, 1)
+    gridL.addWidget(_ajouterCanvas(stat.dessinerConfianceMoyenneParChamp()), 1, 0)
+    gridL.addWidget(_ajouterCanvas(stat.dessinerPourcentageFait()), 1, 1)
 
-    gridL.addWidget(canvasRatioRéalisationHumaine, 0, 0, 1, 1)
-    gridL.addWidget(canvasPourcentageFait, 0, 1, 1, 1)
-    gridL.addWidget(canvasNombreErreursParCatacteristique, 1, 0, 1, 1)
-    gridL.addWidget(canvasNombreErreursParFichier, 1, 1, 1, 1)
+    # -- graphique personnalisable --------------------------------------
+    barreControles = QtWidgets.QHBoxLayout()
+    comboX = QtWidgets.QComboBox()
+    comboX.addItems(stat.champsDisponibles())
+    comboY = QtWidgets.QComboBox()
+    comboY.addItems(stat.metriquesDisponibles())
+    boutonTracer = QtWidgets.QPushButton("Tracer")
+    boutonRafraichir = QtWidgets.QPushButton("Rafraîchir les données")
 
-    for canvas in (canvasRatioRéalisationHumaine, canvasPourcentageFait, canvasNombreErreursParCatacteristique, canvasNombreErreursParFichier):
-        canvas.draw()
+    barreControles.addWidget(QtWidgets.QLabel("Axe X :"))
+    barreControles.addWidget(comboX)
+    barreControles.addWidget(QtWidgets.QLabel("Axe Y :"))
+    barreControles.addWidget(comboY)
+    barreControles.addWidget(boutonTracer)
+    barreControles.addWidget(boutonRafraichir)
+    layoutPrincipal.addLayout(barreControles)
 
-    statistiques.resize(1500, 950)
+    conteneurCustom = QtWidgets.QVBoxLayout()
+    layoutPrincipal.addLayout(conteneurCustom)
+
+    def _tracerPersonnalise():
+        while conteneurCustom.count():
+            item = conteneurCustom.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+        # Labels en X pivotés à 60° + potentiellement longs -> plus de hauteur
+        # que les mini-graphiques du dashboard, sinon le texte est coupé.
+        canvas = _ajouterCanvas(
+            stat.dessinerGraphiquePersonnalise(comboX.currentText(), comboY.currentText()),
+            hauteur_min=460,
+        )
+        conteneurCustom.addWidget(canvas)
+        # Le contenu vient de changer de taille : on force le recalcul de la
+        # zone défilable tout de suite, sinon le QScrollArea garde parfois
+        # l'ancienne étendue jusqu'au prochain redimensionnement manuel.
+        centralWidget.adjustSize()
+        centralWidget.updateGeometry()
+        scrollArea.updateGeometry()
+
+    boutonTracer.clicked.connect(_tracerPersonnalise)
+    boutonRafraichir.clicked.connect(lambda: (stat.rafraichir(), _tracerPersonnalise()))
+    _tracerPersonnalise()
+
+    # Taille fixe 1500x1200 = si l'écran (zone utile, hors barre des tâches)
+    # est plus petit, le bas de la fenêtre -et donc le bas du scroll- est
+    # hors écran et aucun défilement interne ne peut compenser. On plafonne
+    # donc à la zone réellement disponible.
+    ecran = QtWidgets.QApplication.primaryScreen()
+    largeur_voulue, hauteur_voulue = 1500, 1200
+    if ecran is not None:
+        disponible = ecran.availableGeometry()
+        largeur_voulue = min(largeur_voulue, disponible.width() - 40)
+        hauteur_voulue = min(hauteur_voulue, disponible.height() - 40)
+        statistiques.resize(largeur_voulue, hauteur_voulue)
+        # S'assure que la fenêtre est bien positionnée dans la zone visible
+        # (au cas où une position hors écran aurait été héritée).
+        statistiques.move(disponible.topLeft())
+    else:
+        statistiques.resize(largeur_voulue, hauteur_voulue)
+
     currentStatistiques = statistiques
     window_manager.show("statistiques", statistiques)
-
     
 
 if __name__ == "__main__":
