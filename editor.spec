@@ -59,7 +59,7 @@ exe = EXE(pyz,
           a.scripts,
           [],
           exclude_binaries=True,
-          name='retro_catalogage',
+          name='Biblinum',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
@@ -70,7 +70,7 @@ exe = EXE(pyz,
             target_arch=None,
             codesign_identity=None,
             entitlements_file=None,
-            icon=None,)
+            icon='icon.ico',)
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
@@ -78,4 +78,4 @@ coll = COLLECT(exe,
                strip=False,
                upx=True,
                upx_exclude=[],
-               name='retro_catalogage')
+               name='Biblinum')

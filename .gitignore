@@ -54,4 +54,5 @@ _*
 /tests/__pycache__/
 .pytest_cache/*
 
-Biblinum-v1.2.0.zip
+Biblinum-v*
+editor_old.spec
