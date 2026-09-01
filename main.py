@@ -310,15 +310,22 @@ def afficherRenduFormulaire(fiche=None):
                 return ""
 
     def _fermer_rendu_et_executer(action):
-        try:
-            window_manager.close("rendu")
-            QtWidgets.QApplication.processEvents()
-        except Exception as exc:
-            print(f"[Rendu] Erreur lors de la fermeture de la fenêtre de rendu: {exc}")
-        try:
-            action()
-        except Exception as exc:
-            print(f"[Rendu] Erreur lors de l'exécution de l'action: {exc}")
+        # IMPORTANT: on est ici à l'intérieur du gestionnaire de clic d'un
+        # bouton qui appartient lui-même à `rendu`. Fermer `rendu` de façon
+        # synchrone puis pomper les évènements (processEvents) pendant que
+        # Qt traite encore ce clic est réentrant et peut crasher. On diffère
+        # donc tout au prochain passage de la boucle d'évènements.
+        def _differe():
+            try:
+                window_manager.close("rendu")
+            except Exception as exc:
+                print(f"[Rendu] Erreur lors de la fermeture de la fenêtre de rendu: {exc}")
+            try:
+                action()
+            except Exception as exc:
+                print(f"[Rendu] Erreur lors de l'exécution de l'action: {exc}")
+
+        QtCore.QTimer.singleShot(0, _differe)
 
     try:
         rendu_text = fiche.affichage() if fiche is not None and hasattr(fiche, "affichage") else ""
@@ -543,6 +550,9 @@ def afficherLesStatistiques():
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
+    icone_app = os.path.join(BASE_DIR, "icon.ico")
+    if os.path.exists(icone_app):
+        app.setWindowIcon(QtGui.QIcon(icone_app))
     afficherLeCatalogue()
     if not p.has_api_key():
         p.avertir_si_clef_api_manquante()

@@ -20,6 +20,7 @@ base_datas = [
    ('Image', 'Image'),
    ('LLMOutput', 'LLMOutput'),
    ('champs_scientifiques.txt', '.'),
+   ('icon.ico', '.'),
 ]
 
 hidden_imports = [
