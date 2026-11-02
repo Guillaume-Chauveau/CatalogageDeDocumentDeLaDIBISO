@@ -533,7 +533,7 @@ class Fiche:
             text +=self._champs200(articleR, titreR, auteurR, complementTitreR, numeroVolume, coAuteur, auteurSecondaire)
 
         if mentionEdition != "":
-            text += "205 ##" + mentionEdition + "\n"
+            text += "205 ##$a" + mentionEdition + "\n"
         if mentionEditionR != "" and mentionEditionR != mentionEdition:
             text += "205 ##" + mentionEditionR + "\n"
 
