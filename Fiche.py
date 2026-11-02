@@ -655,24 +655,42 @@ class Fiche:
         return "\n".join(resultats)+"\n"
 
     def _champs700(self, premierAuteur, fonctionAuteur):
+		PREFIXES_NOM = {"le", "la", "les", "the", "mc", "de", "des"}
         premierAuteurMorceaux, fonctionMorceaux = self._decouperMorceaux(premierAuteur, fonctionAuteur)
         resultats = []
         max_len = max([len(premierAuteurMorceaux), len(fonctionMorceaux), 0])
         for i in range(max_len):
             text = "700 "
-            if i < len(premierAuteurMorceaux) :
-                if premierAuteurMorceaux[i]!="":
-                    nomPremierAuteurMorceaux= premierAuteurMorceaux[i].split(" ")
-                    text += ("#1$a" + str(self._majusculeEnDebutDeCaracteristique(nomPremierAuteurMorceaux[0])))
-                    text += ("$b" + " ".join(self._majusculeEnDebutDeCaracteristique(nomPremierAuteurMorceaux[1:])))
-            if i < len(fonctionMorceaux): 
-                if fonctionMorceaux[i]!="":
-                    text += ("$4" + str(fonctionMorceaux[i]))
-            else:
-                text += ("$4070")
-            if text != "700 ":
-                resultats.append(text)
-        return "\n".join(resultats)+"\n"
+            if i < len(premierAuteurMorceaux) and premierAuteurMorceaux[i] != "":
+            	mots = premierAuteurMorceaux[i].split()
+
+	            if not mots:
+	                partie_a = ""
+	                partie_b = ""
+	            else:
+	                premier = mots[0].casefold()
+	
+	                if premier in PREFIXES_NOM and len(mots) > 1:
+	                    partie_a = " ".join(mots[:2])
+	                    partie_b = " ".join(mots[2:])
+	                else:
+	                    partie_a = mots[0]
+	                    partie_b = " ".join(mots[1:])
+	
+	            text += "#1$a" + str(self._majusculeEnDebutDeCaracteristique(partie_a))
+	
+	            if partie_b:
+	                text += "$b" + str(self._majusculeEnDebutDeCaracteristique(partie_b))
+
+        if i < len(fonctionMorceaux) and fonctionMorceaux[i] != "":
+            text += "$4" + str(fonctionMorceaux[i])
+        else:
+            text += "$4070"
+
+        if text != "700 ":
+            resultats.append(text)
+
+    return "\n".join(resultats) + "\n"
     
     def _normaliser_casse(self, text):
         if text is None:
@@ -784,10 +802,9 @@ class Fiche:
                auteurs += [str(self._normaliser_casse(cv))
                for cv in co_auteur_morceaux if cv]
                text += "$f" + ",".join(auteurs)
-
-            auteurs_secondaires = [str(self._normaliser_casse(sv)) for sv in auteur_secondaire_morceaux if sv]
-                if auteurs_secondaires:
-                    text += "$g" + ",".join(auteurs_secondaires)
+			   auteurs_secondaires = [str(self._normaliser_casse(sv)) for sv in auteur_secondaire_morceaux if sv]
+               if auteurs_secondaires:
+				   text += "$g" + ",".join(auteurs_secondaires)
              
             if numero_volume_val != "":
                      text += ("$h" + str(numero_volume_val))
