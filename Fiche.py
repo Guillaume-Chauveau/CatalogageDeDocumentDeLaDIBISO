@@ -685,7 +685,7 @@ class Fiche:
         lettres = [c for c in text if c.isalpha()]
         if lettres and all(c.isupper() for c in lettres):
             text = text.lower()
-        return text[0].upper() + text[1:]
+        return text.title()
 
     def _split_article_debut_titre(self, titre):
         if titre is None:
@@ -797,7 +797,7 @@ class Fiche:
         lettres = [c for c in text if c.isalpha()]
         if lettres and all(c.isupper() for c in lettres):
             text = text.lower()
-        return text[0].upper() + text[1:]
+        return text.title()
 
 
     def _retirerLeDernierPointVigule(self,text):
