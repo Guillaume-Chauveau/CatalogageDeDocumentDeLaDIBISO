@@ -525,7 +525,7 @@ class Fiche:
             section = ""
             reference=""
 
-        text="008 $aAax3\n104 ##$ak$bzy$cy$dba$ffre\n106 ##$ar\n181 ##$P01$ctxt\n182 ##$P01$cn\n183 ##$P01$anga\n"
+        text="008 $aAax3\n104 ##$ak$by$cy$dba$ffre\n106 ##$ar\n181 ##$P01$ctxt\n182 ##$P01$cn\n183 ##$P01$anga\n"
 
         if article != "" or titre != "" or auteur != "" or complementTitre != "":
             text +=self._champs200(article, titre, auteur, complementTitre, numeroVolume, coAuteur, auteurSecondaire)
