@@ -118,7 +118,7 @@ class Ui_centralwidget(object):
 
     def retranslateUi(self, centralwidget):
         centralwidget.setWindowTitle(QCoreApplication.translate("centralwidget", u"Dialog", None))
-        self.label_2.setText(QCoreApplication.translate("centralwidget", u"liste des champs scientifique", None))
+        self.label_2.setText(QCoreApplication.translate("centralwidget", u"liste des champs scientifiques", None))
         self.ChampsScientifiquePlus.setText(QCoreApplication.translate("centralwidget", u"+", None))
         self.ChampsScientifiqueMoins.setText(QCoreApplication.translate("centralwidget", u"-", None))
         self.label.setText(QCoreApplication.translate("centralwidget", u"Cr\u00e9er un nouveau champs scientifique", None))
