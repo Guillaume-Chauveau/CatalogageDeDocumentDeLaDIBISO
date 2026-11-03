@@ -655,7 +655,7 @@ class Fiche:
         return "\n".join(resultats)+"\n"
 
     def _champs700(self, premierAuteur, fonctionAuteur):
-		PREFIXES_NOM = {"le", "la", "les", "the", "mc", "de", "des"}
+        PREFIXES_NOM = {"le", "la", "les", "the", "mc", "de", "des"}
         premierAuteurMorceaux, fonctionMorceaux = self._decouperMorceaux(premierAuteur, fonctionAuteur)
         resultats = []
         max_len = max([len(premierAuteurMorceaux), len(fonctionMorceaux), 0])
