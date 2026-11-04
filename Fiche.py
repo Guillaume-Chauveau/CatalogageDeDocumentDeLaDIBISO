@@ -786,28 +786,26 @@ class Fiche:
 
             text = "200 "
             if article_val != "":
-	            text += ("1#$a" + str(article_val) + " @" + str(titre_val))
+                text += ("1#$a" + str(article_val) + " @" + str(titre_val))
             else:
                 text += ("1#$a@" + str(titre_val))
 
             if complement_val != "":
-                complements = [c.strip() for c in complement_val.split(";") if c.strip()]    
-	            for complement in complements:        
-            	    text += "$e" + complement
+                complements = [c.strip() for c in complement_val.split(";") if c.strip()]
+                for complement in complements:
+                    text += "$e" + complement
 
             if auteur_val != "":
-               auteurs = [str(auteur_val)]
-               auteurs += [str(self._normaliser_casse(cv))
-               for cv in co_auteur_morceaux if cv]
-               text += "$f" + ",".join(auteurs)
-			   auteurs_secondaires = [str(self._normaliser_casse(sv)) for sv in auteur_secondaire_morceaux if sv]
-               if auteurs_secondaires:
-				   text += "$g" + ",".join(auteurs_secondaires)
-             
+                auteurs = [str(auteur_val)]
+                auteurs += [str(self._normaliser_casse(cv)) for cv in co_auteur_morceaux if cv]
+                text += "$f" + ",".join(auteurs)
+                auteurs_secondaires = [str(self._normaliser_casse(sv)) for sv in auteur_secondaire_morceaux if sv]
+                if auteurs_secondaires:
+                    text += "$g" + ",".join(auteurs_secondaires)
             if numero_volume_val != "":
-                     text += ("$h" + str(numero_volume_val))
+                text += ("$h" + str(numero_volume_val))
             if text != "200 ":
-                    resultats.append(text)
+                resultats.append(text)
         return "\n".join(resultats)+"\n"
                 
 
