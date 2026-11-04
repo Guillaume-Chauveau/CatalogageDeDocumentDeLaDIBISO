@@ -835,17 +835,15 @@ class Fiche:
 
     def _formatagePourVilleEditeurAnnee(self,ville,editeur,annee):
         ville = [v.strip() for v in ville.split(";") if v.strip()]
-        editeurs = [e.strip().replace(";", ",")
-        for e in re.split(r"\bet\b", editeur, flags=re.IGNORECASE)
-        if e.strip()]
+        editeurs = [e.strip().replace(";", ",") for e in re.split(r"\bet\b", editeur, flags=re.IGNORECASE) if e.strip()]
         annee = [a.strip() for a in annee.split(",") if a.strip()]
         text = ""
         for i in range(max(len(ville), len(editeur), len(annee))):
             text += "214 #0"
-            if i == 0 and ville:        
-		        text += "$a" + " $a".join(ville)
-	        for e in editeurs:
-        	    text += "$c" + e
+            if i == 0 and ville:
+                text += "$a" + " $a".join(ville)
+            for e in editeurs:
+                text += "$c" + e
             if annee != "":
                 text += ("$d" + str(annee[i]) if i < len(annee) else "")
             text += ","
