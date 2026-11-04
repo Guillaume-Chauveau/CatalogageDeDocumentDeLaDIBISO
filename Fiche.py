@@ -655,13 +655,12 @@ class Fiche:
         return "\n".join(resultats)+"\n"
 
     def _champs700(self, premierAuteur, fonctionAuteur):
-		PREFIXES_NOM = {"le", "la", "les", "the", "mc", "de", "des"}
-		premierAuteurMorceaux, fonctionMorceaux = self._decouperMorceaux(
-        premierAuteur, fonctionAuteur)
+        PREFIXES_NOM = {"le", "la", "les", "the", "mc", "de", "des"}
+        premierAuteurMorceaux, fonctionMorceaux = self._decouperMorceaux(premierAuteur, fonctionAuteur)
         resultats = []
         max_len = max(len(premierAuteurMorceaux), len(fonctionMorceaux), 0)
-		for i in range(max_len):
-			text = "700 "
+        for i in range(max_len):
+            text = "700 "
             if i < len(premierAuteurMorceaux) and premierAuteurMorceaux[i] != "":
                 mots = premierAuteurMorceaux[i].split()
                 if not mots:
@@ -669,30 +668,27 @@ class Fiche:
                     partie_b = ""
                 else:
                     premier = mots[0].casefold()
-
+                    
                     if premier in PREFIXES_NOM and len(mots) > 1:
                         partie_a = " ".join(mots[:2])
                         partie_b = " ".join(mots[2:])
                     else:
                         partie_a = mots[0]
                         partie_b = " ".join(mots[1:])
-
                 text += "#1$a" + str(
                     self._majusculeEnDebutDeCaracteristique(partie_a)
                 )
-
                 if partie_b:
                     text += "$b" + str(
                         self._majusculeEnDebutDeCaracteristique(partie_b)
                     )
-
-             if i < len(fonctionMorceaux) and fonctionMorceaux[i] != "":
+            if i < len(fonctionMorceaux) and fonctionMorceaux[i] != "":
                 text += "$4" + str(fonctionMorceaux[i])
-			 else:
+            else:
                 text += "$4070"
-             if text != "700 ":
+            if text != "700 ":
                 resultats.append(text)
-		return "\n".join(resultats) + "\n"
+        return "\n".join(resultats) + "\n"
     
     def _normaliser_casse(self, text):
         if text is None:
