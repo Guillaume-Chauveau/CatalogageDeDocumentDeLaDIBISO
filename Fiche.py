@@ -654,48 +654,40 @@ class Fiche:
                 resultats.append(text)
         return "\n".join(resultats)+"\n"
 
-        def _champs700(self, premierAuteur, fonctionAuteur):
-			PREFIXES_NOM = {"le", "la", "les", "the", "mc", "de", "des"}
-			premierAuteurMorceaux, fonctionMorceaux = self._decouperMorceaux(
-            premierAuteur, fonctionAuteur)
-            resultats = []
-            max_len = max(len(premierAuteurMorceaux), len(fonctionMorceaux), 0)
-		    for i in range(max_len):
-				text = "700 "
-
+    def _champs700(self, premierAuteur, fonctionAuteur):
+        PREFIXES_NOM = {"le", "la", "les", "the", "mc", "de", "des"}
+        premierAuteurMorceaux, fonctionMorceaux = self._decouperMorceaux(premierAuteur, fonctionAuteur)
+        resultats = []
+        max_len = max(len(premierAuteurMorceaux), len(fonctionMorceaux), 0)
+        for i in range(max_len):
+            text = "700 "
             if i < len(premierAuteurMorceaux) and premierAuteurMorceaux[i] != "":
                 mots = premierAuteurMorceaux[i].split()
-
                 if not mots:
                     partie_a = ""
                     partie_b = ""
                 else:
                     premier = mots[0].casefold()
-
+                    
                     if premier in PREFIXES_NOM and len(mots) > 1:
                         partie_a = " ".join(mots[:2])
                         partie_b = " ".join(mots[2:])
                     else:
                         partie_a = mots[0]
                         partie_b = " ".join(mots[1:])
-
                 text += "#1$a" + str(
                     self._majusculeEnDebutDeCaracteristique(partie_a)
                 )
-
                 if partie_b:
                     text += "$b" + str(
                         self._majusculeEnDebutDeCaracteristique(partie_b)
                     )
-
             if i < len(fonctionMorceaux) and fonctionMorceaux[i] != "":
                 text += "$4" + str(fonctionMorceaux[i])
             else:
                 text += "$4070"
-
             if text != "700 ":
                 resultats.append(text)
-
         return "\n".join(resultats) + "\n"
     
     def _normaliser_casse(self, text):
@@ -794,28 +786,26 @@ class Fiche:
 
             text = "200 "
             if article_val != "":
-	            text += ("1#$a" + str(article_val) + " @" + str(titre_val))
+                text += ("1#$a" + str(article_val) + " @" + str(titre_val))
             else:
                 text += ("1#$a@" + str(titre_val))
 
             if complement_val != "":
-                complements = [c.strip() for c in complement_val.split(";") if c.strip()]    
-	            for complement in complements:        
-            	    text += "$e" + complement
+                complements = [c.strip() for c in complement_val.split(";") if c.strip()]
+                for complement in complements:
+                    text += "$e" + complement
 
             if auteur_val != "":
-               auteurs = [str(auteur_val)]
-               auteurs += [str(self._normaliser_casse(cv))
-               for cv in co_auteur_morceaux if cv]
-               text += "$f" + ",".join(auteurs)
-			   auteurs_secondaires = [str(self._normaliser_casse(sv)) for sv in auteur_secondaire_morceaux if sv]
-               if auteurs_secondaires:
-				   text += "$g" + ",".join(auteurs_secondaires)
-             
+                auteurs = [str(auteur_val)]
+                auteurs += [str(self._normaliser_casse(cv)) for cv in co_auteur_morceaux if cv]
+                text += "$f" + ",".join(auteurs)
+                auteurs_secondaires = [str(self._normaliser_casse(sv)) for sv in auteur_secondaire_morceaux if sv]
+                if auteurs_secondaires:
+                    text += "$g" + ",".join(auteurs_secondaires)
             if numero_volume_val != "":
-                     text += ("$h" + str(numero_volume_val))
+                text += ("$h" + str(numero_volume_val))
             if text != "200 ":
-                    resultats.append(text)
+                resultats.append(text)
         return "\n".join(resultats)+"\n"
                 
 
@@ -845,17 +835,15 @@ class Fiche:
 
     def _formatagePourVilleEditeurAnnee(self,ville,editeur,annee):
         ville = [v.strip() for v in ville.split(";") if v.strip()]
-        editeurs = [e.strip().replace(";", ",")
-        for e in re.split(r"\bet\b", editeur, flags=re.IGNORECASE)
-        if e.strip()]
+        editeurs = [e.strip().replace(";", ",") for e in re.split(r"\bet\b", editeur, flags=re.IGNORECASE) if e.strip()]
         annee = [a.strip() for a in annee.split(",") if a.strip()]
         text = ""
         for i in range(max(len(ville), len(editeur), len(annee))):
             text += "214 #0"
-            if i == 0 and ville:        
-		        text += "$a" + " $a".join(ville)
-	        for e in editeurs:
-        	    text += "$c" + e
+            if i == 0 and ville:
+                text += "$a" + " $a".join(ville)
+            for e in editeurs:
+                text += "$c" + e
             if annee != "":
                 text += ("$d" + str(annee[i]) if i < len(annee) else "")
             text += ","
