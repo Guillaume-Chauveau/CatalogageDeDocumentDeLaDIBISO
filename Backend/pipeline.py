@@ -25,8 +25,8 @@ API_KEY       = "Dummy Key"
 MODEL_NAME    = "gemma-4-31b"   # <-- modèle VISION utilisé pour la passe 1 (extraction)
 # Modèle TEXTE (sans image) utilisé pour la passe 2 (enrichissement : parsing des
 # noms d'auteurs, domaine scientifique, romanisation optionnelle). À adapter au nom
-# exact exposé par l'endpoint Aristote pour gpt-oss (ex: "gpt-oss-120b", "gpt-oss-20b"...).
-ENRICHMENT_MODEL_NAME = "gpt-oss-120b"
+# exact exposé par l'endpoint Aristote pour mistral.
+ENRICHMENT_MODEL_NAME = "mistral-small-4-119b"
 TOP_LOGPROBS  = 5               # nombre d'alternatives par token à conserver
 
 
@@ -191,7 +191,7 @@ class AristoteDocumentAnalyzer:
         directeur(s) éditorial/scientifique explicites, tous distincts des
         auteurs).
       - Passe 2 (texte seul, modèle `enrichment_model`, typiquement un
-        modèle de raisonnement type gpt-oss) : ENRICHISSEMENT systématique
+        modèle de raisonnement) : ENRICHISSEMENT systématique
         — décomposition prénom/nom de chaque auteur ("authors_parsed") et
         identification du domaine scientifique ("scientific_field"). La
         romanisation reste une tâche OPTIONNELLE ajoutée au prompt/schéma
@@ -472,7 +472,7 @@ class AristoteDocumentAnalyzer:
         if logprobs_error:
             result["logprobs_error"] = logprobs_error
 
-        # --- Passe 2 : enrichissement (modèle texte, ex: gpt-oss) ---
+        # --- Passe 2 : enrichissement (modèle texte) ---
         # Toujours tentée dès qu'il y a un minimum de contenu exploitable en sortie
         # de la passe 1 (titre ou auteurs). Produit systématiquement :
         #   - "authors_parsed" : décomposition prénom / nom de famille par auteur
@@ -654,7 +654,7 @@ class AristoteDocumentAnalyzer:
     ) -> tuple[str, Optional[List[Dict[str, Any]]], Optional[str]]:
         """
         Passe 2, TEXTE SEUL (pas d'image), exécutée sur `self.enrichment_model`
-        (modèle de raisonnement texte, ex: gpt-oss) plutôt que sur le modèle
+        (modèle de raisonnement texte) plutôt que sur le modèle
         vision de la passe 1. Deux tâches systématiques :
 
           1. "authors_parsed" : décompose chaque auteur listé dans "authors"
@@ -768,7 +768,7 @@ class AristoteDocumentAnalyzer:
         _generate_enrichment (texte seul, passe 2). `model` permet de
         surcharger `self.model` (utilisé par défaut) — la passe 2 passe ici
         `self.enrichment_model` pour router vers un modèle texte distinct
-        (ex: gpt-oss) plutôt que le modèle vision.
+        plutôt que le modèle vision.
 
         Retourne (raw_text, token_logprobs, logprobs_error).
         token_logprobs est une liste de dicts:
@@ -804,7 +804,7 @@ class AristoteDocumentAnalyzer:
             content = message.content
 
             if content is None:
-                # Cas typique des modèles de raisonnement (ex: gpt-oss) : le contenu
+                # Cas typique des modèles de raisonnement : le contenu
                 # final peut être vide si le modèle a épuisé max_tokens pendant sa
                 # phase de raisonnement (finish_reason == "length"), ou si le
                 # contenu se trouve dans un champ séparé (ex: reasoning_content)
@@ -826,7 +826,7 @@ class AristoteDocumentAnalyzer:
         content = message.content
 
         if content is None:
-            # Cas typique des modèles de raisonnement (ex: gpt-oss) : le contenu
+            # Cas typique des modèles de raisonnement : le contenu
             # final peut être vide si le modèle a épuisé max_tokens pendant sa
             # phase de raisonnement (finish_reason == "length"), ou si le
             # contenu se trouve dans un champ séparé (ex: reasoning_content)
@@ -1488,7 +1488,7 @@ def main():
     parser.add_argument("--model",   type=str, default=MODEL_NAME,
                         help="Modèle VISION utilisé pour la passe 1 (extraction)")
     parser.add_argument("--enrichment-model", type=str, default=ENRICHMENT_MODEL_NAME,
-                        help="Modèle TEXTE utilisé pour la passe 2 (enrichissement, ex: gpt-oss)")
+                        help="Modèle TEXTE utilisé pour la passe 2 (enrichissement)
     parser.add_argument("--top-logprobs", type=int, default=TOP_LOGPROBS,
                         help="Nombre d'alternatives de tokens à conserver par position")
 
