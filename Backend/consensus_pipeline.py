@@ -26,8 +26,8 @@ Usage :
         --input-dir ./mes_images \
         --output-dir ./outputs/consensus \
         --model-a gemma-4-31b \
-        --model-b qwen-3.6-35b-instruct \
-        --text-model gpt-oss-120b \
+        --model-b qwen-3.8-27b \
+        --text-model mistral-small-4-119b \
         --base-url https://llm.aristote.education/v1 \
         --api-key "TA_CLE"
 
@@ -529,8 +529,8 @@ def main():
     parser.add_argument("--input-dir", type=str, required=True)
     parser.add_argument("--output-dir", type=str, default="./outputs/consensus")
     parser.add_argument("--model-a", type=str, required=True, help="Premier modèle vision (ex: gemma-4-31b)")
-    parser.add_argument("--model-b", type=str, required=True, help="Second modèle vision (ex: qwen-3.6-35b-instruct)")
-    parser.add_argument("--text-model", type=str, default="gpt-oss-120b",
+    parser.add_argument("--model-b", type=str, required=True, help="Second modèle vision (ex: qwen-3.8-27b)")
+    parser.add_argument("--text-model", type=str, default="mistral-small-4-119b",
                          help="Modèle texte pour l'enrichissement ET l'arbitrage des désaccords")
     parser.add_argument("--base-url", type=str, default="https://llm.aristote.education/v1")
     parser.add_argument("--api-key", type=str, default="Dummy Key")
