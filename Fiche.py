@@ -784,6 +784,18 @@ class Fiche:
             co_auteur_val = self._normaliser_casse(co_auteur_val)
             auteur_secondaire_val = self._normaliser_casse(auteur_secondaire_val)
 
+            # Ignore les morceaux entièrement vides.
+            if not any((
+            article_val,
+            titre_val,
+            complement_val,
+            auteur_val,
+            numero_volume_val,
+            co_auteur_val,
+            auteur_secondaire_val,)):
+                continue
+        
+
             text = "200 "
             if article_val != "":
                 text += ("1#$a" + str(article_val) + " @" + str(titre_val))
@@ -797,16 +809,15 @@ class Fiche:
 
             if auteur_val != "":
                 auteurs = [str(auteur_val)]
-                auteurs += [str(self._normaliser_casse(cv)) for cv in co_auteur_morceaux if cv]
+                if co_auteur_val and co_auteur_val not in auteurs:
+                    auteurs.append(str(co_auteur_val))
                 text += "$f" + ",".join(auteurs)
-                auteurs_secondaires = [str(self._normaliser_casse(sv)) for sv in auteur_secondaire_morceaux if sv]
-                if auteurs_secondaires:
-                    text += "$g" + ",".join(auteurs_secondaires)
+                if auteur_secondaires_val:
+                    text += "$g" + str(auteur_secondaire_val)
             if numero_volume_val != "":
                 text += ("$h" + str(numero_volume_val))
-            if text != "200 ":
-                resultats.append(text)
-        return "\n".join(resultats)+"\n"
+            resultats.append(text)
+        return "\n".join(resultats)+ ("\n" if resultats else "")
                 
 
     def _majusculeEnDebutDeCaracteristique(self, text):
@@ -835,19 +846,15 @@ class Fiche:
 
     def _formatagePourVilleEditeurAnnee(self,ville,editeur,annee):
         ville = [v.strip() for v in ville.split(";") if v.strip()]
-        editeurs = [e.strip().replace(";", ",") for e in re.split(r"\bet\b", editeur, flags=re.IGNORECASE) if e.strip()]
+        editeurs = [e.strip() for e in re.split(r"\bet\b", editeur, flags=re.IGNORECASE) if e.strip()]
         annee = [a.strip() for a in annee.split(",") if a.strip()]
-        text = ""
-        for i in range(max(len(ville), len(editeur), len(annee))):
-            text += "214 #0"
-            if i == 0 and ville:
-                text += "$a" + " $a".join(ville)
-            for e in editeurs:
-                text += "$c" + e
-            if annee != "":
-                text += ("$d" + str(annee[i]) if i < len(annee) else "")
-            text += ","
-        text = text.rstrip(",")
+        text = "214 #0"
+        if ville:
+            text += "$a" + "$a".join(ville)
+        for e in editeurs:
+            text += " $c" + e
+        if annee:
+            text += "$d" + annee[0]
         return text
 
 
